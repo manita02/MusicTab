@@ -2,12 +2,18 @@
     "name": "@music-tab/domain",
     "version": "1.0.0",
     "main": "dist/index.js",
+    "type": "commonjs",
     "scripts": {
-        "build": "tsc -p tsconfig.json",
-        "test": "vitest"
+      "clean": "rm -rf dist",
+      "build": "npm run clean && tsc -p tsconfig.json",
+      "test": "vitest",
+      "test:watch": "vitest --watch",
+      "test:coverage": "vitest run --coverage"
     },
     "devDependencies": {
-        "typescript": "^5.3.3",
-        "vitest": "^0.34.0"
+      "typescript": "^5.3.3",
+      "vitest": "^0.34.0",
+      "@types/node": "^20.5.0"
     }
 }
+  
