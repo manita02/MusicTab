@@ -8,6 +8,8 @@ describe("Tab entity (domain TDD)", () => {
     const tab = Tab.create(
       "Song 1",
       1,
+      2, // genreId
+      3, // instrumentId
       "http://example.com/tab.pdf",
       "http://youtube.com/video",
       "http://example.com/img.jpg"
@@ -16,6 +18,8 @@ describe("Tab entity (domain TDD)", () => {
     expect(tab.id).toBeNull();
     expect(tab.title).toBe("Song 1");
     expect(tab.userId).toBe(1);
+    expect(tab.genreId).toBe(2);
+    expect(tab.instrumentId).toBe(3);
     expect(tab.urlPdf.getValue()).toBe("http://example.com/tab.pdf");
     expect(tab.urlYoutube.getValue()).toBe("http://youtube.com/video");
     expect(tab.urlImg.getValue()).toBe("http://example.com/img.jpg");
@@ -24,25 +28,31 @@ describe("Tab entity (domain TDD)", () => {
 
   it("throws if title is empty", () => {
     expect(() =>
-      Tab.create("", 1, "http://example.com/tab.pdf", "http://youtube.com/video", "http://example.com/img.jpg")
+      Tab.create("", 1, 2, 3, "http://example.com/tab.pdf", "http://youtube.com/video", "http://example.com/img.jpg")
     ).toThrow(DomainError);
   });
 
-  it("throws if urlPdf is missing", () => {
+  it("throws if genreId or instrumentId are invalid", () => {
     expect(() =>
-      Tab.create("Song", 1, "", "http://youtube.com/video", "http://example.com/img.jpg")
+      Tab.create("Song", 1, 0, 1, "http://example.com/tab.pdf", "http://youtube.com/video", "http://example.com/img.jpg")
+    ).toThrow(DomainError);
+
+    expect(() =>
+      Tab.create("Song", 1, 1, -5, "http://example.com/tab.pdf", "http://youtube.com/video", "http://example.com/img.jpg")
     ).toThrow(DomainError);
   });
 
-  it("throws if urlYoutube is missing", () => {
+  it("throws if urlPdf, urlYoutube or urlImg are missing", () => {
     expect(() =>
-      Tab.create("Song", 1, "http://example.com/tab.pdf", "", "http://example.com/img.jpg")
+      Tab.create("Song", 1, 1, 1, "", "http://youtube.com/video", "http://example.com/img.jpg")
     ).toThrow(DomainError);
-  });
 
-  it("throws if urlImg is missing", () => {
     expect(() =>
-      Tab.create("Song", 1, "http://example.com/tab.pdf", "http://youtube.com/video", "")
+      Tab.create("Song", 1, 1, 1, "http://example.com/tab.pdf", "", "http://example.com/img.jpg")
+    ).toThrow(DomainError);
+
+    expect(() =>
+      Tab.create("Song", 1, 1, 1, "http://example.com/tab.pdf", "http://youtube.com/video", "")
     ).toThrow(DomainError);
   });
 
@@ -50,6 +60,8 @@ describe("Tab entity (domain TDD)", () => {
     const tab = Tab.create(
       "Song",
       2,
+      1,
+      1,
       "http://example.com/tab.pdf",
       "http://youtube.com/video",
       "http://example.com/img.jpg"
@@ -65,5 +77,26 @@ describe("Tab entity (domain TDD)", () => {
     expect(tab.canEdit(admin)).toBe(true);
     expect(tab.canEdit(owner)).toBe(true);
     expect(tab.canEdit(other)).toBe(false);
+  });
+
+  it("rehydrates a tab from DB", () => {
+    const tab = Tab.rehydrate(
+      10,
+      "Song DB",
+      5,
+      2,
+      3,
+      "http://example.com/tab.pdf",
+      "http://youtube.com/video",
+      "http://example.com/img.jpg",
+      new Date("2024-01-01")
+    );
+
+    expect(tab.id).toBe(10);
+    expect(tab.title).toBe("Song DB");
+    expect(tab.userId).toBe(5);
+    expect(tab.genreId).toBe(2);
+    expect(tab.instrumentId).toBe(3);
+    expect(tab.createdAt).toEqual(new Date("2024-01-01"));
   });
 });
