@@ -1,14 +1,32 @@
-.vscode/
-
+# Node & Yarn
 node_modules/
-dist/
-.env
-*.log
-
+.pnp.cjs
 .yarn/cache
 .yarn/unplugged
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.loader.mjs
 
+# Build output
+dist/
 
+# Environment
+.env
+
+# Logs
+*.log
+
+# VSCode
+.vscode/
+
+# Prisma generated client
+/src/generated/prisma
+prisma/migrations/migration.lock.toml
+
+# OS files
+.DS_Store
+
+# temp or coverage files
+/temp
+.tmp
+/coverage
