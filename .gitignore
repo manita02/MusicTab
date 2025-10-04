@@ -19,14 +19,15 @@ dist/
 # VSCode
 .vscode/
 
-# Prisma generated client
-/src/generated/prisma
-prisma/migrations/migration.lock.toml
+# Prisma
+apps/backend/prisma/*.db
+apps/backend/src/generated/prisma
+apps/backend/prisma/migrations/migration_lock.toml
 
 # OS files
 .DS_Store
 
-# temp or coverage files
+# Temp / coverage files
 /temp
 .tmp
 /coverage
