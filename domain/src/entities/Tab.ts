@@ -7,6 +7,8 @@ export class Tab {
     public readonly id: number | null,
     public readonly title: string,
     public readonly userId: number,
+    public readonly genreId: number,
+    public readonly instrumentId: number,
     public readonly urlPdf: Url,
     public readonly urlYoutube: Url,
     public readonly urlImg: Url,
@@ -16,6 +18,8 @@ export class Tab {
   static create(
     title: string,
     userId: number,
+    genreId: number,
+    instrumentId: number,
     urlPdf: string,
     urlYoutube: string,
     urlImg: string
@@ -36,17 +40,27 @@ export class Tab {
       throw new DomainError("TabError", "Image URL is obligatory");
     }
 
+    if (!Number.isInteger(genreId) || genreId <= 0) {
+      throw new DomainError("TabError", "Invalid genre ID");
+    }
+
+    if (!Number.isInteger(instrumentId) || instrumentId <= 0) {
+      throw new DomainError("TabError", "Invalid instrument ID");
+    }
+
     const pdf = Url.create(urlPdf);
     const youtube = Url.create(urlYoutube);
     const img = Url.create(urlImg);
 
-    return new Tab(null, title, userId, pdf, youtube, img);
+    return new Tab(null, title, userId, genreId, instrumentId, pdf, youtube, img);
   }
 
   static rehydrate(
     id: number,
     title: string,
     userId: number,
+    genreId: number,
+    instrumentId: number,
     urlPdf: string,
     urlYoutube: string,
     urlImg: string,
@@ -56,7 +70,7 @@ export class Tab {
     const youtube = Url.create(urlYoutube);
     const img = Url.create(urlImg);
 
-    return new Tab(id, title, userId, pdf, youtube, img, createdAt ?? new Date());
+    return new Tab(id, title, userId, genreId, instrumentId, pdf, youtube, img, createdAt ?? new Date());
   }
 
   canEdit(user: User): boolean {

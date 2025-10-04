@@ -6,52 +6,54 @@ import { Role, User } from "../src/entities/User";
 import { IUserRepository } from "../src/repositories/IUserRepository";
 import { DomainError } from "../src/errors/DomainError";
 
-/** In-memory Tab repository for tests */
+/** In-memory Tab repository */
 class InMemoryTabRepository implements ITabRepository {
-    private tabs: Tab[] = [];
-    private idCounter = 1;
-  
-    async save(tab: Tab): Promise<Tab> {
-      if (tab.id === null) {
-        const newTab = Tab.rehydrate(
-          this.idCounter++,
-          tab.title,
-          tab.userId,
-          tab.urlPdf.getValue(),
-          tab.urlYoutube.getValue(),
-          tab.urlImg.getValue(),
-          tab.createdAt
-        );
-        this.tabs.push(newTab);
-        return newTab;
-      } else {
-        const index = this.tabs.findIndex(t => t.id === tab.id);
-        if (index >= 0) this.tabs[index] = tab;
-        return tab;
-      }
+  private tabs: Tab[] = [];
+  private idCounter = 1;
+
+  async save(tab: Tab): Promise<Tab> {
+    if (tab.id === null) {
+      const newTab = Tab.rehydrate(
+        this.idCounter++,
+        tab.title,
+        tab.userId,
+        tab.genreId,
+        tab.instrumentId,
+        tab.urlPdf.getValue(),
+        tab.urlYoutube.getValue(),
+        tab.urlImg.getValue(),
+        tab.createdAt
+      );
+      this.tabs.push(newTab);
+      return newTab;
+    } else {
+      const index = this.tabs.findIndex(t => t.id === tab.id);
+      if (index >= 0) this.tabs[index] = tab;
+      return tab;
     }
-  
-    async findById(id: number): Promise<Tab | null> {
-      return this.tabs.find(t => t.id === id) ?? null;
-    }
-  
-    async findByUser(userId: number): Promise<Tab[]> {
-      return this.tabs.filter(t => t.userId === userId);
-    }
-  
-    async countByUserAndDate(userId: number, date: Date): Promise<number> {
-      const dateString = date.toISOString().split("T")[0];
-      return this.tabs.filter(
-        t => t.userId === userId && t.createdAt.toISOString().split("T")[0] === dateString
-      ).length;
-    }
-  
-    async delete(id: number): Promise<void> {
-      this.tabs = this.tabs.filter(t => t.id !== id);
-    }
+  }
+
+  async findById(id: number): Promise<Tab | null> {
+    return this.tabs.find(t => t.id === id) ?? null;
+  }
+
+  async findByUser(userId: number): Promise<Tab[]> {
+    return this.tabs.filter(t => t.userId === userId);
+  }
+
+  async countByUserAndDate(userId: number, date: Date): Promise<number> {
+    const dateString = date.toISOString().split("T")[0];
+    return this.tabs.filter(
+      t => t.userId === userId && t.createdAt.toISOString().split("T")[0] === dateString
+    ).length;
+  }
+
+  async delete(id: number): Promise<void> {
+    this.tabs = this.tabs.filter(t => t.id !== id);
+  }
 }
-  
-/** In-memory User repo for tests (igual que RegisterUser.spec.ts) */
+
+/** In-memory User repo */
 class InMemoryUserRepository implements IUserRepository {
   private users: User[] = [];
 
@@ -96,6 +98,8 @@ describe("CreateTab use case (domain TDD)", () => {
       const tab = await useCase.execute({
         title: `Song ${i + 1}`,
         userId: normalUser.id!,
+        genreId: 1,
+        instrumentId: 1,
         urlPdf: "http://example.com/tab.pdf",
         urlYoutube: "http://youtube.com/video",
         urlImg: "http://example.com/img.jpg"
@@ -107,6 +111,8 @@ describe("CreateTab use case (domain TDD)", () => {
       useCase.execute({
         title: "Song 4",
         userId: normalUser.id!,
+        genreId: 1,
+        instrumentId: 1,
         urlPdf: "http://example.com/tab.pdf",
         urlYoutube: "http://youtube.com/video",
         urlImg: "http://example.com/img.jpg"
@@ -119,6 +125,8 @@ describe("CreateTab use case (domain TDD)", () => {
       const tab = await useCase.execute({
         title: `Admin Song ${i + 1}`,
         userId: adminUser.id!,
+        genreId: 2,
+        instrumentId: 2,
         urlPdf: "http://example.com/tab.pdf",
         urlYoutube: "http://youtube.com/video",
         urlImg: "http://example.com/img.jpg"
@@ -132,6 +140,8 @@ describe("CreateTab use case (domain TDD)", () => {
       useCase.execute({
         title: "Song X",
         userId: 999,
+        genreId: 1,
+        instrumentId: 1,
         urlPdf: "http://example.com/tab.pdf",
         urlYoutube: "http://youtube.com/video",
         urlImg: "http://example.com/img.jpg"
