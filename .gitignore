@@ -6,6 +6,7 @@ node_modules/
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.loader.mjs
+package-lock.json
 
 # Build output
 dist/
