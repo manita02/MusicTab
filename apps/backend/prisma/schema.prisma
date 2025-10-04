@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./music_tab.db"
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  username     String
+  email        String    @unique
+  passwordHash String
+  role         String
+  createdAt    DateTime  @default(now())
+  sessions     Session[]
+  tablaturas   Tab[]
+}
+
+model Genre {
+  id         Int    @id @default(autoincrement())
+  name       String
+  tablaturas Tab[]
+}
+
+model Instrument {
+  id         Int    @id @default(autoincrement())
+  name       String
+  tablaturas Tab[]
+}
+
+model Tab {
+  id           Int        @id @default(autoincrement())
+  title        String
+  urlYoutube   String?
+  urlImagen    String?
+  urlPdf       String
+  estado       String     @default("PENDING")
+  createdAt    DateTime   @default(now())
+  userId       Int
+  genreId      Int
+  instrumentId Int
+  instrument   Instrument @relation(fields: [instrumentId], references: [id])
+  genre        Genre      @relation(fields: [genreId], references: [id])
+  user         User       @relation(fields: [userId], references: [id])
+}
+
+model Session {
+  tokenId   String   @id
+  userId    Int
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id])
+}
