@@ -9,7 +9,7 @@ datasource db {
 
 model User {
   id           Int       @id @default(autoincrement())
-  username     String
+  username     String    @unique
   email        String    @unique
   passwordHash String
   role         String
@@ -20,23 +20,22 @@ model User {
 
 model Genre {
   id         Int    @id @default(autoincrement())
-  name       String
+  name       String @unique
   tablaturas Tab[]
 }
 
 model Instrument {
   id         Int    @id @default(autoincrement())
-  name       String
+  name       String @unique
   tablaturas Tab[]
 }
 
 model Tab {
   id           Int        @id @default(autoincrement())
-  title        String
+  title        String     @unique
   urlYoutube   String?
   urlImagen    String?
   urlPdf       String
-  estado       String     @default("PENDING")
   createdAt    DateTime   @default(now())
   userId       Int
   genreId      Int
