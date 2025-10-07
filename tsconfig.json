@@ -1,27 +1,19 @@
 {
-    "compilerOptions": {
-      "target": "ES2022",                  
-      "module": "CommonJS",                 
-      "lib": ["ES2022"],                    
-      "rootDir": "./src",                    
-      "outDir": "./dist",                    
-      "strict": true,                        
-      "esModuleInterop": true,               
-      "forceConsistentCasingInFileNames": true,
-      "skipLibCheck": true,                  
-      "moduleResolution": "Node",            
-      "resolveJsonModule": true,             
-      "allowSyntheticDefaultImports": true,  
-      "noImplicitAny": true,                 
-      "noUnusedLocals": true,                
-      "noUnusedParameters": true,            
-      "baseUrl": ".",                        
-      "paths": {
-        "@/*": ["src/*"]                    
-      }
-    },
-    "include": ["src", "tests"],            
-    "exclude": ["node_modules", "dist"]
-}  
-  
-  
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "baseUrl": "."
+  },
+  "include": ["apps/**/*", "domain/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
