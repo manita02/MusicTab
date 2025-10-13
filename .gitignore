@@ -32,3 +32,6 @@ apps/backend/prisma/migrations/migration_lock.toml
 /temp
 .tmp
 /coverage
+
+# TypeScript build info
+*.tsbuildinfo
