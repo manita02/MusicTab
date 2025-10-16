@@ -40,6 +40,21 @@ export class UserPrismaRepository implements IUserRepository {
     );
   }
 
+  async findByUsername(username: string): Promise<User | null> {
+    const record = await this.prisma.user.findUnique({
+      where: { username },
+    });
+    if (!record) return null;
+    return User.rehydrate(
+      record.id,
+      record.username,
+      record.email,
+      record.passwordHash,
+      record.role as Role,
+      record.createdAt
+    );
+  }
+  
   async save(user: User): Promise<User> {
     // si id existe, hace update; si no, create
     let record;
