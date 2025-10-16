@@ -12,14 +12,18 @@ export class RegisterUser {
   ) {}
 
   async execute(dto: DTO): Promise<User> {
-    const existing = await this.userRepo.findByEmail(dto.email.toLowerCase()); // Verify that a user with that email does not already exist
-    if (existing) {
+    const existingEmail = await this.userRepo.findByEmail(dto.email.toLowerCase());
+    if (existingEmail) {
       throw new ConflictError("Email already registered");
     }
+    const existingUsername = await this.userRepo.findByUsername(dto.username);
+    if (existingUsername) {
+      throw new ConflictError("Username already taken");
+    }
+    const hash = await this.passwordHasher.hash(dto.password);
+    const user = User.create(dto.username, dto.email, hash);
+    const saved = await this.userRepo.save(user);
 
-    const hash = await this.passwordHasher.hash(dto.password); // Generate the password hash (with IPasswordHasher)
-    const user = User.create(dto.username, dto.email, hash); // Create the User entity
-    const saved = await this.userRepo.save(user); // Save to repository (the actual implementation in infra will be Prisma/DB)
-    return saved; // Return the newly registered User
+    return saved;
   }
 }
