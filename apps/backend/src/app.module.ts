@@ -1,19 +1,22 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { TestUserController } from './controllers/test-user.controller';
 import { UserController } from './controllers/user.controller';
-import { UserPrismaRepository } from './repositories/user-prisma.repository';
 import { PrismaService } from './prisma/prisma.service';
-import { PasswordHasherService } from './services/password-hasher.service';
 import { AppService } from './app.service';
+import { UserPrismaRepository } from './repositories/user-prisma.repository';
+import { SessionPrismaRepository } from './repositories/session-prisma.repository';
+import { PasswordHasherService } from './services/password-hasher.service';
+import { TokenService } from './services/token.service';
 
 @Module({
-  controllers: [AppController, TestUserController, UserController],
+  controllers: [AppController, UserController],
   providers: [
     AppService,
-    UserPrismaRepository,
     PrismaService,
+    UserPrismaRepository,
+    SessionPrismaRepository,
     PasswordHasherService,
+    TokenService,
   ],
 })
 export class AppModule {}

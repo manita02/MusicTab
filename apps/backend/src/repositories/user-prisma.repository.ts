@@ -56,7 +56,7 @@ export class UserPrismaRepository implements IUserRepository {
   }
   
   async save(user: User): Promise<User> {
-    // si id existe, hace update; si no, create
+    // If id exists, update; if not, create
     let record;
     if (user.id) {
       record = await this.prisma.user.update({

@@ -1,14 +1,16 @@
-import { ITokenService } from "@domain/services/ITokenService";
-import * as jwt from "jsonwebtoken";
+import { Injectable } from '@nestjs/common';
+import { ITokenService } from '@domain/services/ITokenService';
+import * as jwt from 'jsonwebtoken';
 
+@Injectable()
 export class TokenService implements ITokenService {
-  private readonly secret = process.env.JWT_SECRET || "default_secret";
+  private readonly secret = 'super_secret_key';
 
-  async generate(payload: Record<string, any>, expiresInSeconds: number): Promise<string> {
+  async generate(payload: any, expiresInSeconds: number): Promise<string> {
     return jwt.sign(payload, this.secret, { expiresIn: expiresInSeconds });
   }
 
-  async verify(token: string): Promise<Record<string, any>> {
-    return jwt.verify(token, this.secret) as Record<string, any>;
+  async verify(token: string): Promise<any> {
+    return jwt.verify(token, this.secret);
   }
 }
