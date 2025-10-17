@@ -51,6 +51,10 @@ class InMemoryTabRepository implements ITabRepository {
   async delete(id: number): Promise<void> {
     this.tabs = this.tabs.filter(t => t.id !== id);
   }
+
+  async findByTitle(title: string): Promise<Tab | null> {
+    return this.tabs.find(t => t.title === title) ?? null;
+  }  
 }
 
 /** In-memory User repo */
@@ -75,6 +79,10 @@ class InMemoryUserRepository implements IUserRepository {
   async findByEmail(email: string) {
     return this.users.find(u => u.email.toString() === email) ?? null;
   }
+
+  async findByUsername(username: string): Promise<User | null> {
+    return this.users.find(u => u.username === username) ?? null;
+  }  
 }
 
 describe("CreateTab use case (domain TDD)", () => {

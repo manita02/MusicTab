@@ -36,6 +36,10 @@ class InMemoryUserRepository implements IUserRepository {
   async deleteById(id: number) {
     this.users = this.users.filter((u) => u.id !== id);
   }
+
+  async findByUsername(username: string): Promise<User | null> {
+    return this.users.find(u => u.username === username) ?? null;
+  }  
 }
 
 /** Fake hasher for tests */
