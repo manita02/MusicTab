@@ -22,7 +22,7 @@ export class TabController {
 
   constructor(
     private readonly userRepo: UserPrismaRepository,
-    private readonly tabRepo: TabPrismaRepository, // inyectado automáticamente
+    private readonly tabRepo: TabPrismaRepository,
   ) {
     this.createTab = new CreateTab(this.tabRepo, this.userRepo);
   }
@@ -30,7 +30,6 @@ export class TabController {
   @Post('create')
   async create(@Body() dto: CreateTabDTO) {
     try {
-      console.log('Payload recibido:', dto);
       const tab = await this.createTab.execute(dto);
       return {
         id: tab.id,

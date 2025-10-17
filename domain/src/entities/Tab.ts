@@ -36,7 +36,6 @@ export class Tab {
       throw new DomainError("TabError", "Invalid instrument ID");
     }
 
-    // Validar URLs con mensajes específicos
     const pdf = Url.create(urlPdf, "PDF URL");
     const youtube = Url.create(urlYoutube, "YouTube URL");
     const img = Url.create(urlImg, "Image URL");

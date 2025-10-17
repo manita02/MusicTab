@@ -70,8 +70,6 @@ export class TabPrismaRepository implements ITabRepository {
   }
 
   async countByUserAndDate(userId: number, date: Date): Promise<number> {
-    console.log('countByUserAndDate - userId:', userId, 'date:', date);
-  
     if (!this.prisma || !this.prisma.tab) {
       console.error('Prisma o prisma.tab es undefined!', this.prisma);
       throw new Error('Prisma o prisma.tab no está definido');
@@ -91,8 +89,7 @@ export class TabPrismaRepository implements ITabRepository {
         },
       },
     });
-  
-    console.log('Tabs encontrados hoy:', count);
+
     return count;
   }
   
