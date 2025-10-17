@@ -3,7 +3,7 @@ import { ISessionRepository } from '@domain/repositories/ISessionRepository';
 import { Session } from '@domain/entities/Session';
 import { PrismaService } from '../prisma/prisma.service';
 
-@Injectable() // 👈 NECESARIO PARA LA INYECCIÓN
+@Injectable()
 export class SessionPrismaRepository implements ISessionRepository {
   constructor(private readonly prisma: PrismaService) {}
 

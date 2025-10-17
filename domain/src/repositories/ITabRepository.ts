@@ -6,4 +6,5 @@ export interface ITabRepository {
   findByUser(userId: number): Promise<Tab[]>;
   countByUserAndDate(userId: number, date: Date): Promise<number>;
   delete(id: number): Promise<void>;
+  findByTitle(title: string): Promise<Tab | null>;
 }

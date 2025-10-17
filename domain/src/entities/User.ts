@@ -39,9 +39,4 @@ export class User {
   isAdmin() {
     return this.role === Role.ADMIN;
   }
-
-  public hola() {
-    console.log("Hola desde User!");
-  }
-  
 }

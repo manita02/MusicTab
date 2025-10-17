@@ -28,18 +28,6 @@ export class Tab {
       throw new DomainError("TabError", "Title cannot be empty");
     }
 
-    if (!urlPdf) {
-      throw new DomainError("TabError", "PDF of tab is obligatory");
-    }
-
-    if (!urlYoutube) {
-      throw new DomainError("TabError", "YouTube URL is obligatory");
-    }
-
-    if (!urlImg) {
-      throw new DomainError("TabError", "Image URL is obligatory");
-    }
-
     if (!Number.isInteger(genreId) || genreId <= 0) {
       throw new DomainError("TabError", "Invalid genre ID");
     }
@@ -48,9 +36,9 @@ export class Tab {
       throw new DomainError("TabError", "Invalid instrument ID");
     }
 
-    const pdf = Url.create(urlPdf);
-    const youtube = Url.create(urlYoutube);
-    const img = Url.create(urlImg);
+    const pdf = Url.create(urlPdf, "PDF URL");
+    const youtube = Url.create(urlYoutube, "YouTube URL");
+    const img = Url.create(urlImg, "Image URL");
 
     return new Tab(null, title, userId, genreId, instrumentId, pdf, youtube, img);
   }
@@ -66,9 +54,9 @@ export class Tab {
     urlImg: string,
     createdAt?: Date
   ): Tab {
-    const pdf = Url.create(urlPdf);
-    const youtube = Url.create(urlYoutube);
-    const img = Url.create(urlImg);
+    const pdf = Url.create(urlPdf, "PDF URL");
+    const youtube = Url.create(urlYoutube, "YouTube URL");
+    const img = Url.create(urlImg, "Image URL");
 
     return new Tab(id, title, userId, genreId, instrumentId, pdf, youtube, img, createdAt ?? new Date());
   }

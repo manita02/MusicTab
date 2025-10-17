@@ -33,6 +33,11 @@ export class CreateTab {
       }
     }
 
+    const existing = await this.tabRepo.findByTitle(dto.title);
+    if (existing) {
+      throw new DomainError(`A tab with the title "${dto.title}" already exists`);
+    }
+
     const tab = Tab.create(
       dto.title,
       dto.userId,

@@ -33,8 +33,8 @@ model Instrument {
 model Tab {
   id           Int        @id @default(autoincrement())
   title        String     @unique
-  urlYoutube   String?
-  urlImagen    String?
+  urlYoutube   String
+  urlImagen    String
   urlPdf       String
   createdAt    DateTime   @default(now())
   userId       Int
