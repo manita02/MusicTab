@@ -10,15 +10,24 @@ package-lock.json
 
 # Build output
 dist/
+dist-ssr
 
 # Environment
 .env
+*.local
 
 # Logs
+logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
 # VSCode
 .vscode/
+!.vscode/extensions.json
 
 # Prisma
 apps/backend/prisma/*.db
@@ -27,6 +36,11 @@ apps/backend/prisma/migrations/migration_lock.toml
 
 # OS files
 .DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 # Temp / coverage files
 /temp
