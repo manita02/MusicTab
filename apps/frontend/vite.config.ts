@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   test: {
     globals: true,
-    environment: 'jsdom', // para que React Testing Library funcione
+    environment: 'jsdom',
     setupFiles: './src/setupTests.ts'
   }
 })
