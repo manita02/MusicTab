@@ -49,3 +49,5 @@ apps/backend/prisma/migrations/migration_lock.toml
 
 # TypeScript build info
 *.tsbuildinfo
+*storybook.log
+storybook-static
