@@ -1335,6 +1335,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fortawesome/fontawesome-free@npm:^7.1.0":
+  version: 7.1.0
+  resolution: "@fortawesome/fontawesome-free@npm:7.1.0"
+  checksum: 10c0/3bcaf2c18f3b2ece0fb5640681f13051cb787d686ab444437b3605ba3dca9dce4c7c1f844d94b7ad011482ac20b2b387f3a4c33c2739b50c4425fe529ab7b050
+  languageName: node
+  linkType: hard
+
 "@humanfs/core@npm:^0.19.1":
   version: 0.19.1
   resolution: "@humanfs/core@npm:0.19.1"
@@ -6767,6 +6774,7 @@ __metadata:
   resolution: "frontend@workspace:apps/frontend"
   dependencies:
     "@eslint/js": "npm:^9.36.0"
+    "@fortawesome/fontawesome-free": "npm:^7.1.0"
     "@storybook/react-vite": "npm:9.1.13"
     "@testing-library/dom": "npm:^10.4.1"
     "@testing-library/jest-dom": "npm:^6"
