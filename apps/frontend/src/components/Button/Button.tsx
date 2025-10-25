@@ -1,26 +1,34 @@
 import React from "react";
-import "./Button.css";
+import ButtonMUI from "@mui/material/Button";
+import type { ButtonProps as MUIButtonProps } from "@mui/material/Button";
 
-type ButtonVariant = "primary" | "secondary" | "danger";
-
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+type MusicButtonProps = MUIButtonProps & {
+  variantType?: "primary" | "secondary" | "danger";
   label: string;
-  variant?: ButtonVariant;
-}
+};
 
-export const Button: React.FC<ButtonProps> = ({
+export const Button: React.FC<MusicButtonProps> = ({
   label,
-  variant = "primary",
-  disabled,
+  variantType = "primary",
   ...props
 }) => {
+  let color: MUIButtonProps["color"] = "primary";
+
+  if (variantType === "secondary") color = "secondary";
+  if (variantType === "danger") color = "warning";
+
   return (
-    <button
-      className={`btn ${variant}`}
-      disabled={disabled}
+    <ButtonMUI
+      variant="contained"
+      color={color}
       {...props}
+      sx={{
+        "&:hover": {
+          fontWeight: "bold",
+        },
+      }}
     >
       {label}
-    </button>
+    </ButtonMUI>
   );
 };
