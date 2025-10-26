@@ -28,16 +28,17 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   disabled = false,
   fullWidth = true,
 }) => {
+  const labelId = `${label.replace(/\s+/g, "-").toLowerCase()}-label`;
+
   return (
     <FormControl fullWidth={fullWidth} error={error} disabled={disabled}>
-      <InputLabel>{label}</InputLabel>
+      <InputLabel id={labelId}>{label}</InputLabel>
       <Select
+        labelId={labelId}
         value={value}
         onChange={onChange}
         label={label}
-        sx={{
-          borderRadius: "12px",
-        }}
+        sx={{ borderRadius: "12px" }}
       >
         {options.map((opt) => (
           <MenuItem key={opt.value} value={opt.value}>
@@ -45,7 +46,6 @@ export const SelectField: React.FC<SelectFieldProps> = ({
           </MenuItem>
         ))}
       </Select>
-      {helperText && <FormHelperText>{helperText}</FormHelperText>}
     </FormControl>
   );
 };
