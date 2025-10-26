@@ -18,21 +18,21 @@ type Story = StoryObj<typeof Button>;
 
 export const Primary: Story = {
   args: {
-    label: "Save",
+    label: "SAVE",
     variantType: "primary",
   },
 };
 
 export const Secondary: Story = {
   args: {
-    label: "Sign Up",
+    label: "SIGN UP",
     variantType: "secondary",
   },
 };
 
 export const Danger: Story = {
   args: {
-    label: "Delete",
+    label: "DELETE",
     variantType: "danger",
   },
 };

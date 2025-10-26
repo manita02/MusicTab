@@ -30,6 +30,7 @@ export const theme = createTheme({
     button: {
       textTransform: "none",
       fontWeight: 600,
+      fontSize: "1rem",
     },
     h1: {
       fontSize: "2rem",
