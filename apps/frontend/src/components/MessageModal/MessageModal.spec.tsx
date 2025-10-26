@@ -3,34 +3,34 @@ import { describe, it, vi, expect } from "vitest";
 import { MessageModal } from "./MessageModal";
 
 describe("MessageModal", () => {
-  it("renderiza correctamente el mensaje", () => {
-    render(<MessageModal open message="Mensaje de prueba" />);
-    expect(screen.getByText("Mensaje de prueba")).toBeInTheDocument();
+  it("correctly renders the message", () => {
+    render(<MessageModal open message="Test message" />);
+    expect(screen.getByText("Test message")).toBeInTheDocument();
   });
 
-  it("llama a onConfirm al presionar Aceptar", () => {
+  it("calls onConfirm when pressing Accept", () => {
     const onConfirm = vi.fn();
     render(<MessageModal open onConfirm={onConfirm} />);
-    fireEvent.click(screen.getByText("Aceptar"));
+    fireEvent.click(screen.getByText("Accept"));
     expect(onConfirm).toHaveBeenCalled();
   });
 
-  it("llama a onCancel al presionar Cancelar", () => {
+  it("calls onCancel when pressing Cancel", () => {
     const onCancel = vi.fn();
     render(
       <MessageModal
         open
-        cancelText="Cancelar"
+        cancelText="Cancel"
         onCancel={onCancel}
       />
     );
-    fireEvent.click(screen.getByText("Cancelar"));
+    fireEvent.click(screen.getByText("Cancel"));
     expect(onCancel).toHaveBeenCalled();
   });
 
-  it("solo muestra un botón en tipo error", () => {
+  it("only shows one button in error type", () => {
     render(<MessageModal open type="error" />);
-    expect(screen.queryByText("Cancelar")).toBeNull();
-    expect(screen.getByText("Aceptar")).toBeInTheDocument();
+    expect(screen.queryByText("Cancel")).toBeNull();
+    expect(screen.getByText("Accept")).toBeInTheDocument();
   });
 });
