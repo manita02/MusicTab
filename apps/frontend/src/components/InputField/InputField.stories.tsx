@@ -46,3 +46,20 @@ export const Disabled: Story = {
     />
   ),
 };
+
+export const Search: Story = {
+  render: () => {
+    const [value, setValue] = useState("");
+    const handleSearch = () => alert(`Searching: ${value}`);
+    return (
+      <InputField
+        label="Search"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder="Search by title..."
+        isSearch
+        onSearch={handleSearch}
+      />
+    );
+  },
+};
