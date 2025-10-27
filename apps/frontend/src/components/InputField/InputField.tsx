@@ -1,5 +1,6 @@
 import React from "react";
-import { TextField } from "@mui/material";
+import { TextField, InputAdornment, IconButton } from "@mui/material";
+import SearchIcon from '@mui/icons-material/Search';
 
 export interface InputFieldProps {
   label: string;
@@ -11,6 +12,8 @@ export interface InputFieldProps {
   disabled?: boolean;
   type?: string;
   fullWidth?: boolean;
+  isSearch?: boolean;
+  onSearch?: () => void;
 }
 
 export const InputField: React.FC<InputFieldProps> = ({
@@ -23,6 +26,8 @@ export const InputField: React.FC<InputFieldProps> = ({
   disabled = false,
   type = "text",
   fullWidth = true,
+  isSearch = false,
+  onSearch,
 }) => {
   return (
     <TextField
@@ -36,6 +41,15 @@ export const InputField: React.FC<InputFieldProps> = ({
       type={type}
       fullWidth={fullWidth}
       variant="outlined"
+      InputProps={{
+        endAdornment: isSearch && onSearch ? (
+          <InputAdornment position="end">
+            <IconButton onClick={onSearch} edge="end">
+              <SearchIcon />
+            </IconButton>
+          </InputAdornment>
+        ) : undefined,
+      }}
       sx={{
         "& .MuiInputBase-root": {
           borderRadius: "12px",
