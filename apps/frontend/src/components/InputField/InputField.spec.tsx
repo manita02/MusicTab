@@ -28,11 +28,9 @@ describe("InputField", () => {
       />
     );
 
-    // Verificar que el icono esté presente
     const button = screen.getByRole("button");
     expect(button).toBeInTheDocument();
 
-    // Disparar click sobre el icono
     fireEvent.click(button);
     expect(handleSearch).toHaveBeenCalled();
   });
