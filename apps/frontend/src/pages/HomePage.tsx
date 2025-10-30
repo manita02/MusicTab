@@ -14,7 +14,7 @@ const mockTabs = [
 
 export const HomePage: React.FC = () => {
   return (
-    <Box sx={{ backgroundColor: "transparent" }}>
+    <Box sx={{ backgroundColor: "transparent", mt: 3 }}>
       <Typography
         variant="h4"
         textAlign="center"
