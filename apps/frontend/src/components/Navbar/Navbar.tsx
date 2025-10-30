@@ -29,7 +29,7 @@ interface NavbarProps {
 
 const pages = [
   { label: "HOME", path: "/" },
-  { label: "HOW IT WORKS", path: "/how-it-works" },
+  //{ label: "HOW IT WORKS", path: "/how-it-works" },
   { label: "TABS", path: "/tabs" },
 ];
 
