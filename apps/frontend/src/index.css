@@ -1,5 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+@import "slick-carousel/slick/slick.css";
+@import "slick-carousel/slick/slick-theme.css";
 
 body {
   font-family: 'Inter', sans-serif;
+}
+
+.slick-slider {
+  overflow: hidden;
+}
+.slick-prev:before,
+.slick-next:before {
+  color: #000;
 }
