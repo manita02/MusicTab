@@ -8,16 +8,15 @@ export const MainLayout: React.FC = () => {
   return (
     <Box
       sx={{
-        position: "relative",
         display: "flex",
         flexDirection: "column",
         minHeight: "100vh",
-        backgroundImage: `url('https://c1.wallpaperflare.com/preview/52/686/468/guitar-acoustic-guitar-stringed-instrument-instrument.jpg')`, // 🔹 Cambiá esta ruta
+        backgroundImage: `url('https://c1.wallpaperflare.com/preview/52/686/468/guitar-acoustic-guitar-stringed-instrument-instrument.jpg')`,
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
         backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-        backgroundColor: (theme) => theme.palette.background.default,
+        backgroundAttachment: "scroll",
+        position: "relative",
       }}
     >
       <Box
@@ -29,24 +28,34 @@ export const MainLayout: React.FC = () => {
         }}
       />
 
-      <Box sx={{ position: "relative", zIndex: 1, flex: 1, display: "flex", flexDirection: "column" }}>
+      <Box
+        sx={{
+          position: "relative",
+          zIndex: 1,
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <Navbar
           isLoggedIn={false}
           onLogin={() => console.log("Login clicked")}
           onSignUp={() => console.log("Sign Up clicked")}
         />
-
+        
         {/* Main content (Outlet renders the current route view) */}
         <Container
           component="main"
           sx={{
-            flexGrow: 1,
-            py: { xs: 4, md: 6 },
+            flex: "0 1 auto",
+            p: 2,
+            m: "auto",
             backgroundColor: "rgba(245, 241, 220, 0.7)",
             borderRadius: 2,
-            mt: { xs: 2, md: 4 },
-            mb: { xs: 2, md: 4 },
             boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+            display: "flex",
+            flexDirection: "column",
+            maxWidth: "lg",
           }}
         >
           <Outlet />

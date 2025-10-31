@@ -8,7 +8,7 @@ export const AboutSection: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <Box textAlign="center" sx={{ mt: 6, px: 3 }}>
+    <Box textAlign="center" sx={{ mt: 2, mb: 4, px: 3 }}>
       <Typography
         variant="h5"
         fontWeight={700}
