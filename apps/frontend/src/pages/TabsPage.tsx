@@ -139,11 +139,11 @@ export const TabsPage: React.FC = () => {
   
         <Grid item xs={12} sm="auto" sx={{ minWidth: "200px" }}>
           <InputField
-            label="Buscar"
+            label="Search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             isSearch
-            onSearch={() => console.log("Buscar:", search)}
+            onSearch={() => console.log("Search:", search)}
           />
         </Grid>
 
@@ -159,35 +159,35 @@ export const TabsPage: React.FC = () => {
             }}
           >
             <ToggleButton value="all" sx={{ fontWeight: 600 }}>
-              Todas
+              All
             </ToggleButton>
             <ToggleButton value="mine" sx={{ fontWeight: 600 }}>
-              Mis publicaciones
+              My Tabs
             </ToggleButton>
           </ToggleButtonGroup>
         </Grid>
 
         <Grid item xs={12} sm="auto">
           <FormControl sx={{ minWidth: 180, width: { xs: "100%", sm: "auto" } }}>
-            <InputLabel>Ordenar por</InputLabel>
+            <InputLabel>Order by</InputLabel>
             <Select
               value={order}
               onChange={(e) => setOrder(e.target.value)}
-              label="Ordenar por"
+              label="Order by"
             >
-              <MenuItem value="recent">Más recientes</MenuItem>
-              <MenuItem value="oldest">Más antiguas</MenuItem>
+              <MenuItem value="recent">Most Recent</MenuItem>
+              <MenuItem value="oldest">Oldest</MenuItem>
             </Select>
           </FormControl>
         </Grid>
 
         <Grid item xs={12} sm="auto">
           <Button
-            label="Crear Nueva Tab"
+            label="Create New Tab"
             variantType="secondary"
             startIcon={<AddIcon />}
             sx={{ width: { xs: "100%", sm: "auto" }, height: 56 }}
-            onClick={() => console.log("Crear Nueva Tab")}
+            onClick={() => console.log("Create New Tab")}
           />
         </Grid>
       </Grid>
