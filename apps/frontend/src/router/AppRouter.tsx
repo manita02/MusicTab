@@ -5,6 +5,7 @@ import { HomePage } from "../pages/HomePage";
 import { TabsPage } from "../pages/TabsPage";
 import { HowItWorksPage } from "../pages/HowItWorksPage";
 import { IconLoader } from "../components/IconLoader/IconLoader";
+import { LoginPage } from "../pages/LoginPage";
 
 const GlobalLoaderWrapper: React.FC = () => {
   const navigation = useNavigation();
@@ -36,6 +37,7 @@ const router = createBrowserRouter([
           { index: true, element: <HomePage /> },
           { path: "tabs", element: <TabsPage /> },
           //{ path: "how-it-works", element: <HowItWorksPage /> },
+          { path: "/login", element: <LoginPage /> },
         ],
       },
     ],
