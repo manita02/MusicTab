@@ -20,6 +20,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
 import { theme } from "../theme/theme";
 import { Button } from "../components/Button/Button";
+import { SelectField } from "../components/SelectField/SelectField";
 
 export const TabsPage: React.FC = () => {
   const [search, setSearch] = useState("");
@@ -168,17 +169,18 @@ export const TabsPage: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} sm="auto">
-          <FormControl sx={{ minWidth: 180, width: { xs: "100%", sm: "auto" } }}>
-            <InputLabel>Order by</InputLabel>
-            <Select
+          <Box sx={{ minWidth: 180, width: { xs: "100%", sm: "auto" } }}>
+            <SelectField
+              label="Order by"
               value={order}
               onChange={(e) => setOrder(e.target.value)}
-              label="Order by"
-            >
-              <MenuItem value="recent">Most Recent</MenuItem>
-              <MenuItem value="oldest">Oldest</MenuItem>
-            </Select>
-          </FormControl>
+              options={[
+                { value: "recent", label: "Most Recent" },
+                { value: "oldest", label: "Oldest" },
+              ]}
+              fullWidth
+            />
+          </Box>
         </Grid>
 
         <Grid item xs={12} sm="auto">
