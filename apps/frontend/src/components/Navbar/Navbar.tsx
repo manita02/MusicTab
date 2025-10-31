@@ -63,7 +63,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         { label: "Log Out", action: onLogout },
       ]
     : [
-        { label: "Sign Up", action: () => navigate("/signup") },
+        { label: "Sign Up", action: () => navigate("/signin") },
         { label: "Login", action: () => navigate("/login") },
       ];
 
