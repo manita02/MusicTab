@@ -1,13 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, Typography, Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { theme } from "../../theme/theme";
 import { Button } from "../Button/Button";
 import { useAuth } from "../../api/hooks/useAuth";
+import { CreateTabDialog } from "../../dialogs/CreateTabDialog";
 
 export const AboutSection: React.FC = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const handleOpenDialog = () => setIsDialogOpen(true);
+  const handleCloseDialog = () => setIsDialogOpen(false);
+  const handleSaveTab = (data: any) => {
+    console.log("Saved tab:", data);
+  };
 
   return (
     <Box textAlign="center" sx={{ mt: 2, mb: 4, px: 3 }}>
@@ -30,12 +37,7 @@ export const AboutSection: React.FC = () => {
       <Typography
         variant="body1"
         color="text.secondary"
-        sx={{ 
-          maxWidth: 600, 
-          mx: "auto", 
-          mb: 3,
-          textAlign: "justify"
-        }}
+        sx={{ maxWidth: 600, mx: "auto", mb: 3, textAlign: "justify" }}
       >
         MusicTab is a platform created for sharing and discovering song tabs.
         Explore other users' tabs or upload your own to help the community.
@@ -49,12 +51,18 @@ export const AboutSection: React.FC = () => {
             <Button
               label="Create New Tab"
               variantType="secondary"
-              onClick={() => navigate("/create-tab")}
+              onClick={handleOpenDialog}
               disabled={!isLoggedIn}
             />
           </span>
         </Tooltip>
       </Box>
+
+      <CreateTabDialog
+        open={isDialogOpen}
+        onClose={handleCloseDialog}
+        onSave={handleSaveTab}
+      />
     </Box>
   );
 };
