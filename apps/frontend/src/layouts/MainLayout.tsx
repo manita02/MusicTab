@@ -3,8 +3,10 @@ import { Outlet } from "react-router-dom";
 import { Box, Container } from "@mui/material";
 import { Navbar } from "../components/Navbar/Navbar";
 import { Footer } from "../components/Footer/Footer";
+import { useAuth } from "../api/hooks/useAuth";
 
 export const MainLayout: React.FC = () => {
+  const { isLoggedIn, userName, logout } = useAuth();
   return (
     <Box
       sx={{
@@ -38,11 +40,13 @@ export const MainLayout: React.FC = () => {
         }}
       >
         <Navbar
-          isLoggedIn={false}
+          isLoggedIn={isLoggedIn}
+          userName={userName || undefined}
+          onLogout={logout}
           onLogin={() => console.log("Login clicked")}
           onSignUp={() => console.log("Sign Up clicked")}
         />
-        
+
         {/* Main content (Outlet renders the current route view) */}
         <Container
           component="main"

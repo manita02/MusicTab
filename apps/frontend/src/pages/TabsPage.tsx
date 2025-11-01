@@ -4,25 +4,22 @@ import {
   Grid,
   ToggleButton,
   ToggleButtonGroup,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Typography,
   IconButton,
   Tooltip,
 } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
 import { InputField } from "../components/InputField/InputField";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { DataGrid } from "@mui/x-data-grid";
-import type { GridColDef } from "@mui/x-data-grid";
 import { theme } from "../theme/theme";
 import { Button } from "../components/Button/Button";
 import { SelectField } from "../components/SelectField/SelectField";
+import { useAuth } from "../api/hooks/useAuth";
 
 export const TabsPage: React.FC = () => {
+  const { isLoggedIn } = useAuth();
   const [search, setSearch] = useState("");
   const [view, setView] = useState<"all" | "mine">("all");
   const [order, setOrder] = useState("recent");
@@ -34,40 +31,45 @@ export const TabsPage: React.FC = () => {
     }
   };
 
-  const columns: GridColDef[] = [
+  const columns = [
     {
       field: "actions",
       headerName: "Actions",
       width: 130,
       sortable: false,
       filterable: false,
-      renderCell: (params) => (
+      renderCell: (params: any) => (
         <Box sx={{ display: "flex", gap: 1 }}>
-
-          <Tooltip title="Update">
-            <IconButton
-              size="small"
-              onClick={() => handleEdit(params.row.id)}
-              sx={{
-                color: theme.palette.warning.main,
-                "&:hover": { backgroundColor: "rgba(255,144,19,0.1)" },
-              }}
-            >
-              <EditIcon fontSize="small" />
-            </IconButton>
+          <Tooltip title={isLoggedIn ? "Update" : "Login to edit"}>
+            <span>
+              <IconButton
+                size="small"
+                onClick={() => handleEdit(params.row.id)}
+                sx={{
+                  color: theme.palette.warning.main,
+                  "&:hover": { backgroundColor: "rgba(255,144,19,0.1)" },
+                }}
+                disabled={!isLoggedIn}
+              >
+                <EditIcon fontSize="small" />
+              </IconButton>
+            </span>
           </Tooltip>
 
-          <Tooltip title="Delete">
-            <IconButton
-              size="small"
-              onClick={() => handleDelete(params.row.id)}
-              sx={{
-                color: theme.palette.error.main,
-                "&:hover": { backgroundColor: "rgba(255,0,0,0.08)" },
-              }}
-            >
-              <DeleteIcon fontSize="small" />
-            </IconButton>
+          <Tooltip title={isLoggedIn ? "Delete" : "Login to delete"}>
+            <span>
+              <IconButton
+                size="small"
+                onClick={() => handleDelete(params.row.id)}
+                sx={{
+                  color: theme.palette.error.main,
+                  "&:hover": { backgroundColor: "rgba(255,0,0,0.08)" },
+                }}
+                disabled={!isLoggedIn}
+              >
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </span>
           </Tooltip>
         </Box>
       ),
@@ -118,7 +120,7 @@ export const TabsPage: React.FC = () => {
           letterSpacing: "0.5px",
           mb: 2,
         }}
-        >
+      >
         Tabs
       </Typography>
 
@@ -137,7 +139,6 @@ export const TabsPage: React.FC = () => {
           flexDirection: { xs: "column", sm: "row", md: "row" },
         }}
       >
-  
         <Grid item xs={12} sm="auto" sx={{ minWidth: "200px" }}>
           <InputField
             label="Search"
@@ -159,12 +160,21 @@ export const TabsPage: React.FC = () => {
               height: "56px",
             }}
           >
-            <ToggleButton value="all" sx={{ fontWeight: 600 }}>
-              All
-            </ToggleButton>
-            <ToggleButton value="mine" sx={{ fontWeight: 600 }}>
-              My Tabs
-            </ToggleButton>
+            <Tooltip title={isLoggedIn ? "" : "Login to view all tabs"}>
+              <span>
+                <ToggleButton value="all" sx={{ fontWeight: 600 }} disabled={!isLoggedIn}>
+                  All
+                </ToggleButton>
+              </span>
+            </Tooltip>
+
+            <Tooltip title={isLoggedIn ? "" : "Login to view your tabs"}>
+              <span>
+                <ToggleButton value="mine" sx={{ fontWeight: 600 }} disabled={!isLoggedIn}>
+                  My Tabs
+                </ToggleButton>
+              </span>
+            </Tooltip>
           </ToggleButtonGroup>
         </Grid>
 
@@ -184,13 +194,18 @@ export const TabsPage: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} sm="auto">
-          <Button
-            label="Create New Tab"
-            variantType="secondary"
-            startIcon={<AddIcon />}
-            sx={{ width: { xs: "100%", sm: "auto" }, height: 56 }}
-            onClick={() => console.log("Create New Tab")}
-          />
+          <Tooltip title={isLoggedIn ? "" : "Login to create a tab"}>
+            <span>
+              <Button
+                label="Create New Tab"
+                variantType="secondary"
+                startIcon={<AddIcon />}
+                sx={{ width: { xs: "100%", sm: "auto" }, height: 56 }}
+                onClick={() => console.log("Create New Tab")}
+                disabled={!isLoggedIn}
+              />
+            </span>
+          </Tooltip>
         </Grid>
       </Grid>
 
