@@ -57,9 +57,14 @@ export class UserController {
   async login(@Body() dto: LoginDTO) {
     try {
       const session = await this.loginUser.execute(dto);
+      const user = await this.userRepo.findById(session.userId);
+      if (!user) {
+        throw new DomainError('UserNotFound', 'User not found after login');
+      }
       return {
         token: session.token,
         userId: session.userId,
+        userName: user.username, 
         expiresAt: session.expiresAt,
       };
     } catch (error) {
