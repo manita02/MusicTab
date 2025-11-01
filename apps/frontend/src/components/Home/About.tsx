@@ -1,11 +1,13 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { theme } from "../../theme/theme";
 import { Button } from "../Button/Button";
+import { useAuth } from "../../api/hooks/useAuth";
 
 export const AboutSection: React.FC = () => {
   const navigate = useNavigate();
+  const { isLoggedIn } = useAuth();
 
   return (
     <Box textAlign="center" sx={{ mt: 2, mb: 4, px: 3 }}>
@@ -41,7 +43,17 @@ export const AboutSection: React.FC = () => {
 
       <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
         <Button label="View Tabs" variantType="primary" onClick={() => navigate("/tabs")} />
-        <Button label="Create New Tab" variantType="secondary" onClick={() => navigate("/create-tab")} />
+
+        <Tooltip title={isLoggedIn ? "" : "Login to create a tab"} arrow>
+          <span>
+            <Button
+              label="Create New Tab"
+              variantType="secondary"
+              onClick={() => navigate("/create-tab")}
+              disabled={!isLoggedIn}
+            />
+          </span>
+        </Tooltip>
       </Box>
     </Box>
   );
