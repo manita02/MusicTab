@@ -17,12 +17,21 @@ import { theme } from "../theme/theme";
 import { Button } from "../components/Button/Button";
 import { SelectField } from "../components/SelectField/SelectField";
 import { useAuth } from "../api/hooks/useAuth";
+import { CreateTabDialog } from "../dialogs/CreateTabDialog";
 
 export const TabsPage: React.FC = () => {
   const { isLoggedIn } = useAuth();
   const [search, setSearch] = useState("");
   const [view, setView] = useState<"all" | "mine">("all");
   const [order, setOrder] = useState("recent");
+  const [openDialog, setOpenDialog] = useState(false);
+  const handleOpenDialog = () => setOpenDialog(true);
+  const handleCloseDialog = () => setOpenDialog(false);
+
+  const handleSaveTab = (data: any) => {
+    console.log("🆕 New Tab created:", data);
+    handleCloseDialog();
+  };
 
   const handleEdit = (id: number) => console.log("Update:", id);
   const handleDelete = (id: number) => {
@@ -201,7 +210,7 @@ export const TabsPage: React.FC = () => {
                 variantType="secondary"
                 startIcon={<AddIcon />}
                 sx={{ width: { xs: "100%", sm: "auto" }, height: 56 }}
-                onClick={() => console.log("Create New Tab")}
+                onClick={handleOpenDialog} // ✅ abre el dialog
                 disabled={!isLoggedIn}
               />
             </span>
@@ -245,6 +254,12 @@ export const TabsPage: React.FC = () => {
           }}
         />
       </Box>
+
+      <CreateTabDialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        onSave={handleSaveTab}
+      />
     </Box>
   );
 };
