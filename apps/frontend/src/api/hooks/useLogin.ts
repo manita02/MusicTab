@@ -11,6 +11,7 @@ type LoginRequest = {
 type LoginResponse = {
   token: string;
   userId: number;
+  userName: string;
   expiresAt: string;
 };
 
@@ -24,8 +25,9 @@ export const useLogin = () => {
       return res.data;
     },
     onSuccess: (data) => {
-      localStorage.setItem("access_token", data.token);
-      localStorage.setItem("user_id", data.userId.toString());
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userName", data.userName);
+      localStorage.setItem("userId", data.userId.toString());
     },
   });
 };
