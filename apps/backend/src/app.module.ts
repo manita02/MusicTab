@@ -14,6 +14,9 @@ import { SessionPrismaRepository } from './repositories/session-prisma.repositor
 import { PasswordHasherService } from './services/password-hasher.service';
 import { TokenService } from './services/token.service';
 import { AppService } from './app.service';
+import { GenrePrismaRepository } from './repositories/genre-prisma.repository';
+import { InstrumentPrismaRepository } from './repositories/instrument-prisma.repository';
+import { CatalogController } from './controllers/catalog.controller';
 
 @Module({
   imports: [
@@ -26,6 +29,7 @@ import { AppService } from './app.service';
     TestUserController,
     UserController,
     TabController,
+    CatalogController
   ],
   providers: [
     AppService,
@@ -33,6 +37,8 @@ import { AppService } from './app.service';
     UserPrismaRepository,
     TabPrismaRepository,
     SessionPrismaRepository,
+    GenrePrismaRepository,
+    InstrumentPrismaRepository,
     PasswordHasherService,
     TokenService,
   ],
