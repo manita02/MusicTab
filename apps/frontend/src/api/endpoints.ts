@@ -9,5 +9,6 @@ export const ENDPOINTS = {
   },
   tabs: {
     create: "/tabs/create",
+    latest: "/tabs/latest",
   },
 };
