@@ -112,5 +112,28 @@ export class TabPrismaRepository implements ITabRepository {
       record.urlImagen!,
       record.createdAt
     );
-  }  
+  }
+
+  async findLatest(limit: number): Promise<Tab[]> {
+    const records = await this.prisma.tab.findMany({
+      take: limit,
+      orderBy: { createdAt: "desc" },
+      include: { user: true },
+    });
+
+    return records.map(r =>
+      Tab.rehydrate(
+        r.id,
+        r.title,
+        r.userId,
+        r.genreId,
+        r.instrumentId,
+        r.urlPdf,
+        r.urlYoutube!,
+        r.urlImagen!,
+        r.createdAt,
+        r.user.username
+      )
+    );
+  }
 }
