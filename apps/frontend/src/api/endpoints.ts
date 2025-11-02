@@ -10,5 +10,6 @@ export const ENDPOINTS = {
   tabs: {
     create: "/tabs/create",
     latest: "/tabs/latest",
+    all: "/tabs/all",
   },
 };
