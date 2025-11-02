@@ -1,29 +1,12 @@
 import React from "react";
-import { Box, Typography, CircularProgress } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { TabsSlider } from "../components/Home/TabSlider/TabSlider";
 import { AboutSection } from "../components/Home/About";
+import { IconLoader } from "../components/IconLoader/IconLoader";
 import { useLatestTabs, type TabPreview } from "../api/hooks/useLatestTabs";
 
 export const HomePage: React.FC = () => {
   const { data: tabsData, isLoading, error } = useLatestTabs(8);
-  if (isLoading) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box sx={{ textAlign: "center", mt: 6 }}>
-        <Typography color="error">
-          Error fetching tabs: {error.message}
-        </Typography>
-      </Box>
-    );
-  }
-
   const tabs = Array.isArray(tabsData)
     ? tabsData.map((tab: TabPreview) => ({
         id: tab.id,
@@ -35,7 +18,9 @@ export const HomePage: React.FC = () => {
     : [];
 
   return (
-    <Box sx={{ backgroundColor: "transparent", mt: 3 }}>
+    <Box sx={{ backgroundColor: "transparent", mt: 3, position: "relative" }}>
+      <IconLoader active={isLoading} />
+
       <Typography
         variant="h4"
         textAlign="center"
