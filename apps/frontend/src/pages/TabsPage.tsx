@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Grid,
@@ -9,15 +9,22 @@ import {
   Tooltip,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { InputField } from "../components/InputField/InputField";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import DownloadIcon from "@mui/icons-material/Download";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+
 import { theme } from "../theme/theme";
 import { Button } from "../components/Button/Button";
+import { InputField } from "../components/InputField/InputField";
 import { SelectField } from "../components/SelectField/SelectField";
-import { useAuth } from "../api/hooks/useAuth";
 import { CreateTabDialog } from "../dialogs/CreateTabDialog";
+import { useAuth } from "../api/hooks/useAuth";
+import { useAllTabs } from "../api/hooks/useTabs";
+import { useGenres, useInstruments } from "../api/hooks/useCatalog";
+import { IconLoader } from "../components/IconLoader/IconLoader";
 
 export const TabsPage: React.FC = () => {
   const { isLoggedIn } = useAuth();
@@ -25,11 +32,23 @@ export const TabsPage: React.FC = () => {
   const [view, setView] = useState<"all" | "mine">("all");
   const [order, setOrder] = useState("recent");
   const [openDialog, setOpenDialog] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
+
+  const { data, isLoading, isError } = useAllTabs();
+  const { data: genres = [] } = useGenres();
+  const { data: instruments = [] } = useInstruments();
+
+  useEffect(() => {
+    if (!isLoading && data) {
+      const timeout = setTimeout(() => setPageLoading(false), 200);
+      return () => clearTimeout(timeout);
+    }
+  }, [isLoading, data]);
+
   const handleOpenDialog = () => setOpenDialog(true);
   const handleCloseDialog = () => setOpenDialog(false);
-
-  const handleSaveTab = (data: any) => {
-    console.log("🆕 New Tab created:", data);
+  const handleSaveTab = (tabData: any) => {
+    console.log("🆕 New Tab created:", tabData);
     handleCloseDialog();
   };
 
@@ -40,15 +59,41 @@ export const TabsPage: React.FC = () => {
     }
   };
 
+  const getGenreName = (id: number) =>
+    genres.find((g: any) => g.id === id)?.name || "-";
+
+  const getInstrumentName = (id: number) =>
+    instruments.find((i: any) => i.id === id)?.name || "-";
+
+  const getYouTubeEmbedUrl = (url: string) => {
+    const regExp =
+      /(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+    const match = url?.match(regExp);
+    return match ? `https://www.youtube.com/embed/${match[1]}` : null;
+  };
+
+  const rows =
+    data?.map((tab: any) => ({
+      id: tab.id,
+      title: tab.title,
+      imageUrl: tab.urlImg || "",
+      youtubeUrl: tab.urlYoutube || "",
+      pdf: tab.urlPdf || null,
+      instrument: getInstrumentName(tab.instrumentId),
+      genre: getGenreName(tab.genreId),
+      user: tab.userName || "-",
+      createdAt: tab.createdAt,
+    })) || [];
+
   const columns = [
     {
       field: "actions",
       headerName: "Actions",
-      width: 130,
+      width: 180,
       sortable: false,
       filterable: false,
       renderCell: (params: any) => (
-        <Box sx={{ display: "flex", gap: 1 }}>
+        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
           <Tooltip title={isLoggedIn ? "Update" : "Login to edit"}>
             <span>
               <IconButton
@@ -80,186 +125,264 @@ export const TabsPage: React.FC = () => {
               </IconButton>
             </span>
           </Tooltip>
+
+          {params.row.pdf && (
+            <>
+              <Tooltip title="View PDF">
+                <span>
+                  <IconButton
+                    size="small"
+                    component="a"
+                    href={params.row.pdf}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    sx={{
+                      color: theme.palette.info.main,
+                      "&:hover": { backgroundColor: "rgba(0,0,255,0.08)" },
+                    }}
+                  >
+                    <PictureAsPdfIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+
+              <Tooltip title="Download PDF">
+                <span>
+                  <IconButton
+                    size="small"
+                    component="a"
+                    href={params.row.pdf}
+                    download
+                    sx={{
+                      color: theme.palette.success.main,
+                      "&:hover": { backgroundColor: "rgba(0,255,0,0.08)" },
+                    }}
+                  >
+                    <DownloadIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </>
+          )}
         </Box>
       ),
     },
-    { field: "title", headerName: "Title", flex: 1 },
-    { field: "tutorial", headerName: "Tutorial", width: 120 },
-    { field: "pdf", headerName: "PDF", width: 120 },
-    { field: "instrument", headerName: "Instrument", width: 150 },
-    { field: "genre", headerName: "Genre", width: 150 },
-    { field: "user", headerName: "User", width: 150 },
-  ];
-
-  const rows = [
     {
-      id: 1,
-      title: "Wonderwall",
-      tutorial: "Video",
-      pdf: "Download",
-      instrument: "Guitar",
-      genre: "Rock",
-      user: "Ana",
+      field: "title",
+      headerName: "Title",
+      flex: 1,
+      minWidth: 180,
+      renderCell: (params: any) => (
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, alignItems: "center" }}>
+          <Typography fontWeight={600}>{params.row.title}</Typography>
+          {params.row.imageUrl ? (
+            <Box
+              component="img"
+              src={params.row.imageUrl}
+              alt="Preview"
+              sx={{
+                width: 160,
+                height: 170,
+                objectFit: "cover",
+                borderRadius: 1,
+                border: `1px solid ${theme.palette.divider}`,
+              }}
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = "";
+              }}
+            />
+          ) : (
+            <Box
+              sx={{
+                width: 160,
+                height: 170,
+                backgroundColor: "rgba(0,0,0,0.3)",
+                borderRadius: 1,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                fontSize: 12,
+                color: "#fff",
+              }}
+            >
+              No Image
+            </Box>
+          )}
+        </Box>
+      ),
     },
     {
-      id: 2,
-      title: "Imagine",
-      tutorial: "Video",
-      pdf: "Download",
-      instrument: "Piano",
-      genre: "Pop",
-      user: "Tomás",
+      field: "youtubeUrl",
+      headerName: "Video",
+      width: 360,
+      sortable: false,
+      filterable: false,
+      renderCell: (params: any) => {
+        const embedUrl = getYouTubeEmbedUrl(params.value || "");
+        return (
+          <Box sx={{ width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center", p: 2 }}>
+            {embedUrl ? (
+              <Box
+                component="iframe"
+                src={embedUrl}
+                title="YouTube"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                sx={{
+                  width: 347,
+                  height: 195,
+                  borderRadius: 1,
+                  border: `1px solid ${theme.palette.divider}`,
+                }}
+              />
+            ) : (
+              <Box
+                sx={{
+                  width: 347,
+                  height: 195,
+                  backgroundColor: "rgba(0,0,0,0.3)",
+                  borderRadius: 1,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  fontSize: 12,
+                  color: "#fff",
+                }}
+              >
+                No Video
+              </Box>
+            )}
+          </Box>
+        );
+      },
+    },
+    { field: "instrument", headerName: "Instrument", width: 150 },
+    { field: "genre", headerName: "Genre", width: 150 },
+    {
+      field: "user",
+      headerName: "Uploaded by",
+      width: 150,
+      renderCell: (params: any) => (
+        <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start", gap: 0.5, height: "100%" }}>
+          <Typography fontWeight={600}>{params.row.user}</Typography>
+          {params.row.createdAt && (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+              <CalendarTodayIcon sx={{ fontSize: 14, color: "text.secondary" }} />
+              <Typography variant="caption" color="text.secondary">
+                {new Date(params.row.createdAt).toLocaleDateString()}
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      ),
     },
   ];
 
   return (
-    <Box sx={{ backgroundColor: "transparent", py: 2 }}>
-      <Typography
-        variant="h4"
-        fontWeight={700}
-        gutterBottom
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          position: "relative",
-          background: `linear-gradient(90deg, ${theme.palette.warning.main} 0%, ${theme.palette.warning.contrastText} 100%)`,
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          textShadow: "2px 2px 6px rgba(0, 0, 0, 0.15)",
-          letterSpacing: "0.5px",
-          mb: 2,
-        }}
-      >
-        Tabs
-      </Typography>
+    <Box sx={{ position: "relative", backgroundColor: "transparent", py: 2 }}>
+      <IconLoader active={pageLoading || isLoading} />
 
-      <Grid
-        container
-        spacing={2}
-        alignItems="center"
-        justifyContent={{ xs: "center", md: "space-between" }}
-        textAlign={{ xs: "center", md: "left" }}
-        sx={{
-          mb: 4,
-          p: 2,
-          borderRadius: 2,
-          backgroundColor: "rgba(245,241,220,0.6)",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          flexDirection: { xs: "column", sm: "row", md: "row" },
-        }}
-      >
-        <Grid item xs={12} sm="auto" sx={{ minWidth: "200px" }}>
-          <InputField
-            label="Search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            isSearch
-            onSearch={() => console.log("Search:", search)}
-          />
-        </Grid>
+      {isError && (
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+          <Typography color="error">Error al cargar las tabs.</Typography>
+        </Box>
+      )}
 
-        <Grid item xs={12} sm="auto">
-          <ToggleButtonGroup
-            value={view}
-            exclusive
-            onChange={(_, val) => val && setView(val)}
+      {!isError && (
+        <>
+          <Typography
+            variant="h4"
+            fontWeight={700}
+            gutterBottom
             sx={{
-              borderRadius: "12px",
-              overflow: "hidden",
-              height: "56px",
+              display: "flex",
+              justifyContent: "center",
+              position: "relative",
+              background: `linear-gradient(90deg, ${theme.palette.warning.main} 0%, ${theme.palette.warning.contrastText} 100%)`,
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              textShadow: "2px 2px 6px rgba(0, 0, 0, 0.15)",
+              letterSpacing: "0.5px",
+              mb: 2,
             }}
           >
-            <Tooltip title={isLoggedIn ? "" : "Login to view all tabs"}>
-              <span>
-                <ToggleButton value="all" sx={{ fontWeight: 600 }} disabled={!isLoggedIn}>
-                  All
-                </ToggleButton>
-              </span>
-            </Tooltip>
+            Tabs
+          </Typography>
 
-            <Tooltip title={isLoggedIn ? "" : "Login to view your tabs"}>
-              <span>
-                <ToggleButton value="mine" sx={{ fontWeight: 600 }} disabled={!isLoggedIn}>
-                  My Tabs
-                </ToggleButton>
-              </span>
-            </Tooltip>
-          </ToggleButtonGroup>
-        </Grid>
+          <Grid container spacing={2} alignItems="center" justifyContent={{ xs: "center", md: "space-between" }} textAlign={{ xs: "center", md: "left" }} sx={{ mb: 4, p: 2, borderRadius: 2, backgroundColor: "rgba(245,241,220,0.6)", boxShadow: "0 2px 8px rgba(0,0,0,0.1)", flexDirection: { xs: "column", sm: "row" } }}>
+            <Grid item xs={12} sm="auto" sx={{ minWidth: "200px" }}>
+              <InputField label="Search" value={search} onChange={(e) => setSearch(e.target.value)} isSearch onSearch={() => console.log("Search:", search)} />
+            </Grid>
+            <Grid item xs={12} sm="auto">
+              <ToggleButtonGroup value={view} exclusive onChange={(_, val) => val && setView(val)} sx={{ borderRadius: "12px", overflow: "hidden", height: "56px" }}>
+                <Tooltip title={isLoggedIn ? "" : "Login to view all tabs"}>
+                  <span>
+                    <ToggleButton value="all" sx={{ fontWeight: 600 }} disabled={!isLoggedIn}>
+                      All
+                    </ToggleButton>
+                  </span>
+                </Tooltip>
+                <Tooltip title={isLoggedIn ? "" : "Login to view your tabs"}>
+                  <span>
+                    <ToggleButton value="mine" sx={{ fontWeight: 600 }} disabled={!isLoggedIn}>
+                      My Tabs
+                    </ToggleButton>
+                  </span>
+                </Tooltip>
+              </ToggleButtonGroup>
+            </Grid>
+            <Grid item xs={12} sm="auto">
+              <Box sx={{ minWidth: 180, width: { xs: "100%", sm: "auto" } }}>
+                <SelectField
+                  label="Order by"
+                  value={order}
+                  onChange={(e) => setOrder(e.target.value)}
+                  options={[
+                    { value: "recent", label: "Most Recent" },
+                    { value: "oldest", label: "Oldest" },
+                  ]}
+                  fullWidth
+                />
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm="auto">
+              <Tooltip title={isLoggedIn ? "" : "Login to create a tab"}>
+                <span>
+                  <Button
+                    label="Create New Tab"
+                    variantType="secondary"
+                    startIcon={<AddIcon />}
+                    sx={{ width: { xs: "100%", sm: "auto" }, height: 56 }}
+                    onClick={handleOpenDialog}
+                    disabled={!isLoggedIn}
+                  />
+                </span>
+              </Tooltip>
+            </Grid>
+          </Grid>
 
-        <Grid item xs={12} sm="auto">
-          <Box sx={{ minWidth: 180, width: { xs: "100%", sm: "auto" } }}>
-            <SelectField
-              label="Order by"
-              value={order}
-              onChange={(e) => setOrder(e.target.value)}
-              options={[
-                { value: "recent", label: "Most Recent" },
-                { value: "oldest", label: "Oldest" },
-              ]}
-              fullWidth
+          <Box sx={{ height: 500, backgroundColor: "white", borderRadius: 2, boxShadow: "0 2px 10px rgba(0,0,0,0.1)", overflow: "hidden" }}>
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              disableRowSelectionOnClick
+              pageSizeOptions={[5, 10]}
+              getRowHeight={() => 220}
+              sx={{
+                border: "none",
+                "& .MuiDataGrid-columnHeaders": { backgroundColor: theme.palette.primary.main, color: theme.palette.warning.contrastText, fontWeight: "bold" },
+                "& .MuiDataGrid-row:nth-of-type(odd)": { backgroundColor: theme.palette.background.default },
+                "& .MuiDataGrid-row:nth-of-type(even)": { backgroundColor: "rgba(245, 241, 220,0.4)" },
+                "& .MuiDataGrid-cell": { borderBottom: "1px solid rgba(0,0,0,0.08)" },
+                "& .MuiDataGrid-footerContainer": { borderTop: "1px solid rgba(0,0,0,0.08)" },
+              }}
             />
           </Box>
-        </Grid>
 
-        <Grid item xs={12} sm="auto">
-          <Tooltip title={isLoggedIn ? "" : "Login to create a tab"}>
-            <span>
-              <Button
-                label="Create New Tab"
-                variantType="secondary"
-                startIcon={<AddIcon />}
-                sx={{ width: { xs: "100%", sm: "auto" }, height: 56 }}
-                onClick={handleOpenDialog} // ✅ abre el dialog
-                disabled={!isLoggedIn}
-              />
-            </span>
-          </Tooltip>
-        </Grid>
-      </Grid>
-
-      <Box
-        sx={{
-          height: 500,
-          backgroundColor: "white",
-          borderRadius: 2,
-          boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-          overflow: "hidden",
-        }}
-      >
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          disableRowSelectionOnClick
-          pageSizeOptions={[5, 10]}
-          sx={{
-            border: "none",
-            "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: theme.palette.primary.main,
-              color: theme.palette.warning.contrastText,
-              fontWeight: "bold",
-            },
-            "& .MuiDataGrid-row:nth-of-type(odd)": {
-              backgroundColor: theme.palette.background.default,
-            },
-            "& .MuiDataGrid-row:nth-of-type(even)": {
-              backgroundColor: "rgba(245, 241, 220, 0.4)",
-            },
-            "& .MuiDataGrid-cell": {
-              borderBottom: "1px solid rgba(0,0,0,0.08)",
-            },
-            "& .MuiDataGrid-footerContainer": {
-              borderTop: "1px solid rgba(0,0,0,0.08)",
-            },
-          }}
-        />
-      </Box>
-
-      <CreateTabDialog
-        open={openDialog}
-        onClose={handleCloseDialog}
-        onSave={handleSaveTab}
-      />
+          <CreateTabDialog open={openDialog} onClose={handleCloseDialog} onSave={handleSaveTab} />
+        </>
+      )}
     </Box>
   );
 };

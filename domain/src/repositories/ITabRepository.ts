@@ -8,4 +8,5 @@ export interface ITabRepository {
   delete(id: number): Promise<void>;
   findByTitle(title: string): Promise<Tab | null>;
   findLatest(limit: number): Promise<Tab[]>;
+  findAll(): Promise<Tab[]>;
 }

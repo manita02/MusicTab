@@ -1,14 +1,28 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { CircularProgress, Box, useTheme } from "@mui/material";
 
 export interface IconLoaderProps {
   active: boolean;
+  fadeDuration?: number;
 }
 
-export const IconLoader: React.FC<IconLoaderProps> = ({ active }) => {
+export const IconLoader: React.FC<IconLoaderProps> = ({ active, fadeDuration = 300 }) => {
   const theme = useTheme();
+  const [show, setShow] = useState(active);
+  const [opacity, setOpacity] = useState(active ? 1 : 0);
 
-  if (!active) return null;
+  useEffect(() => {
+    if (active) {
+      setShow(true);
+      setOpacity(1);
+    } else {
+      setOpacity(0);
+      const timeout = setTimeout(() => setShow(false), fadeDuration);
+      return () => clearTimeout(timeout);
+    }
+  }, [active, fadeDuration]);
+
+  if (!show) return null;
 
   return (
     <Box
@@ -23,6 +37,8 @@ export const IconLoader: React.FC<IconLoaderProps> = ({ active }) => {
         justifyContent: "center",
         alignItems: "center",
         zIndex: 9999,
+        opacity: opacity,
+        transition: `opacity ${fadeDuration}ms ease-in-out`,
       }}
     >
       <svg width={0} height={0}>
@@ -33,11 +49,11 @@ export const IconLoader: React.FC<IconLoaderProps> = ({ active }) => {
           </linearGradient>
         </defs>
       </svg>
-      <CircularProgress 
-        size={60} 
-        thickness={5} 
-        sx={{ 'svg circle': { stroke: 'url(#theme_gradient)' } }} 
-        />
+      <CircularProgress
+        size={60}
+        thickness={5}
+        sx={{ 'svg circle': { stroke: 'url(#theme_gradient)' } }}
+      />
     </Box>
   );
 };

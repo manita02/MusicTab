@@ -136,4 +136,26 @@ export class TabPrismaRepository implements ITabRepository {
       )
     );
   }
+
+  async findAll(): Promise<Tab[]> {
+    const result = await this.prisma.tab.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { user: true },
+    });
+
+    return result.map((t) =>
+      Tab.rehydrate(
+        t.id,
+        t.title,
+        t.userId,
+        t.genreId,
+        t.instrumentId,
+        t.urlPdf,
+        t.urlYoutube,
+        t.urlImagen,
+        t.createdAt,
+        t.user.username
+      )
+    );
+  }
 }
