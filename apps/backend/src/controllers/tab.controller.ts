@@ -1,9 +1,10 @@
-import { Controller, Post, Body, UseFilters } from '@nestjs/common';
+import { Controller, Post, Body, UseFilters, Get, Query } from '@nestjs/common';
 import { UserPrismaRepository } from '../repositories/user-prisma.repository';
 import { TabPrismaRepository } from '../repositories/tab-prisma.repository';
 import { CreateTab } from '@domain/use-cases/CreateTab';
 import { ConflictErrorFilter } from '../filters/conflict-error.filter';
 import { DomainError } from '@domain/errors/DomainError';
+import { GetLatestTabs } from '@domain/use-cases/GetLatestTabs';
 
 type CreateTabDTO = {
   title: string;
@@ -19,12 +20,14 @@ type CreateTabDTO = {
 @Controller('tabs')
 export class TabController {
   private readonly createTab: CreateTab;
+  private readonly getLatestTabs: GetLatestTabs;
 
   constructor(
     private readonly userRepo: UserPrismaRepository,
     private readonly tabRepo: TabPrismaRepository,
   ) {
     this.createTab = new CreateTab(this.tabRepo, this.userRepo);
+    this.getLatestTabs = new GetLatestTabs(this.tabRepo);
   }
 
   @Post('create')
@@ -49,5 +52,22 @@ export class TabController {
       }
       throw error;
     }
+  }
+
+  @Get('latest')
+  async latest(@Query('limit') limit = 8) {
+    const tabs = await this.getLatestTabs.execute(Number(limit));
+    return tabs.map(tab => ({
+      id: tab.id,
+      title: tab.title,
+      genreId: tab.genreId,
+      instrumentId: tab.instrumentId,
+      userId: tab.userId,
+      userName: tab.userName,
+      createdAt: tab.createdAt,
+      urlPdf: tab.urlPdf.toString(),
+      urlYoutube: tab.urlYoutube.toString(),
+      urlImg: tab.urlImg.toString(),
+    }));
   }
 }
