@@ -9,15 +9,19 @@ import {
   Tooltip,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { InputField } from "../components/InputField/InputField";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { theme } from "../theme/theme";
 import { Button } from "../components/Button/Button";
+import { InputField } from "../components/InputField/InputField";
 import { SelectField } from "../components/SelectField/SelectField";
-import { useAuth } from "../api/hooks/useAuth";
 import { CreateTabDialog } from "../dialogs/CreateTabDialog";
+import { useAuth } from "../api/hooks/useAuth";
+import { useAllTabs } from "../api/hooks/useTabs";
+import { useGenres, useInstruments } from "../api/hooks/useCatalog";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
 export const TabsPage: React.FC = () => {
   const { isLoggedIn } = useAuth();
@@ -25,6 +29,7 @@ export const TabsPage: React.FC = () => {
   const [view, setView] = useState<"all" | "mine">("all");
   const [order, setOrder] = useState("recent");
   const [openDialog, setOpenDialog] = useState(false);
+
   const handleOpenDialog = () => setOpenDialog(true);
   const handleCloseDialog = () => setOpenDialog(false);
 
@@ -40,6 +45,38 @@ export const TabsPage: React.FC = () => {
     }
   };
 
+  const { data, isLoading, isError } = useAllTabs();
+  const { data: genres = [] } = useGenres();
+  const { data: instruments = [] } = useInstruments();
+
+  const getGenreName = (id: number) =>
+    genres.find((g: any) => g.id === id)?.name || "-";
+
+  const getInstrumentName = (id: number) =>
+    instruments.find((i: any) => i.id === id)?.name || "-";
+
+  const getYouTubeEmbedUrl = (url: string) => {
+    const regExp =
+      /(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+    const match = url?.match(regExp);
+    return match ? `https://www.youtube.com/embed/${match[1]}` : null;
+  };
+
+  const rows =
+    data?.map((tab: any) => {
+      return {
+        id: tab.id,
+        title: tab.title,
+        imageUrl: tab.urlImg || "",
+        youtubeUrl: tab.urlYoutube || "",
+        pdf: tab.urlPdf || null,
+        instrument: getInstrumentName(tab.instrumentId),
+        genre: getGenreName(tab.genreId),
+        user: tab.userName || "-",
+        createdAt: tab.createdAt,
+      };
+    }) || [];
+
   const columns = [
     {
       field: "actions",
@@ -48,7 +85,7 @@ export const TabsPage: React.FC = () => {
       sortable: false,
       filterable: false,
       renderCell: (params: any) => (
-        <Box sx={{ display: "flex", gap: 1 }}>
+        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
           <Tooltip title={isLoggedIn ? "Update" : "Login to edit"}>
             <span>
               <IconButton
@@ -80,37 +117,179 @@ export const TabsPage: React.FC = () => {
               </IconButton>
             </span>
           </Tooltip>
+
+          {params.row.pdf && (
+            <>
+              <Tooltip title="View PDF">
+                <span>
+                  <IconButton
+                    size="small"
+                    component="a"
+                    href={params.row.pdf}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    sx={{
+                      color: theme.palette.info.main,
+                      "&:hover": { backgroundColor: "rgba(0,0,255,0.08)" },
+                    }}
+                  >
+                    <PictureAsPdfIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </>
+          )}
         </Box>
       ),
     },
-    { field: "title", headerName: "Title", flex: 1 },
-    { field: "tutorial", headerName: "Tutorial", width: 120 },
-    { field: "pdf", headerName: "PDF", width: 120 },
+
+    {
+      field: "title",
+      headerName: "Title",
+      flex: 1,
+      minWidth: 180,
+      renderCell: (params: any) => (
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+          <Typography fontWeight={600}>{params.row.title}</Typography>
+          {params.row.imageUrl ? (
+            <Box
+              component="img"
+              src={params.row.imageUrl}
+              alt="Preview"
+              sx={{
+                width: 160,
+                height: 170,
+                objectFit: "cover",
+                borderRadius: 1,
+                border: `1px solid ${theme.palette.divider}`,
+                alignSelf: "center",
+              }}
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = "";
+              }}
+            />
+          ) : (
+            <Box
+              sx={{
+                width: 120,
+                height: 80,
+                backgroundColor: "rgba(0,0,0,0.3)",
+                borderRadius: 1,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                fontSize: 12,
+                color: "#fff",
+                alignSelf: "center",
+              }}
+            >
+              No Image
+            </Box>
+          )}
+        </Box>
+      ),
+    },
+
+    {
+      field: "youtubeUrl",
+      headerName: "Video",
+      width: 360,
+      sortable: false,
+      filterable: false,
+      renderCell: (params: any) => {
+        const embedUrl = getYouTubeEmbedUrl(params.value || "");
+        return (
+          <Box
+            sx={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              p: 2,
+            }}
+          >
+            {embedUrl ? (
+              <Box
+                component="iframe"
+                src={embedUrl}
+                title="YouTube"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                sx={{
+                  width: 347,
+                  height: 195,
+                  borderRadius: 1,
+                  border: `1px solid ${theme.palette.divider}`,
+                }}
+              />
+            ) : (
+              <Box
+                sx={{
+                  width: 347,
+                  height: 195,
+                  backgroundColor: "rgba(0,0,0,0.3)",
+                  borderRadius: 1,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  fontSize: 12,
+                  color: "#fff",
+                }}
+              >
+                No Video
+              </Box>
+            )}
+          </Box>
+        );
+      },
+    },
+
     { field: "instrument", headerName: "Instrument", width: 150 },
     { field: "genre", headerName: "Genre", width: 150 },
-    { field: "user", headerName: "User", width: 150 },
-  ];
-
-  const rows = [
     {
-      id: 1,
-      title: "Wonderwall",
-      tutorial: "Video",
-      pdf: "Download",
-      instrument: "Guitar",
-      genre: "Rock",
-      user: "Ana",
-    },
-    {
-      id: 2,
-      title: "Imagine",
-      tutorial: "Video",
-      pdf: "Download",
-      instrument: "Piano",
-      genre: "Pop",
-      user: "Tomás",
-    },
+      field: "user",
+      headerName: "Uploaded by",
+      width: 150,
+      renderCell: (params: any) => (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "flex-start",
+            gap: 0.5,
+            height: "100%",
+          }}
+        >
+          <Typography fontWeight={600}>{params.row.user}</Typography>
+          {params.row.createdAt && (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+              <CalendarTodayIcon sx={{ fontSize: 14, color: "text.secondary" }} />
+              <Typography variant="caption" color="text.secondary">
+                {new Date(params.row.createdAt).toLocaleDateString()}
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      ),
+    }
   ];
+  if (isLoading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <Typography>Cargando tabs...</Typography>
+      </Box>
+    );
+  }
+  if (isError) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <Typography color="error">Error al cargar las tabs.</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ backgroundColor: "transparent", py: 2 }}>
@@ -210,7 +389,7 @@ export const TabsPage: React.FC = () => {
                 variantType="secondary"
                 startIcon={<AddIcon />}
                 sx={{ width: { xs: "100%", sm: "auto" }, height: 56 }}
-                onClick={handleOpenDialog} // ✅ abre el dialog
+                onClick={handleOpenDialog}
                 disabled={!isLoggedIn}
               />
             </span>
@@ -232,6 +411,7 @@ export const TabsPage: React.FC = () => {
           columns={columns}
           disableRowSelectionOnClick
           pageSizeOptions={[5, 10]}
+          getRowHeight={() => 220}
           sx={{
             border: "none",
             "& .MuiDataGrid-columnHeaders": {
@@ -243,7 +423,7 @@ export const TabsPage: React.FC = () => {
               backgroundColor: theme.palette.background.default,
             },
             "& .MuiDataGrid-row:nth-of-type(even)": {
-              backgroundColor: "rgba(245, 241, 220, 0.4)",
+              backgroundColor: "rgba(245, 241, 220,0.4)",
             },
             "& .MuiDataGrid-cell": {
               borderBottom: "1px solid rgba(0,0,0,0.08)",
@@ -255,11 +435,7 @@ export const TabsPage: React.FC = () => {
         />
       </Box>
 
-      <CreateTabDialog
-        open={openDialog}
-        onClose={handleCloseDialog}
-        onSave={handleSaveTab}
-      />
+      <CreateTabDialog open={openDialog} onClose={handleCloseDialog} onSave={handleSaveTab} />
     </Box>
   );
 };
