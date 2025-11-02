@@ -5,6 +5,7 @@ import { CreateTab } from '@domain/use-cases/CreateTab';
 import { ConflictErrorFilter } from '../filters/conflict-error.filter';
 import { DomainError } from '@domain/errors/DomainError';
 import { GetLatestTabs } from '@domain/use-cases/GetLatestTabs';
+import { GetAllTabs } from '@domain/use-cases/GetAllTabs';
 
 type CreateTabDTO = {
   title: string;
@@ -21,6 +22,7 @@ type CreateTabDTO = {
 export class TabController {
   private readonly createTab: CreateTab;
   private readonly getLatestTabs: GetLatestTabs;
+  private readonly getAllTabs: GetAllTabs;
 
   constructor(
     private readonly userRepo: UserPrismaRepository,
@@ -28,6 +30,7 @@ export class TabController {
   ) {
     this.createTab = new CreateTab(this.tabRepo, this.userRepo);
     this.getLatestTabs = new GetLatestTabs(this.tabRepo);
+    this.getAllTabs = new GetAllTabs(this.tabRepo);
   }
 
   @Post('create')
@@ -57,6 +60,23 @@ export class TabController {
   @Get('latest')
   async latest(@Query('limit') limit = 8) {
     const tabs = await this.getLatestTabs.execute(Number(limit));
+    return tabs.map(tab => ({
+      id: tab.id,
+      title: tab.title,
+      genreId: tab.genreId,
+      instrumentId: tab.instrumentId,
+      userId: tab.userId,
+      userName: tab.userName,
+      createdAt: tab.createdAt,
+      urlPdf: tab.urlPdf.toString(),
+      urlYoutube: tab.urlYoutube.toString(),
+      urlImg: tab.urlImg.toString(),
+    }));
+  }
+
+  @Get('all')
+  async getAll() {
+    const tabs = await this.getAllTabs.execute();
     return tabs.map(tab => ({
       id: tab.id,
       title: tab.title,
