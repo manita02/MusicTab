@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -13,6 +13,10 @@ import {
 import { InputField } from "../components/InputField/InputField";
 import { SelectField } from "../components/SelectField/SelectField";
 import { Button } from "../components/Button/Button";
+import { IconLoader } from "../components/IconLoader/IconLoader";
+import { MessageModal } from "../components/MessageModal/MessageModal";
+import { useGenres, useInstruments } from "../api/hooks/useCatalog";
+import { useCreateTab } from "../api/hooks/useCreateTab";
 
 interface CreateTabDialogProps {
   open: boolean;
@@ -27,17 +31,95 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
 }) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
-
   const [title, setTitle] = useState("");
   const [genre, setGenre] = useState("");
   const [instrument, setInstrument] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [pdfUrl, setPdfUrl] = useState("");
+  const [debouncedImageUrl, setDebouncedImageUrl] = useState(imageUrl);
+  const [imageValid, setImageValid] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<"success" | "error" | "warning">(
+    "success"
+  );
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalTitle, setModalTitle] = useState("");
+  const { data: genres = [], isLoading: loadingGenres } = useGenres();
+  const { data: instruments = [], isLoading: loadingInstruments } = useInstruments();
+  const { mutate: createTab, isPending } = useCreateTab();
+  const isLoading = loadingGenres || loadingInstruments || isPending;
+
+  const resetForm = () => {
+    setTitle("");
+    setGenre("");
+    setInstrument("");
+    setYoutubeUrl("");
+    setImageUrl("");
+    setDebouncedImageUrl("");
+    setImageValid(true);
+    setPdfUrl("");
+  };
+
+  const showModal = (
+    type: "success" | "error" | "warning",
+    title: string,
+    message: string
+  ) => {
+    setModalType(type);
+    setModalTitle(title);
+    setModalMessage(message);
+    setModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    if (modalType === "success") {
+      resetForm();
+      onClose();
+    }
+  };
 
   const handleSave = () => {
-    onSave({ title, genre, instrument, youtubeUrl, imageUrl, pdfUrl });
-    onClose();
+    const userId = Number(localStorage.getItem("userId"));
+
+    if (!userId) {
+      showModal("error", "User not logged in", "You must be logged in to create a tab.");
+      return;
+    }
+
+    if (!title.trim() || !genre || !instrument) {
+      showModal(
+        "warning",
+        "Incomplete Form",
+        "Please complete all required fields before saving."
+      );
+      return;
+    }
+
+    const newTab = {
+      title,
+      userId,
+      genreId: Number(genre),
+      instrumentId: Number(instrument),
+      urlPdf: pdfUrl,
+      urlYoutube: youtubeUrl,
+      urlImg: imageUrl,
+    };
+
+    createTab(newTab, {
+      onSuccess: (data) => {
+        showModal("success", "Tab Created", "The tab has been successfully created!");
+        onSave(data);
+      },
+      onError: (error: any) => {
+        showModal(
+          "error",
+          "Error Creating Tab",
+          error?.response?.data?.message || "An unexpected error occurred."
+        );
+      },
+    });
   };
 
   const getYouTubeEmbedUrl = (url: string) => {
@@ -46,6 +128,7 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
     const match = url.match(regExp);
     return match ? `https://www.youtube.com/embed/${match[1]}` : null;
   };
+
   const embedUrl = getYouTubeEmbedUrl(youtubeUrl);
 
   const previewBoxStyles = {
@@ -62,164 +145,80 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
     color: "#fff",
   };
 
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedImageUrl(imageUrl);
+      setImageValid(true);
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [imageUrl]);
+
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      fullWidth
-      maxWidth="lg"
-      fullScreen={fullScreen}
-      PaperProps={{
-        sx: {
-          borderRadius: 3,
-          p: { xs: 1, sm: 2 },
-          backgroundColor: theme.palette.background.paper,
-        },
-      }}
-    >
-      <DialogTitle
-        sx={{
-          fontWeight: 700,
-          textAlign: "center",
-          color: theme.palette.primary.main,
-          pb: 1,
-        }}
+    <>
+      <IconLoader active={isLoading} />
+
+      <MessageModal
+        open={modalOpen}
+        type={modalType}
+        title={modalTitle}
+        message={modalMessage}
+        confirmText={modalType === "warning" ? "Continue" : "OK"}
+        cancelText={modalType === "warning" ? "Cancel" : undefined}
+        onConfirm={handleModalClose}
+        onCancel={handleModalClose}
+      />
+
+      <Dialog open={open} onClose={onClose} fullWidth maxWidth="lg" fullScreen={fullScreen}
+        PaperProps={{ sx: { borderRadius: 3, p: { xs: 1, sm: 2 }, backgroundColor: theme.palette.background.paper } }}
       >
-        Create New Tab
-      </DialogTitle>
+        <DialogTitle sx={{ fontWeight: 700, textAlign: "center", color: theme.palette.primary.main, pb: 1 }}>
+          Create New Tab
+        </DialogTitle>
 
-      <DialogContent dividers sx={{ px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 } }}>
-        <Grid container spacing={3} direction="column">
-          <InputField
-            label="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Enter song title"
-            fullWidth
-          />
-          <SelectField
-            label="Instrument"
-            value={instrument}
-            onChange={(e) => setInstrument(e.target.value)}
-            options={[
-              { value: "guitar", label: "Guitar" },
-              { value: "piano", label: "Piano" },
-              { value: "bass", label: "Bass" },
-              { value: "drums", label: "Drums" },
-            ]}
-            fullWidth
-          />
-          <SelectField
-            label="Genre"
-            value={genre}
-            onChange={(e) => setGenre(e.target.value)}
-            options={[
-              { value: "rock", label: "Rock" },
-              { value: "pop", label: "Pop" },
-              { value: "jazz", label: "Jazz" },
-              { value: "metal", label: "Metal" },
-            ]}
-            fullWidth
-          />
+        <DialogContent dividers sx={{ px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 } }}>
+          <Grid container spacing={3} direction="column">
+            <InputField label="Title *" value={title} onChange={e => setTitle(e.target.value)} fullWidth />
+            <SelectField label="Instrument *" value={instrument} onChange={e => setInstrument(e.target.value)}
+              options={loadingInstruments ? [] : instruments.map(i => ({ value: i.id.toString(), label: i.name }))} fullWidth />
+            <SelectField label="Genre *" value={genre} onChange={e => setGenre(e.target.value)}
+              options={loadingGenres ? [] : genres.map(g => ({ value: g.id.toString(), label: g.name }))} fullWidth />
+            <InputField label="PDF URL" value={pdfUrl} onChange={e => setPdfUrl(e.target.value)} fullWidth />
+            <InputField label="Image URL" value={imageUrl} onChange={e => setImageUrl(e.target.value)} fullWidth />
 
-          <InputField
-            label="PDF URL"
-            value={pdfUrl}
-            onChange={(e) => setPdfUrl(e.target.value)}
-            placeholder="https://example.com/tab.pdf"
-            fullWidth
-          />
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
+              {debouncedImageUrl && imageValid ? (
+                <Box component="img" src={debouncedImageUrl} alt="Preview"
+                  sx={{ width: "100%", maxWidth: 400, height: 225, borderRadius: 2, boxShadow: 3, objectFit: "cover", border: `1px solid ${theme.palette.divider}` }}
+                  onError={() => setImageValid(false)}
+                />
+              ) : (
+                <Box sx={previewBoxStyles}>
+                  <Typography>No image</Typography>
+                </Box>
+              )}
+            </Box>
 
-          <InputField
-            label="Image URL"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            placeholder="https://example.com/image.jpg"
-            fullWidth
-          />
+            <InputField label="YouTube URL" value={youtubeUrl} onChange={e => setYoutubeUrl(e.target.value)} fullWidth />
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
+              {embedUrl ? (
+                <Box component="iframe" src={embedUrl} title="YouTube preview" allowFullScreen
+                  sx={{ width: "100%", maxWidth: 400, aspectRatio: "16/9", borderRadius: 2, boxShadow: 3, border: `1px solid ${theme.palette.divider}` }}
+                />
+              ) : (
+                <Box sx={previewBoxStyles}>
+                  <Typography>No video</Typography>
+                </Box>
+              )}
+            </Box>
+          </Grid>
+        </DialogContent>
 
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
-            {imageUrl ? (
-              <Box
-                component="img"
-                src={imageUrl}
-                alt="Preview"
-                sx={{
-                  width: "100%",
-                  maxWidth: 400,
-                  height: 225,
-                  borderRadius: 2,
-                  boxShadow: 3,
-                  objectFit: "cover",
-                  border: `1px solid ${theme.palette.divider}`,
-                }}
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = "none";
-                }}
-              />
-            ) : (
-              <Box sx={previewBoxStyles}>
-                <Typography>No image</Typography>
-              </Box>
-            )}
-          </Box>
-
-          <InputField
-            label="YouTube URL"
-            value={youtubeUrl}
-            onChange={(e) => setYoutubeUrl(e.target.value)}
-            placeholder="https://youtube.com/watch?v=..."
-            fullWidth
-          />
-
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
-            {embedUrl ? (
-              <Box
-                component="iframe"
-                src={embedUrl}
-                title="YouTube preview"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                sx={{
-                  width: "100%",
-                  maxWidth: 400,
-                  aspectRatio: "16/9",
-                  borderRadius: 2,
-                  boxShadow: 3,
-                  border: `1px solid ${theme.palette.divider}`,
-                }}
-              />
-            ) : (
-              <Box sx={previewBoxStyles}>
-                <Typography>No video</Typography>
-              </Box>
-            )}
-          </Box>
-        </Grid>
-      </DialogContent>
-
-      <DialogActions
-        sx={{
-          justifyContent: "center",
-          py: 2,
-          gap: 2,
-          flexWrap: "wrap",
-        }}
-      >
-        <Button
-          label="Save Tab"
-          variantType="secondary"
-          onClick={handleSave}
-          sx={{ width: { xs: "100%", sm: "auto" } }}
-        />
-        <Button
-          label="Cancel"
-          variantType="danger"
-          onClick={onClose}
-          sx={{ width: { xs: "100%", sm: "auto" } }}
-        />
-      </DialogActions>
-    </Dialog>
+        <DialogActions sx={{ justifyContent: "center", py: 2, gap: 2, flexWrap: "wrap" }}>
+          <Button label={isPending ? "Saving..." : "Save Tab"} variantType="secondary" disabled={isPending} onClick={handleSave} sx={{ width: { xs: "100%", sm: "auto" } }} />
+          <Button label="Cancel" variantType="danger" onClick={onClose} sx={{ width: { xs: "100%", sm: "auto" } }} />
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
