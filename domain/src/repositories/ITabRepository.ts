@@ -7,4 +7,5 @@ export interface ITabRepository {
   countByUserAndDate(userId: number, date: Date): Promise<number>;
   delete(id: number): Promise<void>;
   findByTitle(title: string): Promise<Tab | null>;
+  findLatest(limit: number): Promise<Tab[]>;
 }
