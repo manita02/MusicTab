@@ -12,7 +12,8 @@ export class Tab {
     public readonly urlPdf: Url,
     public readonly urlYoutube: Url,
     public readonly urlImg: Url,
-    public readonly createdAt: Date = new Date()
+    public readonly createdAt: Date = new Date(),
+    public readonly userName?: string
   ) {}
 
   static create(
@@ -52,13 +53,14 @@ export class Tab {
     urlPdf: string,
     urlYoutube: string,
     urlImg: string,
-    createdAt?: Date
+    createdAt?: Date,
+    userName?: string
   ): Tab {
     const pdf = Url.create(urlPdf, "PDF URL");
     const youtube = Url.create(urlYoutube, "YouTube URL");
     const img = Url.create(urlImg, "Image URL");
 
-    return new Tab(id, title, userId, genreId, instrumentId, pdf, youtube, img, createdAt ?? new Date());
+    return new Tab(id, title, userId, genreId, instrumentId, pdf, youtube, img, createdAt ?? new Date(), userName);
   }
 
   canEdit(user: User): boolean {
