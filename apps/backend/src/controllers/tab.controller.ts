@@ -1,9 +1,7 @@
-import { Controller, Post, Body, UseFilters, Get, Query, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Put, Param, Delete } from '@nestjs/common';
 import { UserPrismaRepository } from '../repositories/user-prisma.repository';
 import { TabPrismaRepository } from '../repositories/tab-prisma.repository';
 import { CreateTab } from '@domain/use-cases/CreateTab';
-import { ConflictErrorFilter } from '../filters/conflict-error.filter';
-import { DomainError } from '@domain/errors/DomainError';
 import { GetLatestTabs } from '@domain/use-cases/GetLatestTabs';
 import { GetAllTabs } from '@domain/use-cases/GetAllTabs';
 import { UpdateTab } from '@domain/use-cases/UpdateTab';
@@ -19,7 +17,6 @@ type CreateTabDTO = {
   urlImg: string;
 };
 
-@UseFilters(ConflictErrorFilter)
 @Controller('tabs')
 export class TabController {
   private readonly createTab: CreateTab;
@@ -41,27 +38,20 @@ export class TabController {
 
   @Post('create')
   async create(@Body() dto: CreateTabDTO) {
-    try {
-      const tab = await this.createTab.execute(dto);
-      return {
-        id: tab.id,
-        title: tab.title,
-        genreId: tab.genreId,
-        instrumentId: tab.instrumentId,
-        userId: tab.userId,
-        createdAt: tab.createdAt,
-        urlPdf: tab.urlPdf.toString(),
-        urlYoutube: tab.urlYoutube.toString(),
-        urlImg: tab.urlImg.toString(),
-      };
-    } catch (error) {
-      console.error('Error en TabController.create:', error);
-      if (error instanceof DomainError) {
-        return { error: error.name, message: error.message };
-      }
-      throw error;
-    }
+    const tab = await this.createTab.execute(dto);
+    return {
+      id: tab.id,
+      title: tab.title,
+      genreId: tab.genreId,
+      instrumentId: tab.instrumentId,
+      userId: tab.userId,
+      createdAt: tab.createdAt,
+      urlPdf: tab.urlPdf.toString(),
+      urlYoutube: tab.urlYoutube.toString(),
+      urlImg: tab.urlImg.toString(),
+    };
   }
+
 
   @Get('latest')
   async latest(@Query('limit') limit = 8) {
@@ -99,8 +89,7 @@ export class TabController {
 
   @Put('update/:id')
   async update(@Param('id') id: string, @Body() dto: any) {
-    try {
-      const updated = await this.updateTab.execute({
+    const updated = await this.updateTab.execute({
         id: Number(id),
         userId: dto.userId,
         title: dto.title,
@@ -120,26 +109,12 @@ export class TabController {
         urlPdf: updated.urlPdf,
         urlYoutube: updated.urlYoutube,
         urlImg: updated.urlImg,
-      };
-    } catch (error) {
-      console.error("Error in TabController.update:", error);
-      if (error instanceof DomainError) {
-        return { error: error.name, message: error.message };
-      }
-      throw error;
-    }
+      }; 
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string, @Body('userId') userId: number) {
-    try {
-      await this.deleteTab.execute(Number(id), userId);
-      return { success: true, message: "Tab deleted successfully" };
-    } catch (error) {
-      if (error instanceof DomainError) {
-        return { error: error.name, message: error.message };
-      }
-      throw error;
-    }
+    await this.deleteTab.execute(Number(id), userId);
+    return { success: true, message: 'Tab deleted successfully' };
   }
 }
