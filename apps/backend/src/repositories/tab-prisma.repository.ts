@@ -158,4 +158,34 @@ export class TabPrismaRepository implements ITabRepository {
       )
     );
   }
+
+  async update(tab: Tab): Promise<Tab> {
+    if (!tab.id) {
+      throw new Error("Cannot update a tab without an ID");
+    }
+
+    const record = await this.prisma.tab.update({
+      where: { id: tab.id },
+      data: {
+        title: tab.title,
+        urlPdf: tab.urlPdf.toString(),
+        urlYoutube: tab.urlYoutube.toString(),
+        urlImagen: tab.urlImg.toString(),
+        genreId: tab.genreId,
+        instrumentId: tab.instrumentId,
+      },
+    });
+
+    return Tab.rehydrate(
+      record.id,
+      record.title,
+      record.userId,
+      record.genreId,
+      record.instrumentId,
+      record.urlPdf,
+      record.urlYoutube!,
+      record.urlImagen!,
+      record.createdAt
+    );
+  }
 }
