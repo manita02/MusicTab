@@ -66,6 +66,7 @@ export class UserController {
         userId: session.userId,
         userName: user.username, 
         expiresAt: session.expiresAt,
+        userRole: user.role,
       };
     } catch (error) {
       if (error instanceof DomainError) {

@@ -13,7 +13,6 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import DownloadIcon from "@mui/icons-material/Download";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 
 import { theme } from "../theme/theme";
@@ -25,9 +24,10 @@ import { useAuth } from "../api/hooks/useAuth";
 import { useAllTabs } from "../api/hooks/useTabs";
 import { useGenres, useInstruments } from "../api/hooks/useCatalog";
 import { IconLoader } from "../components/IconLoader/IconLoader";
+import { EditTabDialog } from "../dialogs/EditTabDialog";
 
 export const TabsPage: React.FC = () => {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, userId: loggedUserId, userRole } = useAuth();
   const [search, setSearch] = useState("");
   const [view, setView] = useState<"all" | "mine">("all");
   const [order, setOrder] = useState("recent");
@@ -37,6 +37,9 @@ export const TabsPage: React.FC = () => {
   const { data, isLoading, isError } = useAllTabs();
   const { data: genres = [] } = useGenres();
   const { data: instruments = [] } = useInstruments();
+
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedTab, setSelectedTab] = useState<any>(null);
 
   useEffect(() => {
     if (!isLoading && data) {
@@ -52,7 +55,19 @@ export const TabsPage: React.FC = () => {
     handleCloseDialog();
   };
 
-  const handleEdit = (id: number) => console.log("Update:", id);
+  const handleEdit = (tabId: number) => {
+    const tab = data.find((t: any) => t.id === tabId);
+    if (!tab) return;
+    setSelectedTab(tab);
+    setEditDialogOpen(true);
+  };
+
+  const handleCloseEditDialog = () => setEditDialogOpen(false);
+  const handleUpdateTab = (updatedTab: any) => {
+    console.log("Tab updated:", updatedTab);
+    setEditDialogOpen(false);
+  };
+
   const handleDelete = (id: number) => {
     if (window.confirm("Are you sure you want to delete this tab?")) {
       console.log("Delete tab:", id);
@@ -72,8 +87,7 @@ export const TabsPage: React.FC = () => {
     return match ? `https://www.youtube.com/embed/${match[1]}` : null;
   };
 
-  const rows =
-    data?.map((tab: any) => ({
+  const rows = data?.map((tab: any) => ({
       id: tab.id,
       title: tab.title,
       imageUrl: tab.urlImg || "",
@@ -82,90 +96,81 @@ export const TabsPage: React.FC = () => {
       instrument: getInstrumentName(tab.instrumentId),
       genre: getGenreName(tab.genreId),
       user: tab.userName || "-",
-      createdAt: tab.createdAt,
+      userId: tab.userId,
+      createdAt: tab.createdAt
     })) || [];
 
   const columns = [
     {
       field: "actions",
       headerName: "Actions",
-      width: 180,
+      width: 130,
       sortable: false,
       filterable: false,
-      renderCell: (params: any) => (
-        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-          <Tooltip title={isLoggedIn ? "Update" : "Login to edit"}>
-            <span>
-              <IconButton
-                size="small"
-                onClick={() => handleEdit(params.row.id)}
-                sx={{
-                  color: theme.palette.warning.main,
-                  "&:hover": { backgroundColor: "rgba(255,144,19,0.1)" },
-                }}
-                disabled={!isLoggedIn}
-              >
-                <EditIcon fontSize="small" />
-              </IconButton>
-            </span>
-          </Tooltip>
-
-          <Tooltip title={isLoggedIn ? "Delete" : "Login to delete"}>
-            <span>
-              <IconButton
-                size="small"
-                onClick={() => handleDelete(params.row.id)}
-                sx={{
-                  color: theme.palette.error.main,
-                  "&:hover": { backgroundColor: "rgba(255,0,0,0.08)" },
-                }}
-                disabled={!isLoggedIn}
-              >
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </span>
-          </Tooltip>
-
-          {params.row.pdf && (
-            <>
-              <Tooltip title="View PDF">
-                <span>
-                  <IconButton
-                    size="small"
-                    component="a"
-                    href={params.row.pdf}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    sx={{
-                      color: theme.palette.info.main,
-                      "&:hover": { backgroundColor: "rgba(0,0,255,0.08)" },
-                    }}
-                  >
-                    <PictureAsPdfIcon fontSize="small" />
-                  </IconButton>
-                </span>
+      renderCell: (params: any) => {
+        const canManage = isLoggedIn && (userRole === "ADMIN" || params.row.userId === loggedUserId);
+        return (
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              flexWrap: "wrap",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+              width: "100%",
+            }}
+          >
+            {canManage && (
+              <Tooltip title="Update" arrow>
+                <IconButton
+                  size="small"
+                  onClick={() => handleEdit(params.row.id)}
+                  sx={{
+                    color: theme.palette.warning.main,
+                    "&:hover": { backgroundColor: "rgba(255,144,19,0.1)" },
+                  }}
+                >
+                  <EditIcon fontSize="small" />
+                </IconButton>
               </Tooltip>
+            )}
 
-              <Tooltip title="Download PDF">
-                <span>
-                  <IconButton
-                    size="small"
-                    component="a"
-                    href={params.row.pdf}
-                    download
-                    sx={{
-                      color: theme.palette.success.main,
-                      "&:hover": { backgroundColor: "rgba(0,255,0,0.08)" },
-                    }}
-                  >
-                    <DownloadIcon fontSize="small" />
-                  </IconButton>
-                </span>
+            {canManage && (
+              <Tooltip title="Delete" arrow>
+                <IconButton
+                  size="small"
+                  onClick={() => handleDelete(params.row.id)}
+                  sx={{
+                    color: theme.palette.error.main,
+                    "&:hover": { backgroundColor: "rgba(255,0,0,0.08)" },
+                  }}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
               </Tooltip>
-            </>
-          )}
-        </Box>
-      ),
+            )}
+
+            {params.row.pdf && (
+              <Tooltip title="View PDF" arrow>
+                <IconButton
+                  size="small"
+                  component="a"
+                  href={params.row.pdf}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{
+                    color: theme.palette.info.main,
+                    "&:hover": { backgroundColor: "rgba(0,0,255,0.08)" },
+                  }}
+                >
+                  <PictureAsPdfIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Box>
+        );
+      },
     },
     {
       field: "title",
@@ -381,6 +386,12 @@ export const TabsPage: React.FC = () => {
           </Box>
 
           <CreateTabDialog open={openDialog} onClose={handleCloseDialog} onSave={handleSaveTab} />
+          <EditTabDialog
+            open={editDialogOpen}
+            onClose={handleCloseEditDialog}
+            tabData={selectedTab}
+            onSave={handleUpdateTab}
+          />
         </>
       )}
     </Box>

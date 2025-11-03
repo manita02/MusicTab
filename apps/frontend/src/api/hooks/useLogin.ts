@@ -13,6 +13,7 @@ type LoginResponse = {
   userId: number;
   userName: string;
   expiresAt: string;
+  userRole: string;
 };
 
 export const useLogin = () => {
@@ -28,6 +29,7 @@ export const useLogin = () => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("userName", data.userName);
       localStorage.setItem("userId", data.userId.toString());
+      localStorage.setItem("userRole", data.userRole);
     },
   });
 };

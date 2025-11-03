@@ -66,4 +66,26 @@ export class Tab {
   canEdit(user: User): boolean {
     return user.isAdmin() || user.id === this.userId;
   }
+
+  update(props: {
+    title?: string;
+    genreId?: number;
+    instrumentId?: number;
+    urlPdf?: string;
+    urlYoutube?: string;
+    urlImg?: string;
+  }): Tab {
+    return new Tab(
+      this.id,
+      props.title ?? this.title,
+      this.userId,
+      props.genreId ?? this.genreId,
+      props.instrumentId ?? this.instrumentId,
+      Url.create(props.urlPdf ?? this.urlPdf.toString(), "PDF URL"),
+      Url.create(props.urlYoutube ?? this.urlYoutube.toString(), "YouTube URL"),
+      Url.create(props.urlImg ?? this.urlImg.toString(), "Image URL"),
+      this.createdAt,
+      this.userName
+    );
+  }
 }
