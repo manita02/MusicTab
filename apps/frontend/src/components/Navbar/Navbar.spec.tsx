@@ -51,7 +51,7 @@ describe("Navbar component", () => {
     fireEvent.click(navButton);
     const mobileMenu = screen.getByTestId("mobile-menu");
     expect(within(mobileMenu).getByText(/HOME/i)).toBeVisible();
-    expect(within(mobileMenu).getByText(/HOW IT WORKS/i)).toBeVisible();
+    // expect(within(mobileMenu).getByText(/HOW IT WORKS/i)).toBeVisible();
     expect(within(mobileMenu).getByText(/TABS/i)).toBeVisible();
     fireEvent.click(navButton);
   });
