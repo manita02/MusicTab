@@ -11,5 +11,6 @@ export const ENDPOINTS = {
     create: "/tabs/create",
     latest: "/tabs/latest",
     all: "/tabs/all",
+    update: (id: number | string) => `/tabs/update/${id}`,
   },
 };
