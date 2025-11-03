@@ -82,31 +82,36 @@ export const EditTabDialog: React.FC<EditTabDialogProps> = ({
 
   const handleSave = () => {
     if (!title.trim() || !genre || !instrument) {
-      showModal("warning", "Incomplete Form", "Please complete all required fields.");
+      showModal("warning", "Incomplete Form", "Please complete all required fields before saving.");
       return;
     }
 
-    updateTab(
-      {
-        id: tabData.id,
-        title,
-        genreId: Number(genre),
-        instrumentId: Number(instrument),
-        urlPdf: pdfUrl,
-        urlYoutube: youtubeUrl,
-        urlImg: imageUrl,
-        userId: tabData.userId,
+    const updatedTab = {
+      id: tabData.id,
+      title,
+      genreId: Number(genre),
+      instrumentId: Number(instrument),
+      urlPdf: pdfUrl,
+      urlYoutube: youtubeUrl,
+      urlImg: imageUrl,
+      userId: tabData.userId,
+    };
+
+    updateTab(updatedTab, {
+      onSuccess: (data) => {
+        showModal("success", "Tab Updated", "The tab has been successfully updated!");
+        onSave(data);
       },
-      {
-        onSuccess: (data) => {
-          showModal("success", "Tab Updated", "The tab has been successfully updated!");
-          onSave(data);
-        },
-        onError: (error: any) => {
-          showModal("error", "Update Failed", error?.message || "Unexpected error");
-        },
-      }
-    );
+      onError: (error) => {
+        const backendMsg =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message ||
+          "An unexpected error occurred while updating the tab.";
+
+        showModal("error", "Error Updating Tab", backendMsg);
+      },
+    });
   };
 
   const getYouTubeEmbedUrl = (url: string) => {
