@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
-import { TestUserController } from './controllers/test-user.controller';
 import { UserController } from './controllers/user.controller';
 import { TabController } from './controllers/tab.controller';
 
@@ -26,7 +25,6 @@ import { CatalogController } from './controllers/catalog.controller';
   ],
   controllers: [
     AppController,
-    TestUserController,
     UserController,
     TabController,
     CatalogController
