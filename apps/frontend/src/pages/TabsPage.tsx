@@ -13,7 +13,6 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import DownloadIcon from "@mui/icons-material/Download";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 
 import { theme } from "../theme/theme";
@@ -25,6 +24,7 @@ import { useAuth } from "../api/hooks/useAuth";
 import { useAllTabs } from "../api/hooks/useTabs";
 import { useGenres, useInstruments } from "../api/hooks/useCatalog";
 import { IconLoader } from "../components/IconLoader/IconLoader";
+import { EditTabDialog } from "../dialogs/EditTabDialog";
 
 export const TabsPage: React.FC = () => {
   const { isLoggedIn, userId: loggedUserId, userRole } = useAuth();
@@ -37,6 +37,9 @@ export const TabsPage: React.FC = () => {
   const { data, isLoading, isError } = useAllTabs();
   const { data: genres = [] } = useGenres();
   const { data: instruments = [] } = useInstruments();
+
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedTab, setSelectedTab] = useState<any>(null);
 
   useEffect(() => {
     if (!isLoading && data) {
@@ -52,7 +55,19 @@ export const TabsPage: React.FC = () => {
     handleCloseDialog();
   };
 
-  const handleEdit = (id: number) => console.log("Update:", id);
+  const handleEdit = (tabId: number) => {
+    const tab = data.find((t: any) => t.id === tabId);
+    if (!tab) return;
+    setSelectedTab(tab);
+    setEditDialogOpen(true);
+  };
+
+  const handleCloseEditDialog = () => setEditDialogOpen(false);
+  const handleUpdateTab = (updatedTab: any) => {
+    console.log("Tab updated:", updatedTab);
+    setEditDialogOpen(false);
+  };
+
   const handleDelete = (id: number) => {
     if (window.confirm("Are you sure you want to delete this tab?")) {
       console.log("Delete tab:", id);
@@ -371,6 +386,12 @@ export const TabsPage: React.FC = () => {
           </Box>
 
           <CreateTabDialog open={openDialog} onClose={handleCloseDialog} onSave={handleSaveTab} />
+          <EditTabDialog
+            open={editDialogOpen}
+            onClose={handleCloseEditDialog}
+            tabData={selectedTab}
+            onSave={handleUpdateTab}
+          />
         </>
       )}
     </Box>
