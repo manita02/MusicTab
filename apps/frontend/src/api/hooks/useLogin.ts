@@ -30,6 +30,7 @@ export const useLogin = () => {
       localStorage.setItem("userName", data.userName);
       localStorage.setItem("userId", data.userId.toString());
       localStorage.setItem("userRole", data.userRole);
+      localStorage.setItem("expiresAt", data.expiresAt);
     },
   });
 };
