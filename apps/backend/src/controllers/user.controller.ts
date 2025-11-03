@@ -1,11 +1,10 @@
-import { Controller, Post, Body, UseFilters } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { UserPrismaRepository } from '../repositories/user-prisma.repository';
 import { SessionPrismaRepository } from '../repositories/session-prisma.repository';
 import { PasswordHasherService } from '../services/password-hasher.service';
 import { TokenService } from '../services/token.service';
 import { RegisterUser } from '@domain/use-cases/RegisterUser';
 import { LoginUser } from '@domain/use-cases/LoginUser';
-import { ConflictErrorFilter } from '../filters/conflict-error.filter';
 import { DomainError } from '@domain/errors/DomainError';
 
 type RegisterDTO = {
@@ -20,7 +19,6 @@ type LoginDTO = {
   expiresInSeconds: number;
 };
 
-@UseFilters(ConflictErrorFilter)
 @Controller('users')
 export class UserController {
   private readonly registerUser: RegisterUser;
@@ -55,9 +53,8 @@ export class UserController {
 
   @Post('login')
   async login(@Body() dto: LoginDTO) {
-    try {
-      const session = await this.loginUser.execute(dto);
-      const user = await this.userRepo.findById(session.userId);
+    const session = await this.loginUser.execute(dto);
+    const user = await this.userRepo.findById(session.userId);
       if (!user) {
         throw new DomainError('UserNotFound', 'User not found after login');
       }
@@ -68,14 +65,5 @@ export class UserController {
         expiresAt: session.expiresAt,
         userRole: user.role,
       };
-    } catch (error) {
-      if (error instanceof DomainError) {
-        return {
-          error: error.name,
-          message: error.message,
-        };
-      }
-      throw error;
-    }
   }
 }
