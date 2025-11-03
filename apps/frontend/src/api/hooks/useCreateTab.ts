@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { api } from "../client";
 import { ENDPOINTS } from "../endpoints";
+import type { AxiosError } from "axios";
 
 type CreateTabRequest = {
   title: string;
@@ -24,11 +25,23 @@ type CreateTabResponse = {
   urlImg: string;
 };
 
+type ApiErrorResponse = {
+  statusCode?: number;
+  message?: string;
+  error?: string;
+  code?: string;
+};
+
 export const useCreateTab = () => {
-  return useMutation<CreateTabResponse, Error, CreateTabRequest>({
+  return useMutation<CreateTabResponse, AxiosError<ApiErrorResponse>, CreateTabRequest>({
     mutationFn: async (data: CreateTabRequest) => {
-      const res = await api.post(ENDPOINTS.tabs.create, data);
-      return res.data;
+      try {
+        const res = await api.post(ENDPOINTS.tabs.create, data);
+        return res.data;
+      } catch (error) {
+        if (error instanceof Error) throw error;
+        throw new Error("Unexpected error while creating tab");
+      }
     },
   });
 };
