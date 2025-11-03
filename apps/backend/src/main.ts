@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
-import { ConflictErrorFilter } from './filters/conflict-error.filter';
+import { DomainErrorFilter } from './filters/conflict-error.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,7 +13,8 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.useGlobalFilters(new ConflictErrorFilter());
+  app.useGlobalFilters(new DomainErrorFilter());
+
   const port = process.env.PORT || 3000;
   await app.listen(port);
   console.log(`🚀 Server running on port ${port}, CORS enabled for ${corsOrigin}`);
