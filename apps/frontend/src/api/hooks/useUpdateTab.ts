@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { api } from "../client";
 import { ENDPOINTS } from "../endpoints";
+import type { AxiosError } from "axios";
 
 type UpdateTabRequest = {
   id: number;
@@ -25,14 +26,26 @@ type UpdateTabResponse = {
   urlImg: string;
 };
 
+type ApiErrorResponse = {
+  statusCode?: number;
+  message?: string;
+  error?: string;
+  code?: string;
+};
+
 export const useUpdateTab = () => {
-  return useMutation<UpdateTabResponse, Error, UpdateTabRequest>({
+  return useMutation<UpdateTabResponse, AxiosError<ApiErrorResponse>, UpdateTabRequest>({
     mutationFn: async (tab: UpdateTabRequest) => {
       const token = localStorage.getItem("token");
-      const response = await api.put(`${ENDPOINTS.tabs.update(tab.id)}`, tab, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data;
+      try {
+        const response = await api.put(ENDPOINTS.tabs.update(tab.id), tab, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+      } catch (error) {
+        if (error instanceof Error) throw error;
+        throw new Error("Unexpected error while updating tab");
+      }
     },
   });
 };
