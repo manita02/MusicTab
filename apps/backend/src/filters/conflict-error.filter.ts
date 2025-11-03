@@ -1,15 +1,21 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpStatus } from '@nestjs/common';
-import { ConflictError } from '@domain/errors/DomainError';
+import { DomainError } from '@domain/errors/DomainError';
 
-@Catch(ConflictError)
-export class ConflictErrorFilter implements ExceptionFilter {
-  catch(exception: ConflictError, host: ArgumentsHost) {
+@Catch(DomainError)
+export class DomainErrorFilter implements ExceptionFilter {
+  catch(exception: DomainError, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
 
-    response.status(HttpStatus.CONFLICT).json({
-      statusCode: HttpStatus.CONFLICT,
+    const status =
+      exception.code === 'Conflict'
+        ? HttpStatus.CONFLICT
+        : HttpStatus.BAD_REQUEST;
+
+    response.status(status).json({
+      statusCode: status,
       message: exception.message,
+      code: exception.code,
     });
   }
 }
