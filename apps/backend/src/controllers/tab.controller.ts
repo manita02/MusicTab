@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseFilters, Get, Query, Put, Param } from '@nestjs/common';
+import { Controller, Post, Body, UseFilters, Get, Query, Put, Param, Delete } from '@nestjs/common';
 import { UserPrismaRepository } from '../repositories/user-prisma.repository';
 import { TabPrismaRepository } from '../repositories/tab-prisma.repository';
 import { CreateTab } from '@domain/use-cases/CreateTab';
@@ -7,6 +7,7 @@ import { DomainError } from '@domain/errors/DomainError';
 import { GetLatestTabs } from '@domain/use-cases/GetLatestTabs';
 import { GetAllTabs } from '@domain/use-cases/GetAllTabs';
 import { UpdateTab } from '@domain/use-cases/UpdateTab';
+import { DeleteTab } from '@domain/use-cases/DeleteTab';
 
 type CreateTabDTO = {
   title: string;
@@ -25,6 +26,7 @@ export class TabController {
   private readonly getLatestTabs: GetLatestTabs;
   private readonly getAllTabs: GetAllTabs;
   private readonly updateTab: UpdateTab;
+  private readonly deleteTab: DeleteTab;
 
   constructor(
     private readonly userRepo: UserPrismaRepository,
@@ -34,6 +36,7 @@ export class TabController {
     this.getLatestTabs = new GetLatestTabs(this.tabRepo);
     this.getAllTabs = new GetAllTabs(this.tabRepo);
     this.updateTab = new UpdateTab(this.tabRepo, this.userRepo);
+    this.deleteTab = new DeleteTab(this.tabRepo, this.userRepo);
   }
 
   @Post('create')
@@ -120,6 +123,19 @@ export class TabController {
       };
     } catch (error) {
       console.error("Error in TabController.update:", error);
+      if (error instanceof DomainError) {
+        return { error: error.name, message: error.message };
+      }
+      throw error;
+    }
+  }
+
+  @Delete(':id')
+  async remove(@Param('id') id: string, @Body('userId') userId: number) {
+    try {
+      await this.deleteTab.execute(Number(id), userId);
+      return { success: true, message: "Tab deleted successfully" };
+    } catch (error) {
       if (error instanceof DomainError) {
         return { error: error.name, message: error.message };
       }

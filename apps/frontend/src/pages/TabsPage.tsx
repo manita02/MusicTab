@@ -23,8 +23,10 @@ import { CreateTabDialog } from "../dialogs/CreateTabDialog";
 import { useAuth } from "../api/hooks/useAuth";
 import { useAllTabs } from "../api/hooks/useTabs";
 import { useGenres, useInstruments } from "../api/hooks/useCatalog";
+import { useDeleteTab } from "../api/hooks/useDeleteTab";
 import { IconLoader } from "../components/IconLoader/IconLoader";
 import { EditTabDialog } from "../dialogs/EditTabDialog";
+import { MessageModal } from "../components/MessageModal/MessageModal";
 
 export const TabsPage: React.FC = () => {
   const { isLoggedIn, userId: loggedUserId, userRole } = useAuth();
@@ -40,6 +42,20 @@ export const TabsPage: React.FC = () => {
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState<any>(null);
+
+  const { mutate: deleteTab, isPending: isDeleting } = useDeleteTab();
+
+  const [modal, setModal] = useState<{
+    open: boolean;
+    type: "success" | "error" | "warning";
+    title: string;
+    message: string;
+  }>({
+    open: false,
+    type: "warning",
+    title: "",
+    message: "",
+  });
 
   useEffect(() => {
     if (!isLoading && data) {
@@ -68,10 +84,54 @@ export const TabsPage: React.FC = () => {
     setEditDialogOpen(false);
   };
 
-  const handleDelete = (id: number) => {
-    if (window.confirm("Are you sure you want to delete this tab?")) {
-      console.log("Delete tab:", id);
-    }
+  const [tabs, setTabs] = useState<any[]>([]);
+  useEffect(() => {
+    if (data) setTabs(data);
+  }, [data]);
+
+  const handleDeleteClick = (tab: { id: number; title: string; userId: number }) => {
+    setSelectedTab(tab);
+    setModal({
+      open: true,
+      type: "warning",
+      title: "Delete this tab?",
+      message: `Are you sure you want to delete "${tab.title}"? This action cannot be undone.`,
+    });
+  };
+
+  const handleConfirmDelete = () => {
+    if (!selectedTab) return;
+    deleteTab(
+      { id: selectedTab.id, userId: Number(localStorage.getItem("userId")) },
+      {
+        onSuccess: () => {
+          setTabs((prevTabs) => prevTabs.filter((t) => t.id !== selectedTab.id));
+          setModal({
+            open: true,
+            type: "success",
+            title: "Deleted successfully",
+            message: `The tab "${selectedTab.title}" was deleted successfully.`,
+          });
+          setSelectedTab(null);
+        },
+        onError: (error: any) => {
+          const errorMessage =
+            error?.response?.data?.message ||
+            error?.message ||
+            "An unexpected error occurred while deleting the tab.";
+          setModal({
+            open: true,
+            type: "error",
+            title: "Error deleting",
+            message: errorMessage,
+          });
+        },
+      }
+    );
+  };
+
+  const handleCloseModal = () => {
+    setModal((prev) => ({ ...prev, open: false }));
   };
 
   const getGenreName = (id: number) =>
@@ -140,7 +200,8 @@ export const TabsPage: React.FC = () => {
               <Tooltip title="Delete" arrow>
                 <IconButton
                   size="small"
-                  onClick={() => handleDelete(params.row.id)}
+                  onClick={() => handleDeleteClick(params.row)}
+                  disabled={isDeleting}
                   sx={{
                     color: theme.palette.error.main,
                     "&:hover": { backgroundColor: "rgba(255,0,0,0.08)" },
@@ -391,6 +452,26 @@ export const TabsPage: React.FC = () => {
             onClose={handleCloseEditDialog}
             tabData={selectedTab}
             onSave={handleUpdateTab}
+          />
+          <MessageModal
+            open={modal.open}
+            type={modal.type}
+            title={modal.title}
+            message={modal.message}
+            confirmText={
+              modal.type === "warning"
+                ? isDeleting
+                  ? "Deleting..."
+                  : "Yes, delete"
+                : "Accept"
+            }
+            cancelText={modal.type === "warning" ? "Cancel" : undefined}
+            onConfirm={
+              modal.type === "warning"
+                ? handleConfirmDelete
+                : handleCloseModal
+            }
+            onCancel={handleCloseModal}
           />
         </>
       )}

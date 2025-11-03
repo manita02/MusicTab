@@ -12,5 +12,6 @@ export const ENDPOINTS = {
     latest: "/tabs/latest",
     all: "/tabs/all",
     update: (id: number | string) => `/tabs/update/${id}`,
+    delete: (id: number) => `/tabs/${id}`,
   },
 };
