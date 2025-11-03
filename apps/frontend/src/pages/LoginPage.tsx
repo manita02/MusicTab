@@ -22,6 +22,8 @@ export const LoginPage: React.FC = () => {
         onSuccess: (data) => {
           localStorage.setItem("token", data.token);
           localStorage.setItem("userName", data.userName);
+          localStorage.setItem("userId", String(data.userId));
+          localStorage.setItem("userRole", data.userRole);
           navigate("/");
           window.location.reload();
         },
