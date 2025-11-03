@@ -31,23 +31,26 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
 }) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
+
   const [title, setTitle] = useState("");
   const [genre, setGenre] = useState("");
   const [instrument, setInstrument] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [pdfUrl, setPdfUrl] = useState("");
+
   const [debouncedImageUrl, setDebouncedImageUrl] = useState(imageUrl);
   const [imageValid, setImageValid] = useState(true);
+
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<"success" | "error" | "warning">(
-    "success"
-  );
+  const [modalType, setModalType] = useState<"success" | "error" | "warning">("success");
   const [modalMessage, setModalMessage] = useState("");
   const [modalTitle, setModalTitle] = useState("");
+
   const { data: genres = [], isLoading: loadingGenres } = useGenres();
   const { data: instruments = [], isLoading: loadingInstruments } = useInstruments();
   const { mutate: createTab, isPending } = useCreateTab();
+
   const isLoading = loadingGenres || loadingInstruments || isPending;
 
   const resetForm = () => {
@@ -80,7 +83,7 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const userId = Number(localStorage.getItem("userId"));
 
     if (!userId) {
@@ -89,11 +92,7 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
     }
 
     if (!title.trim() || !genre || !instrument) {
-      showModal(
-        "warning",
-        "Incomplete Form",
-        "Please complete all required fields before saving."
-      );
+      showModal("warning", "Incomplete Form", "Please complete all required fields before saving.");
       return;
     }
 
@@ -112,15 +111,18 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
         showModal("success", "Tab Created", "The tab has been successfully created!");
         onSave(data);
       },
-      onError: (error: any) => {
-        showModal(
-          "error",
-          "Error Creating Tab",
-          error?.response?.data?.message || "An unexpected error occurred."
-        );
+      onError: (error) => {
+        const backendMsg =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message ||
+          "An unexpected error occurred.";
+
+        showModal("error", "Error Creating Tab", backendMsg);
       },
     });
   };
+
 
   const getYouTubeEmbedUrl = (url: string) => {
     const regExp =
@@ -150,7 +152,6 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
       setDebouncedImageUrl(imageUrl);
       setImageValid(true);
     }, 500);
-
     return () => clearTimeout(handler);
   }, [imageUrl]);
 
@@ -163,33 +164,73 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
         type={modalType}
         title={modalTitle}
         message={modalMessage}
-        confirmText={modalType === "warning" ? "Continue" : "OK"}
-        cancelText={modalType === "warning" ? "Cancel" : undefined}
+        confirmText="OK"
         onConfirm={handleModalClose}
-        onCancel={handleModalClose}
       />
 
-      <Dialog open={open} onClose={onClose} fullWidth maxWidth="lg" fullScreen={fullScreen}
-        PaperProps={{ sx: { borderRadius: 3, p: { xs: 1, sm: 2 }, backgroundColor: theme.palette.background.paper } }}
+      <Dialog
+        open={open}
+        onClose={onClose}
+        fullWidth
+        maxWidth="lg"
+        fullScreen={fullScreen}
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            p: { xs: 1, sm: 2 },
+            backgroundColor: theme.palette.background.paper,
+          },
+        }}
       >
-        <DialogTitle sx={{ fontWeight: 700, textAlign: "center", color: theme.palette.primary.main, pb: 1 }}>
+        <DialogTitle
+          sx={{
+            fontWeight: 700,
+            textAlign: "center",
+            color: theme.palette.primary.main,
+            pb: 1,
+          }}
+        >
           Create New Tab
         </DialogTitle>
 
         <DialogContent dividers sx={{ px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 } }}>
           <Grid container spacing={3} direction="column">
-            <InputField label="Title *" value={title} onChange={e => setTitle(e.target.value)} fullWidth />
-            <SelectField label="Instrument *" value={instrument} onChange={e => setInstrument(e.target.value)}
-              options={loadingInstruments ? [] : instruments.map(i => ({ value: i.id.toString(), label: i.name }))} fullWidth />
-            <SelectField label="Genre *" value={genre} onChange={e => setGenre(e.target.value)}
-              options={loadingGenres ? [] : genres.map(g => ({ value: g.id.toString(), label: g.name }))} fullWidth />
-            <InputField label="PDF URL" value={pdfUrl} onChange={e => setPdfUrl(e.target.value)} fullWidth />
-            <InputField label="Image URL" value={imageUrl} onChange={e => setImageUrl(e.target.value)} fullWidth />
+            <InputField label="Title *" value={title} onChange={(e) => setTitle(e.target.value)} fullWidth />
+
+            <SelectField
+              label="Instrument *"
+              value={instrument}
+              onChange={(e) => setInstrument(e.target.value)}
+              options={loadingInstruments ? [] : instruments.map((i) => ({ value: i.id.toString(), label: i.name }))}
+              fullWidth
+            />
+
+            <SelectField
+              label="Genre *"
+              value={genre}
+              onChange={(e) => setGenre(e.target.value)}
+              options={loadingGenres ? [] : genres.map((g) => ({ value: g.id.toString(), label: g.name }))}
+              fullWidth
+            />
+
+            <InputField label="PDF URL" value={pdfUrl} onChange={(e) => setPdfUrl(e.target.value)} fullWidth />
+            <InputField label="Image URL" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} fullWidth />
 
             <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
               {debouncedImageUrl && imageValid ? (
-                <Box component="img" src={debouncedImageUrl} alt="Preview"
-                  sx={{ width: "100%", maxWidth: 400, height: 225, borderRadius: 2, boxShadow: 3, objectFit: "cover", border: `1px solid ${theme.palette.divider}` }}
+                <Box
+                  component="img"
+                  src={debouncedImageUrl}
+                  alt="Preview"
+                  sx={{
+                    width: "100%",
+                    maxWidth: 400,
+                    height: 225,
+                    borderRadius: 2,
+                    boxShadow: 3,
+                    objectFit: "cover",
+                    border: `1px solid ${theme.palette.divider}`,
+                  }}
                   onError={() => setImageValid(false)}
                 />
               ) : (
@@ -199,11 +240,23 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
               )}
             </Box>
 
-            <InputField label="YouTube URL" value={youtubeUrl} onChange={e => setYoutubeUrl(e.target.value)} fullWidth />
+            <InputField label="YouTube URL" value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} fullWidth />
+
             <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
               {embedUrl ? (
-                <Box component="iframe" src={embedUrl} title="YouTube preview" allowFullScreen
-                  sx={{ width: "100%", maxWidth: 400, aspectRatio: "16/9", borderRadius: 2, boxShadow: 3, border: `1px solid ${theme.palette.divider}` }}
+                <Box
+                  component="iframe"
+                  src={embedUrl}
+                  title="YouTube preview"
+                  allowFullScreen
+                  sx={{
+                    width: "100%",
+                    maxWidth: 400,
+                    aspectRatio: "16/9",
+                    borderRadius: 2,
+                    boxShadow: 3,
+                    border: `1px solid ${theme.palette.divider}`,
+                  }}
                 />
               ) : (
                 <Box sx={previewBoxStyles}>
@@ -215,8 +268,19 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
         </DialogContent>
 
         <DialogActions sx={{ justifyContent: "center", py: 2, gap: 2, flexWrap: "wrap" }}>
-          <Button label={isPending ? "Saving..." : "Save Tab"} variantType="secondary" disabled={isPending} onClick={handleSave} sx={{ width: { xs: "100%", sm: "auto" } }} />
-          <Button label="Cancel" variantType="danger" onClick={onClose} sx={{ width: { xs: "100%", sm: "auto" } }} />
+          <Button
+            label={isPending ? "Saving..." : "Save Tab"}
+            variantType="secondary"
+            disabled={isPending}
+            onClick={handleSave}
+            sx={{ width: { xs: "100%", sm: "auto" } }}
+          />
+          <Button
+            label="Cancel"
+            variantType="danger"
+            onClick={onClose}
+            sx={{ width: { xs: "100%", sm: "auto" } }}
+          />
         </DialogActions>
       </Dialog>
     </>
