@@ -69,7 +69,7 @@ export class UserController {
         userName: user.username, 
         expiresAt: session.expiresAt,
         userRole: user.role,
-        urlImg: user.urlImg.toString(),
+        userImg: user.urlImg.toString(),
       };
   }
 }
