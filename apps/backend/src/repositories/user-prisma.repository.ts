@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { IUserRepository } from '@domain/repositories/IUserRepository';
-
 import { User, Role } from '@domain/entities/User';
 
 @Injectable()
@@ -20,7 +19,9 @@ export class UserPrismaRepository implements IUserRepository {
       record.email,
       record.passwordHash,
       record.role as Role,
-      record.createdAt
+      record.createdAt,
+      record.birthDate,
+      record.urlImg
     );
   }
 
@@ -36,7 +37,9 @@ export class UserPrismaRepository implements IUserRepository {
       record.email,
       record.passwordHash,
       record.role as Role,
-      record.createdAt
+      record.createdAt,
+      record.birthDate,
+      record.urlImg
     );
   }
 
@@ -51,7 +54,9 @@ export class UserPrismaRepository implements IUserRepository {
       record.email,
       record.passwordHash,
       record.role as Role,
-      record.createdAt
+      record.createdAt,
+      record.birthDate,
+      record.urlImg
     );
   }
   
@@ -66,6 +71,8 @@ export class UserPrismaRepository implements IUserRepository {
           email: user.email.toString(),
           passwordHash: user.passwordHash,
           role: user.role,
+          birthDate: user.birthDate,
+          urlImg: user.urlImg.toString(),
         },
       });
     } else {
@@ -76,6 +83,8 @@ export class UserPrismaRepository implements IUserRepository {
           passwordHash: user.passwordHash,
           role: user.role,
           createdAt: user.createdAt,
+          birthDate: user.birthDate,
+          urlImg: user.urlImg.toString(),
         },
       });
     }
@@ -86,7 +95,9 @@ export class UserPrismaRepository implements IUserRepository {
       record.email,
       record.passwordHash,
       record.role as Role,
-      record.createdAt
+      record.createdAt,
+      record.birthDate,
+      record.urlImg
     );
   }
 
