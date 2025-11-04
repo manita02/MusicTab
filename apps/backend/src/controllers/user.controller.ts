@@ -11,12 +11,15 @@ type RegisterDTO = {
   username: string;
   email: string;
   password: string;
+  birthDate: Date;
+  urlImg: string;
 };
 
 type LoginDTO = {
   email: string;
   password: string;
   expiresInSeconds: number;
+  urlImg: string;
 };
 
 @Controller('users')
@@ -48,6 +51,8 @@ export class UserController {
       email: user.email,
       role: user.role,
       createdAt: user.createdAt,
+      birthDate: user.birthDate,
+      urlImg: user.urlImg.toString(),
     };
   }
 
@@ -64,6 +69,7 @@ export class UserController {
         userName: user.username, 
         expiresAt: session.expiresAt,
         userRole: user.role,
+        urlImg: user.urlImg.toString(),
       };
   }
 }
