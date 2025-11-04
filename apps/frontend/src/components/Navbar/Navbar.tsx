@@ -179,13 +179,43 @@ export const Navbar: React.FC<NavbarProps> = ({
               sx={{
                 p: 0,
                 transition: "transform 0.2s ease, color 0.3s ease",
-                "&:hover": { color: theme.palette.warning.main, transform: "scale(1.05)" },
+                "&:hover": {
+                  color: theme.palette.warning.main,
+                  transform: "scale(1.05)",
+                },
               }}
             >
               {isLoggedIn ? (
-                <Avatar alt={userName} src={userAvatar} />
+                <Avatar
+                  alt={userName}
+                  src={userAvatar}
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    border: `3px solid ${
+                      userRole === "ADMIN" ? "#FF9100" : "#2979FF"
+                    }`,
+                    boxShadow:
+                      userRole === "ADMIN"
+                        ? "0 0 10px 2px rgba(255,145,0,0.8)"
+                        : "0 0 10px 2px rgba(41,121,255,0.8)",
+                    transition: "box-shadow 0.3s ease, transform 0.2s ease",
+                    "&:hover": {
+                      boxShadow:
+                        userRole === "ADMIN"
+                          ? "0 0 14px 3px rgba(255,145,0,1)"
+                          : "0 0 14px 3px rgba(41,121,255,1)",
+                      transform: "scale(1.08)",
+                    },
+                  }}
+                />
               ) : (
-                <AccountCircleIcon sx={{ color: theme.palette.primary.contrastText, fontSize: 36 }} />
+                <AccountCircleIcon
+                  sx={{
+                    color: theme.palette.primary.contrastText,
+                    fontSize: 36,
+                  }}
+                />
               )}
             </IconButton>
           </Tooltip>
