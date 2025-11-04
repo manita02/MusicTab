@@ -13,7 +13,28 @@
 npx ts-node --project apps/backend/tsconfig.json -r tsconfig-paths/register apps/backend/src/main.ts
 ```
 
-### * Run tests
+### * Run backend tests
 ```bash
 yarn vitest run
 ```
+
+---
+
+### * Run frontend
+```bash
+cd apps/frontend
+yarn dev
+```
+
+### * Run frontend tests
+```bash
+cd apps/frontend
+yarn test
+```
+
+### * Run storybook
+```bash
+cd apps/frontend
+yarn storybook
+```
+
