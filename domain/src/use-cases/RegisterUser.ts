@@ -1,9 +1,9 @@
 import { IUserRepository } from "../repositories/IUserRepository";
 import { IPasswordHasher } from "../services/IPasswordHasher";
-import { User } from "../entities/User";
+import { Role, User } from "../entities/User";
 import { ConflictError } from "../errors/DomainError";
 
-type DTO = { username: string; email: string; password: string };
+type DTO = { username: string; email: string; password: string; birthDate: Date; urlImg: string };
 
 export class RegisterUser {
   constructor(
@@ -21,7 +21,7 @@ export class RegisterUser {
       throw new ConflictError("Username already taken");
     }
     const hash = await this.passwordHasher.hash(dto.password);
-    const user = User.create(dto.username, dto.email, hash);
+    const user = User.create(dto.username, dto.email, hash, Role.USER, dto.birthDate, dto.urlImg);
     const saved = await this.userRepo.save(user);
 
     return saved;

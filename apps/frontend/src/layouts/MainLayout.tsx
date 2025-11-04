@@ -6,7 +6,7 @@ import { Footer } from "../components/Footer/Footer";
 import { useAuth } from "../api/hooks/useAuth";
 
 export const MainLayout: React.FC = () => {
-  const { isLoggedIn, userName, logout } = useAuth();
+  const { isLoggedIn, userName, userImg, logout, userRole } = useAuth();
   return (
     <Box
       sx={{
@@ -42,6 +42,14 @@ export const MainLayout: React.FC = () => {
         <Navbar
           isLoggedIn={isLoggedIn}
           userName={userName || undefined}
+          userAvatar={userImg || undefined}
+          userRole={
+            userRole === "ADMIN"
+              ? "ADMIN"
+              : userRole === "USER"
+              ? "USER"
+              : undefined
+          }
           onLogout={logout}
           onLogin={() => console.log("Login clicked")}
           onSignUp={() => console.log("Sign Up clicked")}

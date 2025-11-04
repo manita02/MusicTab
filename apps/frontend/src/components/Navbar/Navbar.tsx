@@ -10,16 +10,20 @@ import {
   Tooltip,
   Box,
   Button,
+  Chip,
 } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
 import MenuIcon from "@mui/icons-material/Menu";
+import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium"; // 👑 admin icon
+import PersonIcon from "@mui/icons-material/Person"; // 👤 user icon
 import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 
 interface NavbarProps {
   isLoggedIn: boolean;
   userName?: string;
+  userRole?: "ADMIN" | "USER" | undefined;
   userAvatar?: string;
   onLogin?: () => void;
   onSignUp?: () => void;
@@ -36,6 +40,7 @@ const pages = [
 export const Navbar: React.FC<NavbarProps> = ({
   isLoggedIn,
   userName,
+  userRole,
   userAvatar,
   onLogin,
   onSignUp,
@@ -59,11 +64,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const menuItems = isLoggedIn
     ? [
-        { label: "Update User", action: onEditUser },
         { label: "Log Out", action: onLogout },
       ]
     : [
-        { label: "Sign Up", action: () => navigate("/signin") },
+        { label: "Sign In", action: () => navigate("/signin") },
         { label: "Login", action: () => navigate("/login") },
       ];
 
@@ -175,13 +179,43 @@ export const Navbar: React.FC<NavbarProps> = ({
               sx={{
                 p: 0,
                 transition: "transform 0.2s ease, color 0.3s ease",
-                "&:hover": { color: theme.palette.warning.main, transform: "scale(1.05)" },
+                "&:hover": {
+                  color: theme.palette.warning.main,
+                  transform: "scale(1.05)",
+                },
               }}
             >
               {isLoggedIn ? (
-                <Avatar alt={userName} src={userAvatar} />
+                <Avatar
+                  alt={userName}
+                  src={userAvatar}
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    border: `3px solid ${
+                      userRole === "ADMIN" ? "#FF9100" : "#2979FF"
+                    }`,
+                    boxShadow:
+                      userRole === "ADMIN"
+                        ? "0 0 10px 2px rgba(255,145,0,0.8)"
+                        : "0 0 10px 2px rgba(41,121,255,0.8)",
+                    transition: "box-shadow 0.3s ease, transform 0.2s ease",
+                    "&:hover": {
+                      boxShadow:
+                        userRole === "ADMIN"
+                          ? "0 0 14px 3px rgba(255,145,0,1)"
+                          : "0 0 14px 3px rgba(41,121,255,1)",
+                      transform: "scale(1.08)",
+                    },
+                  }}
+                />
               ) : (
-                <AccountCircleIcon sx={{ color: theme.palette.primary.contrastText, fontSize: 36 }} />
+                <AccountCircleIcon
+                  sx={{
+                    color: theme.palette.primary.contrastText,
+                    fontSize: 36,
+                  }}
+                />
               )}
             </IconButton>
           </Tooltip>
@@ -195,9 +229,55 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClose={handleCloseUserMenu}
           >
             {isLoggedIn && userName && (
-              <MenuItem disabled>
-                <Typography textAlign="center" fontWeight={600}>{userName}</Typography>
-              </MenuItem>
+              <Tooltip title="Update user" arrow placement="left">
+                <MenuItem
+                  onClick={() => {
+                    handleCloseUserMenu();
+                    onEditUser?.();
+                  }}
+                  sx={{
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "rgba(25, 118, 210, 0.08)",
+                    },
+                  }}
+                >
+                  <Typography textAlign="center" fontWeight={600}>
+                    {userName}
+                  </Typography>
+
+                  {userRole && (
+                    <Chip
+                      size="small"
+                      label={userRole === "ADMIN" ? "Admin" : "User"}
+                      icon={
+                        userRole === "ADMIN" ? (
+                          <WorkspacePremiumIcon sx={{ fontSize: 18, color: "white" }} />
+                        ) : (
+                          <PersonIcon sx={{ fontSize: 18, color: "white" }} />
+                        )
+                      }
+                      sx={{
+                        ml: 1.2,
+                        fontWeight: 600,
+                        pl: 0.5,
+                        backgroundColor:
+                          userRole === "ADMIN" ? "#FF9100" : "#2979FF",
+                        color: "white",
+                        "& .MuiChip-icon": { ml: "4px" },
+                        "&:hover": {
+                          backgroundColor:
+                            userRole === "ADMIN" ? "#FB8C00" : "#1565C0",
+                        },
+                        boxShadow:
+                          userRole === "ADMIN"
+                            ? "0 2px 6px rgba(255,145,0,0.4)"
+                            : "0 2px 6px rgba(41,121,255,0.4)",
+                      }}
+                    />
+                  )}
+                </MenuItem>
+              </Tooltip>
             )}
             {menuItems.map(({ label, action }) => (
               <MenuItem key={label} onClick={() => { handleCloseUserMenu(); action?.(); }}>
