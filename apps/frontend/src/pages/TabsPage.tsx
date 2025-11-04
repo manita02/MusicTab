@@ -44,6 +44,7 @@ export const TabsPage: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<any>(null);
 
   const { mutate: deleteTab, isPending: isDeleting } = useDeleteTab();
+  const localUserId  = Number(localStorage.getItem("userId"));
 
   const [modal, setModal] = useState<{
     open: boolean;
@@ -57,12 +58,46 @@ export const TabsPage: React.FC = () => {
     message: "",
   });
 
+  const [tabs, setTabs] = useState<any[]>([]);
+  const [filteredTabs, setFilteredTabs] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (data) {
+      setTabs(data);
+      setFilteredTabs(data);
+    }
+  }, [data]);
+
   useEffect(() => {
     if (!isLoading && data) {
       const timeout = setTimeout(() => setPageLoading(false), 200);
       return () => clearTimeout(timeout);
     }
   }, [isLoading, data]);
+
+  useEffect(() => {
+    let results = [...tabs];
+    if (search.trim()) {
+      results = results.filter((t) =>
+        t.title.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+    if (view === "mine" && isLoggedIn && localUserId) {
+      results = results.filter((t) => t.userId === localUserId);
+    }
+    results.sort((a, b) => {
+      const dateA = new Date(a.createdAt);
+      const dateB = new Date(b.createdAt);
+      return order === "recent"
+        ? dateB.getTime() - dateA.getTime()
+        : dateA.getTime() - dateB.getTime();
+    });
+    setFilteredTabs(results);
+  }, [tabs, search, view, order, isLoggedIn, localUserId ]);
+
+  const handleSearch = () => {
+    setSearch(search.trim());
+  };
 
   const handleOpenDialog = () => setOpenDialog(true);
   const handleCloseDialog = () => setOpenDialog(false);
@@ -84,11 +119,6 @@ export const TabsPage: React.FC = () => {
     setEditDialogOpen(false);
   };
 
-  const [tabs, setTabs] = useState<any[]>([]);
-  useEffect(() => {
-    if (data) setTabs(data);
-  }, [data]);
-
   const handleDeleteClick = (tab: { id: number; title: string; userId: number }) => {
     setSelectedTab(tab);
     setModal({
@@ -106,6 +136,9 @@ export const TabsPage: React.FC = () => {
       {
         onSuccess: () => {
           setTabs((prevTabs) => prevTabs.filter((t) => t.id !== selectedTab.id));
+          setFilteredTabs((prevTabs) =>
+            prevTabs.filter((t) => t.id !== selectedTab.id)
+          );
           setModal({
             open: true,
             type: "success",
@@ -147,7 +180,8 @@ export const TabsPage: React.FC = () => {
     return match ? `https://www.youtube.com/embed/${match[1]}` : null;
   };
 
-  const rows = data?.map((tab: any) => ({
+  const rows =
+    filteredTabs?.map((tab: any) => ({
       id: tab.id,
       title: tab.title,
       imageUrl: tab.urlImg || "",
@@ -157,7 +191,7 @@ export const TabsPage: React.FC = () => {
       genre: getGenreName(tab.genreId),
       user: tab.userName || "-",
       userId: tab.userId,
-      createdAt: tab.createdAt
+      createdAt: tab.createdAt,
     })) || [];
 
   const columns = [
@@ -168,7 +202,9 @@ export const TabsPage: React.FC = () => {
       sortable: false,
       filterable: false,
       renderCell: (params: any) => {
-        const canManage = isLoggedIn && (userRole === "ADMIN" || params.row.userId === loggedUserId);
+        const canManage =
+          isLoggedIn &&
+          (userRole === "ADMIN" || params.row.userId === loggedUserId);
         return (
           <Box
             sx={{
@@ -239,7 +275,14 @@ export const TabsPage: React.FC = () => {
       flex: 1,
       minWidth: 180,
       renderCell: (params: any) => (
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 0.5,
+            alignItems: "center",
+          }}
+        >
           <Typography fontWeight={600}>{params.row.title}</Typography>
           {params.row.imageUrl ? (
             <Box
@@ -287,7 +330,16 @@ export const TabsPage: React.FC = () => {
       renderCell: (params: any) => {
         const embedUrl = getYouTubeEmbedUrl(params.value || "");
         return (
-          <Box sx={{ width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center", p: 2 }}>
+          <Box
+            sx={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              p: 2,
+            }}
+          >
             {embedUrl ? (
               <Box
                 component="iframe"
@@ -330,11 +382,22 @@ export const TabsPage: React.FC = () => {
       headerName: "Uploaded by",
       width: 150,
       renderCell: (params: any) => (
-        <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start", gap: 0.5, height: "100%" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "flex-start",
+            gap: 0.5,
+            height: "100%",
+          }}
+        >
           <Typography fontWeight={600}>{params.row.user}</Typography>
           {params.row.createdAt && (
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <CalendarTodayIcon sx={{ fontSize: 14, color: "text.secondary" }} />
+              <CalendarTodayIcon
+                sx={{ fontSize: 14, color: "text.secondary" }}
+              />
               <Typography variant="caption" color="text.secondary">
                 {new Date(params.row.createdAt).toLocaleDateString()}
               </Typography>
@@ -348,13 +411,11 @@ export const TabsPage: React.FC = () => {
   return (
     <Box sx={{ position: "relative", backgroundColor: "transparent", py: 2 }}>
       <IconLoader active={pageLoading || isLoading} />
-
       {isError && (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-          <Typography color="error">Error al cargar las tabs.</Typography>
+          <Typography color="error">Error loading tabs.</Typography>
         </Box>
       )}
-
       {!isError && (
         <>
           <Typography
@@ -364,7 +425,6 @@ export const TabsPage: React.FC = () => {
             sx={{
               display: "flex",
               justifyContent: "center",
-              position: "relative",
               background: `linear-gradient(90deg, ${theme.palette.warning.main} 0%, ${theme.palette.warning.contrastText} 100%)`,
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
@@ -376,12 +436,37 @@ export const TabsPage: React.FC = () => {
             Tabs
           </Typography>
 
-          <Grid container spacing={2} alignItems="center" justifyContent={{ xs: "center", md: "space-between" }} textAlign={{ xs: "center", md: "left" }} sx={{ mb: 4, p: 2, borderRadius: 2, backgroundColor: "rgba(245,241,220,0.6)", boxShadow: "0 2px 8px rgba(0,0,0,0.1)", flexDirection: { xs: "column", sm: "row" } }}>
+          <Grid
+            container
+            spacing={2}
+            alignItems="center"
+            justifyContent={{ xs: "center", md: "space-between" }}
+            textAlign={{ xs: "center", md: "left" }}
+            sx={{
+              mb: 4,
+              p: 2,
+              borderRadius: 2,
+              backgroundColor: "rgba(245,241,220,0.6)",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              flexDirection: { xs: "column", sm: "row" },
+            }}
+          >
             <Grid item xs={12} sm="auto" sx={{ minWidth: "200px" }}>
-              <InputField label="Search" value={search} onChange={(e) => setSearch(e.target.value)} isSearch onSearch={() => console.log("Search:", search)} />
+              <InputField
+                label="Search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                isSearch
+                onSearch={handleSearch}
+              />
             </Grid>
             <Grid item xs={12} sm="auto">
-              <ToggleButtonGroup value={view} exclusive onChange={(_, val) => val && setView(val)} sx={{ borderRadius: "12px", overflow: "hidden", height: "56px" }}>
+              <ToggleButtonGroup
+                value={view}
+                exclusive
+                onChange={(_, val) => val && setView(val)}
+                sx={{ borderRadius: "12px", overflow: "hidden", height: "56px" }}
+              >
                 <Tooltip title={isLoggedIn ? "" : "Login to view all tabs"}>
                   <span>
                     <ToggleButton value="all" sx={{ fontWeight: 600 }} disabled={!isLoggedIn}>
@@ -399,7 +484,7 @@ export const TabsPage: React.FC = () => {
               </ToggleButtonGroup>
             </Grid>
             <Grid item xs={12} sm="auto">
-              <Box sx={{ minWidth: 180, width: { xs: "100%", sm: "auto" } }}>
+              <Box sx={{ minWidth: 180 }}>
                 <SelectField
                   label="Order by"
                   value={order}
@@ -419,7 +504,7 @@ export const TabsPage: React.FC = () => {
                     label="Create New Tab"
                     variantType="secondary"
                     startIcon={<AddIcon />}
-                    sx={{ width: { xs: "100%", sm: "auto" }, height: 56 }}
+                    sx={{ height: 56 }}
                     onClick={handleOpenDialog}
                     disabled={!isLoggedIn}
                   />
@@ -428,7 +513,15 @@ export const TabsPage: React.FC = () => {
             </Grid>
           </Grid>
 
-          <Box sx={{ height: 500, backgroundColor: "white", borderRadius: 2, boxShadow: "0 2px 10px rgba(0,0,0,0.1)", overflow: "hidden" }}>
+          <Box
+            sx={{
+              height: 500,
+              backgroundColor: "white",
+              borderRadius: 2,
+              boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+              overflow: "hidden",
+            }}
+          >
             <DataGrid
               rows={rows}
               columns={columns}
@@ -437,11 +530,17 @@ export const TabsPage: React.FC = () => {
               getRowHeight={() => 220}
               sx={{
                 border: "none",
-                "& .MuiDataGrid-columnHeaders": { backgroundColor: theme.palette.primary.main, color: theme.palette.warning.contrastText, fontWeight: "bold" },
-                "& .MuiDataGrid-row:nth-of-type(odd)": { backgroundColor: theme.palette.background.default },
-                "& .MuiDataGrid-row:nth-of-type(even)": { backgroundColor: "rgba(245, 241, 220,0.4)" },
-                "& .MuiDataGrid-cell": { borderBottom: "1px solid rgba(0,0,0,0.08)" },
-                "& .MuiDataGrid-footerContainer": { borderTop: "1px solid rgba(0,0,0,0.08)" },
+                "& .MuiDataGrid-columnHeaders": {
+                  backgroundColor: theme.palette.primary.main,
+                  color: theme.palette.warning.contrastText,
+                  fontWeight: "bold",
+                },
+                "& .MuiDataGrid-row:nth-of-type(odd)": {
+                  backgroundColor: theme.palette.background.default,
+                },
+                "& .MuiDataGrid-row:nth-of-type(even)": {
+                  backgroundColor: "rgba(245,241,220,0.4)",
+                },
               }}
             />
           </Box>
@@ -467,9 +566,7 @@ export const TabsPage: React.FC = () => {
             }
             cancelText={modal.type === "warning" ? "Cancel" : undefined}
             onConfirm={
-              modal.type === "warning"
-                ? handleConfirmDelete
-                : handleCloseModal
+              modal.type === "warning" ? handleConfirmDelete : handleCloseModal
             }
             onCancel={handleCloseModal}
           />
