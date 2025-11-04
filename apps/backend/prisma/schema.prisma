@@ -14,6 +14,8 @@ model User {
   passwordHash String
   role         String
   createdAt    DateTime  @default(now())
+  birthDate    DateTime
+  urlImg       String
   sessions     Session[]
   tablaturas   Tab[]
 }
