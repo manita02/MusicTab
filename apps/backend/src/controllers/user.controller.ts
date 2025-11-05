@@ -73,6 +73,8 @@ export class UserController {
         expiresAt: session.expiresAt,
         userRole: user.role,
         userImg: user.urlImg.toString(),
+        email: user.email.toString(),
+        birthDate: user.birthDate,
       };
   }
 }
