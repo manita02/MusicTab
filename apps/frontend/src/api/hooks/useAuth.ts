@@ -18,6 +18,7 @@ export const useAuth = () => {
     localStorage.removeItem("expiresAt");
     localStorage.removeItem("userImg");
     localStorage.removeItem("birthDate");
+    localStorage.removeItem("email");
   };
 
   const logout = useCallback(() => {
@@ -55,6 +56,7 @@ export const useAuth = () => {
     const role = localStorage.getItem("userRole");
     const expiresAt = localStorage.getItem("expiresAt");
     const img = localStorage.getItem("userImg");
+    const email = localStorage.getItem("email");
 
     if (!token || !expiresAt) {
       setIsLoggedIn(false);
@@ -76,13 +78,14 @@ export const useAuth = () => {
   }, [logout, scheduleLogout]);
 
   const login = useCallback(
-    (token: string, id: number, user: string, role: string, expiresAt: string, img: string) => {
+    (token: string, id: number, user: string, role: string, expiresAt: string, img: string, email: string) => {
       localStorage.setItem("token", token);
       localStorage.setItem("userId", String(id));
       localStorage.setItem("userName", user);
       localStorage.setItem("userRole", role);
       localStorage.setItem("expiresAt", expiresAt);
       localStorage.setItem("userImg", img);
+      localStorage.setItem("email", email);
 
       setIsLoggedIn(true);
       setUserId(id);
