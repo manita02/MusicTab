@@ -11,6 +11,7 @@ import {
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { useNavigate } from "react-router-dom";
 
 interface TabItem {
   id: number;
@@ -26,6 +27,12 @@ interface TabsSliderProps {
 
 export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs }) => {
   const theme = useTheme();
+  const navigate = useNavigate();
+
+  const handleCardClick = (tab: TabItem) => {
+    // Navega al TabsPage pasando el título en query params
+    navigate(`/tabs?search=${encodeURIComponent(tab.title)}`);
+  };
 
   const settings = {
     dots: false,
@@ -76,15 +83,17 @@ export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs }) => {
         {tabs.map((tab) => (
           <Box key={tab.id} px={1}>
             <Card
+              onClick={() => handleCardClick(tab)}
               sx={{
                 borderRadius: 3,
                 overflow: "hidden",
                 boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                 backgroundColor: theme.palette.background.paper,
+                cursor: "pointer",
                 transition: "transform 0.3s ease, box-shadow 0.3s ease",
                 "&:hover": {
-                  transform: "translateY(-5px)",
-                  boxShadow: "0 6px 16px rgba(0,0,0,0.2)",
+                  boxShadow: `0 0 16px ${theme.palette.warning.main}`,
+                  border: `2px solid ${theme.palette.warning.main}`,
                 },
               }}
             >
