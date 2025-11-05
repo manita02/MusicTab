@@ -27,11 +27,13 @@ import { useDeleteTab } from "../api/hooks/useDeleteTab";
 import { IconLoader } from "../components/IconLoader/IconLoader";
 import { EditTabDialog } from "../dialogs/EditTabDialog";
 import { MessageModal } from "../components/MessageModal/MessageModal";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export const TabsPage: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const initialSearch = searchParams.get("search") || "";
+  const [search, setSearch] = useState(initialSearch);
   const { isLoggedIn, userId: loggedUserId, userRole } = useAuth();
-  const [search, setSearch] = useState("");
   const [view, setView] = useState<"all" | "mine">("all");
   const [order, setOrder] = useState("recent");
   const [openDialog, setOpenDialog] = useState(false);

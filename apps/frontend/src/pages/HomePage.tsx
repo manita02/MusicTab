@@ -4,10 +4,12 @@ import { TabsSlider } from "../components/Home/TabSlider/TabSlider";
 import { AboutSection } from "../components/Home/About";
 import { IconLoader } from "../components/IconLoader/IconLoader";
 import { useLatestTabs, type TabPreview } from "../api/hooks/useLatestTabs";
+import { useInstruments } from "../api/hooks/useCatalog";
 
 export const HomePage: React.FC = () => {
   const { data: tabsData, isLoading, error } = useLatestTabs(8);
   const [pageLoading, setPageLoading] = useState(true);
+  const { data: instruments = [] } = useInstruments();
 
   useEffect(() => {
     if (!isLoading && tabsData) {
@@ -25,6 +27,7 @@ export const HomePage: React.FC = () => {
         image: tab.urlImg || "https://via.placeholder.com/400x225?text=No+Image",
         date: tab.createdAt,
         user: tab.userName || `User #${tab.userId}`,
+        instrumentId: tab.instrumentId,
       }))
     : [];
 
@@ -75,7 +78,7 @@ export const HomePage: React.FC = () => {
               backgroundColor: "transparent",
             }}
           >
-            <TabsSlider tabs={tabs} />
+            <TabsSlider tabs={tabs} instruments={instruments} />
           </Box>
 
           <AboutSection />
