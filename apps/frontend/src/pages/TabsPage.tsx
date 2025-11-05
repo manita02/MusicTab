@@ -27,6 +27,7 @@ import { useDeleteTab } from "../api/hooks/useDeleteTab";
 import { IconLoader } from "../components/IconLoader/IconLoader";
 import { EditTabDialog } from "../dialogs/EditTabDialog";
 import { MessageModal } from "../components/MessageModal/MessageModal";
+import { useNavigate } from "react-router-dom";
 
 export const TabsPage: React.FC = () => {
   const { isLoggedIn, userId: loggedUserId, userRole } = useAuth();
@@ -45,6 +46,11 @@ export const TabsPage: React.FC = () => {
 
   const { mutate: deleteTab, isPending: isDeleting } = useDeleteTab();
   const localUserId  = Number(localStorage.getItem("userId"));
+
+  const handleTabCreated = (newTab: any) => {
+    setTabs((prev) => [newTab, ...prev]);
+    setFilteredTabs((prev) => [newTab, ...prev]);
+  };
 
   const [modal, setModal] = useState<{
     open: boolean;
@@ -114,8 +120,12 @@ export const TabsPage: React.FC = () => {
   };
 
   const handleCloseEditDialog = () => setEditDialogOpen(false);
+  const navigate = useNavigate();
   const handleUpdateTab = (updatedTab: any) => {
-    console.log("Tab updated:", updatedTab);
+    navigate("/tabs");
+    setTimeout(() => {
+      window.location.reload();
+    }, 200);
     setEditDialogOpen(false);
   };
 
@@ -545,7 +555,7 @@ export const TabsPage: React.FC = () => {
             />
           </Box>
 
-          <CreateTabDialog open={openDialog} onClose={handleCloseDialog} onSave={handleSaveTab} />
+          <CreateTabDialog open={openDialog} onClose={handleCloseDialog} onSave={handleSaveTab} onCreated={handleTabCreated}/>
           <EditTabDialog
             open={editDialogOpen}
             onClose={handleCloseEditDialog}
