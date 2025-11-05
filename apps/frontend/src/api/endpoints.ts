@@ -2,6 +2,7 @@ export const ENDPOINTS = {
   users: {
     login: "/users/login",
     register: "/users/register",
+    update: (id: number | string) => `/users/${id}`,
   },
   catalogs: {
     genres: "/catalogs/genres",
