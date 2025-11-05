@@ -83,13 +83,6 @@ export const MainLayout: React.FC = () => {
       <ManageProfileDialog
         open={openManageProfile}
         onClose={handleCloseManageProfile}
-        userData={{
-          username: userName || "",
-          email: "example@email.com",
-          dateOfBirth: "1995-06-15",
-          age: 29,
-          profileImg: userImg || "",
-        }}
       />
     </Box>
   );
