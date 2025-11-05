@@ -7,11 +7,13 @@ import {
   CardContent,
   Typography,
   useTheme,
+  Chip
 } from "@mui/material";
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useNavigate } from "react-router-dom";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 
 interface TabItem {
   id: number;
@@ -19,20 +21,29 @@ interface TabItem {
   image: string;
   date: string;
   user: string;
+  instrumentId: number;
+}
+
+interface Instrument {
+  id: number;
+  name: string;
 }
 
 interface TabsSliderProps {
   tabs: TabItem[];
+  instruments: Instrument[];
 }
 
-export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs }) => {
+export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs, instruments }) => {
   const theme = useTheme();
   const navigate = useNavigate();
-
+  
   const handleCardClick = (tab: TabItem) => {
-    // Navega al TabsPage pasando el título en query params
     navigate(`/tabs?search=${encodeURIComponent(tab.title)}`);
   };
+
+  const getInstrumentName = (id: number) =>
+    instruments.find((i: any) => i.id === id)?.name || "-";
 
   const settings = {
     dots: false,
@@ -100,23 +111,69 @@ export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs }) => {
               <CardMedia
                 component="img"
                 image={tab.image}
-                height="180"
+                height="250"
                 alt={tab.title}
               />
               <CardContent>
-                <Typography
-                  variant="h6"
-                  fontWeight={600}
-                  color={theme.palette.text.primary}
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    mb: 0.5,
+                  }}
                 >
-                  {tab.title}
-                </Typography>
-                <Typography variant="body2" color={theme.palette.text.secondary}>
-                  Uploaded by {tab.user}
-                </Typography>
-                <Typography variant="caption" color={theme.palette.text.secondary}>
-                  {new Date(tab.date).toLocaleDateString()}
-                </Typography>
+                  <Typography
+                    variant="h6"
+                    fontWeight={600}
+                    color={theme.palette.text.primary}
+                    sx={{
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      maxWidth: "70%",
+                    }}
+                  >
+                    {tab.title}
+                  </Typography>
+
+                  <Chip
+                    label={getInstrumentName(tab.instrumentId)}
+                    size="small"
+                    sx={{
+                      fontWeight: 600,
+                      backgroundColor: theme.palette.warning.main,
+                      color: theme.palette.warning.contrastText,
+                      ml: 1,
+                      flexShrink: 0,
+                      "&:hover": {
+                        backgroundColor: theme.palette.warning.dark,
+                      },
+                    }}
+                  />
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 0.5,
+                    flexWrap: "wrap",
+                    color: theme.palette.text.secondary,
+                  }}
+                >
+                  <Typography variant="body2">
+                    By <strong>{tab.user}</strong> •{" "}
+                  </Typography>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                    <CalendarMonthIcon
+                      sx={{ fontSize: 16, color: theme.palette.text.secondary }}
+                    />
+                    <Typography variant="body2">
+                      {new Date(tab.date).toLocaleDateString()}
+                    </Typography>
+                  </Box>
+                </Box>
               </CardContent>
             </Card>
           </Box>
