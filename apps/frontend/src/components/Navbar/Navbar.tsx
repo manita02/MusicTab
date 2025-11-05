@@ -27,7 +27,7 @@ interface NavbarProps {
   userAvatar?: string;
   onLogin?: () => void;
   onSignUp?: () => void;
-  onEditUser?: () => void;
+  onManageProfile?: () => void;
   onLogout?: () => void;
 }
 
@@ -44,7 +44,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   userAvatar,
   onLogin,
   onSignUp,
-  onEditUser,
+  onManageProfile,
   onLogout,
 }) => {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
@@ -229,11 +229,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClose={handleCloseUserMenu}
           >
             {isLoggedIn && userName && (
-              <Tooltip title="Update user" arrow placement="left">
+              <Tooltip title="Manage profile" arrow placement="left">
                 <MenuItem
                   onClick={() => {
                     handleCloseUserMenu();
-                    onEditUser?.();
+                    onManageProfile?.();
                   }}
                   sx={{
                     cursor: "pointer",
