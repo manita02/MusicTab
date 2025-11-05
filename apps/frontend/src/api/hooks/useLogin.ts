@@ -16,6 +16,7 @@ type LoginResponse = {
   userRole: string;
   userImg: string;
   birthDate: string;
+  email: string;
 };
 
 export const useLogin = () => {
@@ -35,6 +36,7 @@ export const useLogin = () => {
       localStorage.setItem("expiresAt", data.expiresAt);
       localStorage.setItem("userImg", data.userImg);
       localStorage.setItem("birthDate", data.birthDate);
+      localStorage.setItem("email", data.email);
     },
   });
 };
