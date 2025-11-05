@@ -9,43 +9,70 @@ import {
   Avatar,
   useMediaQuery,
   useTheme,
+  IconButton,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import { InputField } from "../components/InputField/InputField";
 import { Button } from "../components/Button/Button";
 import { IconLoader } from "../components/IconLoader/IconLoader";
 import { MessageModal } from "../components/MessageModal/MessageModal";
-import CloseIcon from "@mui/icons-material/Close";
-import IconButton from "@mui/material/IconButton";
+import { useAuth } from "../api/hooks/useAuth";
 
-
-interface ManageProfileDialogProps {
+export const ManageProfileDialog: React.FC<{
   open: boolean;
   onClose: () => void;
-  userData?: {
-    username: string;
-    email: string;
-    dateOfBirth: string;
-    age: number;
-    profileImg?: string;
-  };
-}
-
-export const ManageProfileDialog: React.FC<ManageProfileDialogProps> = ({
-  open,
-  onClose,
-  userData,
-}) => {
+}> = ({ open, onClose }) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
+  const { userName: authUserName, userImg: authUserImg } = useAuth();
 
-  const [username, setUsername] = useState(userData?.username || "");
-  const [email, setEmail] = useState(userData?.email || "");
-  const [dateOfBirth, setDateOfBirth] = useState(userData?.dateOfBirth || "");
-  const [age, setAge] = useState(userData?.age || 0);
-  const [profileImg, setProfileImg] = useState(userData?.profileImg || "");
-  const [previewImg, setPreviewImg] = useState(profileImg);
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [age, setAge] = useState(0);
+  const [profileImg, setProfileImg] = useState("");
+  const [previewImg, setPreviewImg] = useState("");
   const [password, setPassword] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+
+  const formatDate = (isoString: string | null) => {
+    if (!isoString) return "";
+    const d = new Date(isoString);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const calcularEdad = (fecha: string) => {
+    if (!fecha) return 0;
+    const nacimiento = new Date(fecha);
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - nacimiento.getFullYear(); 
+    const m = hoy.getMonth() - nacimiento.getMonth();
+    if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) edad--;
+    return edad;
+  };
+
+  useEffect(() => {
+    if (open) {
+        const storedUser = localStorage.getItem("userName") ?? authUserName ?? "";
+        const storedEmail = localStorage.getItem("email") ?? "";
+        const storedBirthDate = localStorage.getItem("birthDate");
+        const storedImg = localStorage.getItem("userImg") ?? authUserImg ?? "";
+        const formattedDate = formatDate(storedBirthDate);
+
+        setUsername(storedUser);
+        setEmail(storedEmail);
+        setDateOfBirth(formattedDate);
+        setProfileImg(storedImg);
+        setPreviewImg(storedImg);
+        setAge(calcularEdad(formattedDate));
+        setPassword("");
+        setIsEditing(false);
+    }
+  }, [open, authUserName, authUserImg]);
+
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<"success" | "error" | "warning">("success");
@@ -53,23 +80,10 @@ export const ManageProfileDialog: React.FC<ManageProfileDialogProps> = ({
   const [modalTitle, setModalTitle] = useState("");
 
   useEffect(() => {
-    const handler = setTimeout(() => {
-      if (profileImg && profileImg.startsWith("http")) {
-        setPreviewImg(profileImg);
-      }
-    }, 500);
-
-    return () => clearTimeout(handler);
-  }, [profileImg]);
-
-  useEffect(() => {
-    if (dateOfBirth) {
-      const birthDate = new Date(dateOfBirth);
-      const today = new Date();
-      const calculatedAge = today.getFullYear() - birthDate.getFullYear();
-      setAge(calculatedAge);
+    if (profileImg && profileImg.startsWith("http")) {
+      setPreviewImg(profileImg);
     }
-  }, [dateOfBirth]);
+  }, [profileImg]);
 
   const handleEditToggle = () => setIsEditing((prev) => !prev);
 
@@ -122,34 +136,33 @@ export const ManageProfileDialog: React.FC<ManageProfileDialogProps> = ({
         }}
       >
         <DialogTitle
-        sx={{
+          sx={{
             fontWeight: 700,
             textAlign: "center",
             color: theme.palette.primary.main,
             pb: 1,
             position: "relative",
-        }}
+          }}
         >
-        Manage Profile
-        <IconButton
+          Manage Profile
+          <IconButton
             aria-label="close"
             onClick={onClose}
             sx={{
-            position: "absolute",
-            right: 8,
-            top: 8,
-            color: theme.palette.text.secondary,
-            "&:hover": {
+              position: "absolute",
+              right: 8,
+              top: 8,
+              color: theme.palette.text.secondary,
+              "&:hover": {
                 color: theme.palette.primary.main,
                 transform: "scale(1.1)",
                 transition: "all 0.2s ease",
-            },
+              },
             }}
-        >
+          >
             <CloseIcon />
-        </IconButton>
+          </IconButton>
         </DialogTitle>
-
 
         <DialogContent dividers sx={{ px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 } }}>
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 3 }}>
@@ -186,6 +199,7 @@ export const ManageProfileDialog: React.FC<ManageProfileDialogProps> = ({
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="********"
               fullWidth
               disabled={!isEditing}
             />
@@ -197,14 +211,23 @@ export const ManageProfileDialog: React.FC<ManageProfileDialogProps> = ({
               disabled={!isEditing}
             />
             <InputField
-              label="Date of Birth"
-              type="date"
-              value={dateOfBirth}
-              onChange={(e) => setDateOfBirth(e.target.value)}
-              fullWidth
-              disabled={!isEditing}
+             label="Date of Birth"
+             type="date"
+             value={dateOfBirth}
+             onChange={(e) => {
+                const nuevaFecha = e.target.value;
+                setDateOfBirth(nuevaFecha);
+                setAge(calcularEdad(nuevaFecha));
+             }}
+             fullWidth
+             disabled={!isEditing}
             />
-            <InputField label="Age" value={age.toString()} fullWidth disabled />
+            <InputField
+            label="Age"
+            value={age ? `${age} years old` : ""}
+            fullWidth
+            disabled
+            />
           </Grid>
         </DialogContent>
 
