@@ -10,6 +10,7 @@ import {
   useMediaQuery,
   useTheme,
   IconButton,
+  Chip
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { InputField } from "../components/InputField/InputField";
@@ -17,6 +18,9 @@ import { Button } from "../components/Button/Button";
 import { IconLoader } from "../components/IconLoader/IconLoader";
 import { MessageModal } from "../components/MessageModal/MessageModal";
 import { useAuth } from "../api/hooks/useAuth";
+import { useUpdateUser } from "../api/hooks/useUpdateUser";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+
 
 export const ManageProfileDialog: React.FC<{
   open: boolean;
@@ -34,6 +38,10 @@ export const ManageProfileDialog: React.FC<{
   const [previewImg, setPreviewImg] = useState("");
   const [password, setPassword] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const updateUserMutation = useUpdateUser();
+
+  const userRole = localStorage.getItem("userRole") ?? "USER";
+  const isAdmin = userRole === "ADMIN";
 
   const formatDate = (isoString: string | null) => {
     if (!isoString) return "";
@@ -104,10 +112,28 @@ export const ManageProfileDialog: React.FC<{
     showModal("warning", "Delete Account", "Are you sure you want to delete your account?");
   };
 
-  const handleSave = () => {
-    showModal("success", "Profile Updated", "Your profile has been updated successfully.");
-    setIsEditing(false);
-  };
+  const handleSave = async () => {
+    try {
+        await updateUserMutation.mutateAsync({
+        id: Number(localStorage.getItem("userId")),
+        username,
+        email,
+        password: password || undefined,
+        birthDate: dateOfBirth,
+        urlImg: profileImg,
+        });
+
+        showModal("success", "Profile Updated", "Your profile has been updated successfully.");
+        setPassword("");
+        setIsEditing(false);
+        localStorage.setItem("userName", username);
+        localStorage.setItem("email", email);
+        localStorage.setItem("birthDate", dateOfBirth);
+        localStorage.setItem("userImg", profileImg);
+    } catch (err: any) {
+        showModal("error", "Update Failed", err?.response?.data?.message || "Something went wrong");
+    }
+    };
 
   return (
     <>
@@ -167,15 +193,38 @@ export const ManageProfileDialog: React.FC<{
         <DialogContent dividers sx={{ px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 } }}>
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 3 }}>
             <Avatar
-              src={previewImg}
-              alt={username}
-              sx={{
+                src={previewImg}
+                alt={username}
+                sx={{
                 width: 120,
                 height: 120,
-                mb: 2,
-                border: `3px solid ${theme.palette.primary.main}`,
-                boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-              }}
+                mb: 1,
+                border: `3px solid ${isAdmin ? "#FF9100" : "#2979FF"}`,
+                boxShadow: isAdmin
+                    ? "0 0 10px 2px rgba(255,145,0,0.8)"
+                    : "0 0 10px 2px rgba(41,121,255,0.8)",
+                transition: "box-shadow 0.3s ease, transform 0.2s ease",
+                "&:hover": {
+                    boxShadow: isAdmin
+                    ? "0 0 14px 3px rgba(255,145,0,1)"
+                    : "0 0 14px 3px rgba(41,121,255,1)",
+                    transform: "scale(1.08)",
+                },
+                }}
+            />
+
+            <Chip
+                label={userRole}
+                icon={<AccountCircleIcon />}
+                sx={{
+                mt: 1,
+                fontWeight: 600,
+                color: "#fff",
+                backgroundColor: isAdmin ? "#FF9100" : "#2979FF",
+                boxShadow: isAdmin
+                    ? "0 0 10px 2px rgba(255,145,0,0.8)"
+                    : "0 0 10px 2px rgba(41,121,255,0.8)",
+                }}
             />
           </Box>
 
