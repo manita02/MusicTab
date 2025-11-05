@@ -44,7 +44,10 @@ export class UserController {
 
   @Post('register')
   async register(@Body() dto: RegisterDTO) {
-    const user = await this.registerUser.execute(dto);
+    const user = await this.registerUser.execute({
+      ...dto,
+      birthDate: new Date(dto.birthDate),
+    });
     return {
       id: user.id,
       username: user.username,
