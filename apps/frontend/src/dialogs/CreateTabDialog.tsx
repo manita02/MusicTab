@@ -22,12 +22,14 @@ interface CreateTabDialogProps {
   open: boolean;
   onClose: () => void;
   onSave: (data: any) => void;
+  onCreated?: (newTab: any) => void;
 }
 
 export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
   open,
   onClose,
   onSave,
+  onCreated,
 }) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
@@ -110,6 +112,7 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
       onSuccess: (data) => {
         showModal("success", "Tab Created", "The tab has been successfully created!");
         onSave(data);
+        if (onCreated) onCreated(data);
       },
       onError: (error) => {
         const backendMsg =
