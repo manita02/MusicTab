@@ -15,6 +15,13 @@ export const AboutSection: React.FC = () => {
   const handleSaveTab = (data: any) => {
     console.log("Saved tab:", data);
   };
+  const handleTabCreated = (data: any) => {
+    setIsDialogOpen(false);
+    navigate("/");
+    setTimeout(() => {
+      window.location.reload();
+    }, 200);
+  };
 
   return (
     <Box textAlign="center" sx={{ mt: 2, mb: 4, px: 3 }}>
@@ -62,6 +69,7 @@ export const AboutSection: React.FC = () => {
         open={isDialogOpen}
         onClose={handleCloseDialog}
         onSave={handleSaveTab}
+        onCreated={handleTabCreated}
       />
     </Box>
   );
