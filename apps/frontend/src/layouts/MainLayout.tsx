@@ -68,16 +68,16 @@ export const MainLayout: React.FC = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyContent: "flex-start",
+          justifyContent: "center",
+          overflowY: "auto",
+          minHeight: "100vh",
           pt: { xs: 10, md: 12 },
           pb: { xs: 10, md: 12 },
-          overflowY: "auto",
         }}
       >
         <Container
           component="main"
           sx={{
-            flex: "0 0 auto",
             p: { xs: 2, md: 3 },
             mb: 4,
             backgroundColor: "rgba(245, 241, 220, 0.75)",
