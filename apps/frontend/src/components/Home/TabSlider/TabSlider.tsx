@@ -54,40 +54,50 @@ export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs, instruments }) => 
     responsive: [
       { breakpoint: 1200, settings: { slidesToShow: 3, slidesToScroll: 3 } },
       { breakpoint: 900, settings: { slidesToShow: 2, slidesToScroll: 2 } },
-      { breakpoint: 600, settings: { slidesToShow: 1, slidesToScroll: 1 } },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          centerMode: false,
+          variableWidth: false,
+          arrows: true,
+        },
+      },
     ],
   };
 
   return (
     <Box
-        sx={{
-            position: "relative",
-            width: "100%",
-            py: 4,
-            "& .slick-list": {
-            px: { xs: 2, sm: 0 },
-            },
-            "& .slick-prev, & .slick-next": {
-            width: 35,         
-            height: 35,
-            zIndex: 10,
-            top: "50%",
-            transform: "translateY(-50%)",
-            borderRadius: "50%",
-            backgroundColor: theme.palette.warning.main,
-            color: theme.palette.warning.contrastText,
-            display: "flex !important",
-            alignItems: "center",
-            justifyContent: "center",
-            transition: "all 0.2s ease",
-            },
-            "& .slick-prev:hover, & .slick-next:hover": {
-            backgroundColor: theme.palette.background.default,
-            color: theme.palette.warning.main,
-            },
-            "& .slick-prev": { left: { xs: 8, sm: 0 } },
-            "& .slick-next": { right: { xs: 8, sm: 0 } },
-        }}
+      sx={{
+        position: "relative",
+        width: "100%",
+        py: 4,
+        overflow: "hidden",
+        "& .slick-list": {
+          px: { xs: 0, sm: 0 },
+        },
+        "& .slick-prev, & .slick-next": {
+          width: 35,
+          height: 35,
+          zIndex: 10,
+          top: "50%",
+          transform: "translateY(-50%)",
+          borderRadius: "50%",
+          backgroundColor: theme.palette.warning.main,
+          color: theme.palette.warning.contrastText,
+          display: "flex !important",
+          alignItems: "center",
+          justifyContent: "center",
+          transition: "all 0.2s ease",
+        },
+        "& .slick-prev:hover, & .slick-next:hover": {
+          backgroundColor: theme.palette.background.default,
+          color: theme.palette.warning.main,
+        },
+        "& .slick-prev": { left: { xs: 8, sm: 0 } },
+        "& .slick-next": { right: { xs: 8, sm: 0 } },
+      }}
     >
 
       <Slider {...settings}>
@@ -111,8 +121,16 @@ export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs, instruments }) => 
               <CardMedia
                 component="img"
                 image={tab.image}
-                height="250"
                 alt={tab.title}
+                sx={{
+                  height: { xs: 180, sm: 220, md: 250 },
+                  objectFit: "cover",
+                  width: "100%",
+                  transition: "transform 0.3s ease",
+                  "&:hover": {
+                    transform: "scale(1.02)",
+                  },
+                }}
               />
               <CardContent>
                 <Box
