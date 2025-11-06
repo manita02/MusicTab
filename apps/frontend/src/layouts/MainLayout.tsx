@@ -78,7 +78,7 @@ export const MainLayout: React.FC = () => {
           overflowY: "auto",
           minHeight: "100vh",
           pt: { xs: 10, md: 12 },
-          pb: { xs: 10, md: 12 },
+          pb: { xs: 18, sm: 14, md: 12 },
         }}
       >
         <Container
