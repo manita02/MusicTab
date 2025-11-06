@@ -5,6 +5,8 @@ import { Navbar } from "../components/Navbar/Navbar";
 import { Footer } from "../components/Footer/Footer";
 import { useAuth } from "../api/hooks/useAuth";
 import { ManageProfileDialog } from "../dialogs/ManageProfileDialog";
+import bgDesktop from "../assets/desktop_background.jpg";
+import bgMobile from "../assets/mobile_background.jpg";
 
 export const MainLayout: React.FC = () => {
   const { isLoggedIn, userName, userImg, logout, userRole } = useAuth();
@@ -13,16 +15,20 @@ export const MainLayout: React.FC = () => {
   const handleCloseManageProfile = () => setOpenManageProfile(false);
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         display: "flex",
         flexDirection: "column",
         minHeight: "100vh",
-        backgroundImage: `url('https://c1.wallpaperflare.com/preview/52/686/468/guitar-acoustic-guitar-stringed-instrument-instrument.jpg')`,
+        position: "relative",
+        backgroundImage: `url(${bgDesktop})`,
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
         backgroundPosition: "center",
-        position: "relative",
-      }}
+        [theme.breakpoints.down("sm")]: {
+          backgroundImage: `url(${bgMobile})`,
+          backgroundPosition: "center",
+        },
+      })}
     >
       <Box
         sx={{
