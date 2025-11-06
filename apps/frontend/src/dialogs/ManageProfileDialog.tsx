@@ -19,6 +19,7 @@ import { IconLoader } from "../components/IconLoader/IconLoader";
 import { MessageModal } from "../components/MessageModal/MessageModal";
 import { useAuth } from "../api/hooks/useAuth";
 import { useUpdateUser } from "../api/hooks/useUpdateUser";
+import { useDeleteUser } from "../api/hooks/useDeleteUser";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 
@@ -42,6 +43,8 @@ export const ManageProfileDialog: React.FC<{
 
   const userRole = localStorage.getItem("userRole") ?? "USER";
   const isAdmin = userRole === "ADMIN";
+
+  const deleteUserMutation = useDeleteUser();
 
   const formatDate = (isoString: string | null) => {
     if (!isoString) return "";
@@ -107,10 +110,33 @@ export const ManageProfileDialog: React.FC<{
   };
 
   const handleModalClose = () => setModalOpen(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
-  const handleDeleteUser = () => {
-    showModal("warning", "Delete Account", "Are you sure you want to delete your account?");
-  };
+  const handleDeleteUser = async () => {
+    try {
+        await deleteUserMutation.mutateAsync(Number(localStorage.getItem("userId")));
+
+        showModal(
+        "success",
+        "Account Deleted",
+        "Your account and all your published tabs have been deleted successfully."
+        );
+
+        localStorage.clear();
+        setTimeout(() => {
+        setModalOpen(false);
+        onClose();
+        window.location.href = "/";
+        }, 1500);
+    } catch (err: any) {
+        showModal(
+        "error",
+        "Delete Failed",
+        err?.response?.data?.message || "Something went wrong"
+        );
+    }
+    };
+
 
   const handleSave = async () => {
     try {
@@ -145,6 +171,20 @@ export const ManageProfileDialog: React.FC<{
         message={modalMessage}
         confirmText="OK"
         onConfirm={handleModalClose}
+      />
+
+      <MessageModal
+        open={confirmDeleteOpen}
+        type="warning"
+        title="Delete Account?"
+        message="This action will permanently delete your account and all your published tabs. Are you sure you want to continue?"
+        confirmText="Yes, delete"
+        cancelText="Cancel"
+        onConfirm={() => {
+          setConfirmDeleteOpen(false);
+          handleDeleteUser();
+        }}
+        onCancel={() => setConfirmDeleteOpen(false)}
       />
 
       <Dialog
@@ -314,7 +354,7 @@ export const ManageProfileDialog: React.FC<{
               <Button
                 label="Delete Account"
                 variantType="danger"
-                onClick={handleDeleteUser}
+                onClick={() => setConfirmDeleteOpen(true)}
                 sx={{ width: { xs: "100%", sm: "auto" } }}
               />
             </>
