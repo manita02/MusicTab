@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Put, Param } from '@nestjs/common';
+import { Controller, Post, Body, Put, Param, Delete } from '@nestjs/common';
 import { UserPrismaRepository } from '../repositories/user-prisma.repository';
 import { SessionPrismaRepository } from '../repositories/session-prisma.repository';
 import { PasswordHasherService } from '../services/password-hasher.service';
@@ -110,5 +110,20 @@ export class UserController {
 
     const savedUser = await this.userRepo.save(updatedUser);
     return savedUser;
+  }
+
+  @Delete(':id')
+  async deleteUser(@Param('id') id: string) {
+    const numericId = Number(id);
+    if (isNaN(numericId)) {
+      throw new DomainError('InvalidId', 'ID must be a number');
+    }
+
+    const user = await this.userRepo.findById(numericId);
+    if (!user) throw new DomainError('UserNotFound', 'User not found');
+
+    await this.userRepo.deleteById(numericId);
+
+    return { message: 'User deleted successfully' };
   }
 }
