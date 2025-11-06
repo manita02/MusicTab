@@ -44,12 +44,12 @@ model Tab {
   instrumentId Int
   instrument   Instrument @relation(fields: [instrumentId], references: [id])
   genre        Genre      @relation(fields: [genreId], references: [id])
-  user         User       @relation(fields: [userId], references: [id])
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Session {
   tokenId   String   @id
   userId    Int
   expiresAt DateTime
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
