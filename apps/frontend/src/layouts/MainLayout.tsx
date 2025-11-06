@@ -21,7 +21,6 @@ export const MainLayout: React.FC = () => {
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
         backgroundPosition: "center",
-        backgroundAttachment: "scroll",
         position: "relative",
       }}
     >
@@ -36,11 +35,11 @@ export const MainLayout: React.FC = () => {
 
       <Box
         sx={{
-          position: "relative",
-          zIndex: 1,
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 10,
         }}
       >
         <Navbar
@@ -59,25 +58,51 @@ export const MainLayout: React.FC = () => {
           onSignUp={() => console.log("Sign Up clicked")}
           onManageProfile={handleOpenManageProfile}
         />
+      </Box>
 
-        {/* Main content (Outlet renders the current route view) */}
+      {/* Main content (Outlet renders the current route view) */}
+      <Box
+        sx={{
+          flex: 1,
+          zIndex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          pt: { xs: 10, md: 12 },
+          pb: { xs: 10, md: 12 },
+          overflowY: "auto",
+        }}
+      >
         <Container
           component="main"
           sx={{
-            flex: "0 1 auto",
-            p: 2,
-            m: "auto",
-            backgroundColor: "rgba(245, 241, 220, 0.7)",
-            borderRadius: 2,
-            boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+            flex: "0 0 auto",
+            p: { xs: 2, md: 3 },
+            mb: 4,
+            backgroundColor: "rgba(245, 241, 220, 0.75)",
+            borderRadius: 3,
+            boxShadow: "0 8px 30px rgba(0,0,0,0.25)",
             display: "flex",
             flexDirection: "column",
-            maxWidth: "lg",
+            maxWidth: "md",
+            width: "100%",
+            alignSelf: "center",
           }}
         >
           <Outlet />
         </Container>
+      </Box>
 
+      <Box
+        sx={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 10,
+        }}
+      >
         <Footer />
       </Box>
       <ManageProfileDialog
