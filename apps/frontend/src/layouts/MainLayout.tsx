@@ -1,12 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Box, Container } from "@mui/material";
 import { Navbar } from "../components/Navbar/Navbar";
 import { Footer } from "../components/Footer/Footer";
 import { useAuth } from "../api/hooks/useAuth";
+import { ManageProfileDialog } from "../dialogs/ManageProfileDialog";
 
 export const MainLayout: React.FC = () => {
   const { isLoggedIn, userName, userImg, logout, userRole } = useAuth();
+  const [openManageProfile, setOpenManageProfile] = useState(false);
+  const handleOpenManageProfile = () => setOpenManageProfile(true);
+  const handleCloseManageProfile = () => setOpenManageProfile(false);
   return (
     <Box
       sx={{
@@ -53,6 +57,7 @@ export const MainLayout: React.FC = () => {
           onLogout={logout}
           onLogin={() => console.log("Login clicked")}
           onSignUp={() => console.log("Sign Up clicked")}
+          onManageProfile={handleOpenManageProfile}
         />
 
         {/* Main content (Outlet renders the current route view) */}
@@ -75,6 +80,10 @@ export const MainLayout: React.FC = () => {
 
         <Footer />
       </Box>
+      <ManageProfileDialog
+        open={openManageProfile}
+        onClose={handleCloseManageProfile}
+      />
     </Box>
   );
 };
