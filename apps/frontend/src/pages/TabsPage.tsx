@@ -210,7 +210,7 @@ export const TabsPage: React.FC = () => {
     {
       field: "actions",
       headerName: "Actions",
-      width: 130,
+      width: 140,
       sortable: false,
       filterable: false,
       renderCell: (params: any) => {
@@ -239,7 +239,7 @@ export const TabsPage: React.FC = () => {
                     "&:hover": { backgroundColor: "rgba(255,144,19,0.1)" },
                   }}
                 >
-                  <EditIcon fontSize="small" />
+                  <EditIcon fontSize="medium" />
                 </IconButton>
               </Tooltip>
             )}
@@ -273,7 +273,7 @@ export const TabsPage: React.FC = () => {
                     "&:hover": { backgroundColor: "rgba(0,0,255,0.08)" },
                   }}
                 >
-                  <PictureAsPdfIcon fontSize="small" />
+                  <PictureAsPdfIcon fontSize="medium" />
                 </IconButton>
               </Tooltip>
             )}
