@@ -7,6 +7,13 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
+      - DATABASE_URL=file:/data/music_tab.db
+      - PORT=3000
+      - CORS_ORIGIN=http://localhost:5173
+      - JWT_SECRET=holo
+    volumes:
+      - sqlite-data:/data
+    depends_on: []
 
   frontend:
     build:
@@ -14,9 +21,11 @@ services:
       dockerfile: apps/frontend/Dockerfile
     ports:
       - "5173:5173"
-    volumes:
-      - ./apps/frontend:/usr/src/app/apps/frontend
     environment:
       - NODE_ENV=development
+      - VITE_BACKEND_URL=http://localhost:3000
     depends_on:
       - backend
+
+volumes:
+  sqlite-data:
