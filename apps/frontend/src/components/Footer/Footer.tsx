@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Typography, Link } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
-import forItLogo from "../../assets/forIt_logo.png";
+import forItLogo from "../../assets/forit_logo.png";
 import formarLogo from "../../assets/formar_logo.png";
 
 export const Footer: React.FC = () => {

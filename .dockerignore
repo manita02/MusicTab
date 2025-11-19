@@ -1,0 +1,34 @@
+# Node
+node_modules
+**/node_modules
+dist
+**/dist
+
+# Git
+.git
+.gitignore
+
+# Logs
+*.log
+
+# Mac
+.DS_Store
+
+# IDE
+.vscode
+.idea
+
+# Storybook
+apps/frontend/storybook-static
+
+# Tests
+coverage
+
+# Vite cache
+apps/frontend/.vite
+
+# Yarn stuff to ignore
+.yarn/cache
+.yarn/build-state.yml
+.pnp.*
+
