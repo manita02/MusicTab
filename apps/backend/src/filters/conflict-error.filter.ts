@@ -7,10 +7,12 @@ export class DomainErrorFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
 
-    const status =
+    let status =
       exception.code === 'Conflict'
         ? HttpStatus.CONFLICT
-        : HttpStatus.BAD_REQUEST;
+        : exception.code === 'AuthError'
+          ? HttpStatus.FORBIDDEN
+          : HttpStatus.BAD_REQUEST;
 
     response.status(status).json({
       statusCode: status,
