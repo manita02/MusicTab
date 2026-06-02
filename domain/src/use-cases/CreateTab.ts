@@ -26,11 +26,7 @@ export class CreateTab {
     }
 
     if (!user.isAdmin()) {
-      const today = new Date();
-      const count = await this.tabRepo.countByUserAndDate(user.id!, today);
-      if (count >= 3) {
-        throw new DomainError("TabError", "Daily upload limit reached");
-      }
+      throw new DomainError("AuthError", "Only administrators can create tabs");
     }
 
     const existing = await this.tabRepo.findByTitle(dto.title);
