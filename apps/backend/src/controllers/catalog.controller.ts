@@ -1,10 +1,12 @@
 import { Controller, Get } from '@nestjs/common';
 import { GenrePrismaRepository } from '../repositories/genre-prisma.repository';
 import { InstrumentPrismaRepository } from '../repositories/instrument-prisma.repository';
+import { Public } from '../auth/decorators/public.decorator';
 
 type GenreDTO = { id: number; name: string };
 type InstrumentDTO = { id: number; name: string };
 
+@Public()
 @Controller('catalogs')
 export class CatalogController {
   constructor(
