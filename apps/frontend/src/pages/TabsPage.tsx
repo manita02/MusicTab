@@ -28,12 +28,25 @@ import { IconLoader } from "../components/IconLoader/IconLoader";
 import { EditTabDialog } from "../dialogs/EditTabDialog";
 import { MessageModal } from "../components/MessageModal/MessageModal";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import {
+  canDownloadTabPdf,
+  canManageTabs,
+  normalizeRole,
+} from "../auth/tabPermissions";
+
+const GUEST_TABS_MESSAGE =
+  "You can browse all published tabs below. Buttons for PDF download and tab editing are locked until you sign in. Sign in or create an account to unlock downloads; only admins can manage (create/edit/delete) tabs.";
 
 export const TabsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const initialSearch = searchParams.get("search") || "";
   const [search, setSearch] = useState(initialSearch);
-  const { isLoggedIn, userId: loggedUserId, userRole } = useAuth();
+  const { isLoggedIn, userRole: rawRole } = useAuth();
+  const viewerRole = normalizeRole(rawRole);
+  const canManage = canManageTabs(isLoggedIn, viewerRole);
+  const canDownload = canDownloadTabPdf(isLoggedIn);
+  const isGuest = !isLoggedIn;
+
   const [view, setView] = useState<"all" | "mine">("all");
   const [order, setOrder] = useState("recent");
   const [openDialog, setOpenDialog] = useState(false);
@@ -47,12 +60,24 @@ export const TabsPage: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<any>(null);
 
   const { mutate: deleteTab, isPending: isDeleting } = useDeleteTab();
-  const localUserId  = Number(localStorage.getItem("userId"));
+  const localUserId = Number(localStorage.getItem("userId"));
+
+  useEffect(() => {
+    if (!canManage && view === "mine") {
+      setView("all");
+    }
+  }, [canManage, view]);
+
+  useEffect(() => {
+    setGuestInfoOpen(isGuest);
+  }, [isGuest]);
 
   const handleTabCreated = (newTab: any) => {
     setTabs((prev) => [newTab, ...prev]);
     setFilteredTabs((prev) => [newTab, ...prev]);
   };
+
+  const [guestInfoOpen, setGuestInfoOpen] = useState(false);
 
   const [modal, setModal] = useState<{
     open: boolean;
@@ -77,7 +102,7 @@ export const TabsPage: React.FC = () => {
   }, [data]);
 
   useEffect(() => {
-    if (!isLoading && data) {
+    if (!isLoading && data !== undefined) {
       const timeout = setTimeout(() => setPageLoading(false), 200);
       return () => clearTimeout(timeout);
     }
@@ -87,10 +112,10 @@ export const TabsPage: React.FC = () => {
     let results = [...tabs];
     if (search.trim()) {
       results = results.filter((t) =>
-        t.title.toLowerCase().includes(search.toLowerCase())
+        t.title.toLowerCase().includes(search.toLowerCase()),
       );
     }
-    if (view === "mine" && isLoggedIn && localUserId) {
+    if (view === "mine" && isLoggedIn && localUserId && canManage) {
       results = results.filter((t) => t.userId === localUserId);
     }
     results.sort((a, b) => {
@@ -101,7 +126,7 @@ export const TabsPage: React.FC = () => {
         : dateA.getTime() - dateB.getTime();
     });
     setFilteredTabs(results);
-  }, [tabs, search, view, order, isLoggedIn, localUserId ]);
+  }, [tabs, search, view, order, isLoggedIn, localUserId, canManage]);
 
   const handleSearch = () => {
     setSearch(search.trim());
@@ -109,13 +134,12 @@ export const TabsPage: React.FC = () => {
 
   const handleOpenDialog = () => setOpenDialog(true);
   const handleCloseDialog = () => setOpenDialog(false);
-  const handleSaveTab = (tabData: any) => {
-    console.log("🆕 New Tab created:", tabData);
+  const handleSaveTab = () => {
     handleCloseDialog();
   };
 
   const handleEdit = (tabId: number) => {
-    const tab = data.find((t: any) => t.id === tabId);
+    const tab = filteredTabs.find((t: any) => t.id === tabId) ?? data?.find((t: any) => t.id === tabId);
     if (!tab) return;
     setSelectedTab(tab);
     setEditDialogOpen(true);
@@ -123,7 +147,7 @@ export const TabsPage: React.FC = () => {
 
   const handleCloseEditDialog = () => setEditDialogOpen(false);
   const navigate = useNavigate();
-  const handleUpdateTab = (updatedTab: any) => {
+  const handleUpdateTab = () => {
     navigate("/tabs");
     setTimeout(() => {
       window.location.reload();
@@ -144,13 +168,11 @@ export const TabsPage: React.FC = () => {
   const handleConfirmDelete = () => {
     if (!selectedTab) return;
     deleteTab(
-      { id: selectedTab.id, userId: Number(localStorage.getItem("userId")) },
+      { id: selectedTab.id },
       {
         onSuccess: () => {
           setTabs((prevTabs) => prevTabs.filter((t) => t.id !== selectedTab.id));
-          setFilteredTabs((prevTabs) =>
-            prevTabs.filter((t) => t.id !== selectedTab.id)
-          );
+          setFilteredTabs((prevTabs) => prevTabs.filter((t) => t.id !== selectedTab.id));
           setModal({
             open: true,
             type: "success",
@@ -171,7 +193,7 @@ export const TabsPage: React.FC = () => {
             message: errorMessage,
           });
         },
-      }
+      },
     );
   };
 
@@ -206,61 +228,65 @@ export const TabsPage: React.FC = () => {
       createdAt: tab.createdAt,
     })) || [];
 
-  const columns = [
-    {
+  const manageDisabledTooltip = isGuest
+    ? "Sign in to manage tabs (admins only)"
+    : "Only administrators can manage tabs";
+
+  const actionsCol = {
       field: "actions",
       headerName: "Actions",
       width: 140,
       sortable: false,
       filterable: false,
-      renderCell: (params: any) => {
-        const canManage =
-          isLoggedIn &&
-          (userRole === "ADMIN" || params.row.userId === loggedUserId);
-        return (
-          <Box
-            sx={{
-              display: "flex",
-              gap: 1,
-              flexWrap: "wrap",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-              width: "100%",
-            }}
-          >
-            {canManage && (
-              <Tooltip title="Update" arrow>
-                <IconButton
-                  size="small"
-                  onClick={() => handleEdit(params.row.id)}
-                  sx={{
-                    color: theme.palette.warning.main,
-                    "&:hover": { backgroundColor: "rgba(255,144,19,0.1)" },
-                  }}
-                >
-                  <EditIcon fontSize="medium" />
-                </IconButton>
-              </Tooltip>
-            )}
+      renderCell: (params: any) => (
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            flexWrap: "wrap",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+            width: "100%",
+          }}
+        >
+          <Tooltip title={canManage ? "Update" : manageDisabledTooltip} arrow>
+            <span>
+              <IconButton
+                size="small"
+                onClick={() => canManage && handleEdit(params.row.id)}
+                disabled={!canManage}
+                sx={{
+                  color: canManage ? theme.palette.warning.main : theme.palette.action.disabled,
+                  "&:hover": canManage
+                    ? { backgroundColor: "rgba(255,144,19,0.1)" }
+                    : undefined,
+                }}
+              >
+                <EditIcon fontSize="medium" />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Tooltip title={canManage ? "Delete" : manageDisabledTooltip} arrow>
+            <span>
+              <IconButton
+                size="small"
+                onClick={() => canManage && handleDeleteClick(params.row)}
+                disabled={!canManage || isDeleting}
+                sx={{
+                  color: canManage ? theme.palette.error.main : theme.palette.action.disabled,
+                  "&:hover": canManage
+                    ? { backgroundColor: "rgba(255,0,0,0.08)" }
+                    : undefined,
+                }}
+              >
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
 
-            {canManage && (
-              <Tooltip title="Delete" arrow>
-                <IconButton
-                  size="small"
-                  onClick={() => handleDeleteClick(params.row)}
-                  disabled={isDeleting}
-                  sx={{
-                    color: theme.palette.error.main,
-                    "&:hover": { backgroundColor: "rgba(255,0,0,0.08)" },
-                  }}
-                >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            )}
-
-            {params.row.pdf && (
+          {params.row.pdf &&
+            (canDownload ? (
               <Tooltip title="View PDF" arrow>
                 <IconButton
                   size="small"
@@ -276,12 +302,20 @@ export const TabsPage: React.FC = () => {
                   <PictureAsPdfIcon fontSize="medium" />
                 </IconButton>
               </Tooltip>
-            )}
-          </Box>
-        );
-      },
-    },
-    {
+            ) : (
+              <Tooltip title="Sign in to download PDFs" arrow>
+                <span>
+                  <IconButton size="small" disabled sx={{ color: theme.palette.action.disabled }}>
+                    <PictureAsPdfIcon fontSize="medium" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            ))}
+        </Box>
+      ),
+  };
+
+  const titleCol = {
       field: "title",
       headerName: "Title",
       flex: 1,
@@ -332,8 +366,9 @@ export const TabsPage: React.FC = () => {
           )}
         </Box>
       ),
-    },
-    {
+  };
+
+  const videoCol = {
       field: "youtubeUrl",
       headerName: "Video",
       width: 360,
@@ -386,39 +421,41 @@ export const TabsPage: React.FC = () => {
           </Box>
         );
       },
-    },
-    { field: "instrument", headerName: "Instrument", width: 150 },
-    { field: "genre", headerName: "Genre", width: 150 },
-    {
-      field: "user",
-      headerName: "Uploaded by",
-      width: 150,
-      renderCell: (params: any) => (
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "flex-start",
-            gap: 0.5,
-            height: "100%",
-          }}
-        >
-          <Typography fontWeight={600}>{params.row.user}</Typography>
-          {params.row.createdAt && (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <CalendarTodayIcon
-                sx={{ fontSize: 14, color: "text.secondary" }}
-              />
-              <Typography variant="caption" color="text.secondary">
-                {new Date(params.row.createdAt).toLocaleDateString()}
-              </Typography>
-            </Box>
-          )}
-        </Box>
-      ),
-    },
+  };
+
+  const metaCols = [
+      { field: "instrument", headerName: "Instrument", width: 150 },
+      { field: "genre", headerName: "Genre", width: 150 },
+      {
+        field: "user",
+        headerName: "Uploaded by",
+        width: 150,
+        renderCell: (params: any) => (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "flex-start",
+              gap: 0.5,
+              height: "100%",
+            }}
+          >
+            <Typography fontWeight={600}>{params.row.user}</Typography>
+            {params.row.createdAt && (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <CalendarTodayIcon sx={{ fontSize: 14, color: "text.secondary" }} />
+                <Typography variant="caption" color="text.secondary">
+                  {new Date(params.row.createdAt).toLocaleDateString()}
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        ),
+      },
   ];
+
+  const columns = [actionsCol, titleCol, videoCol, ...metaCols];
 
   return (
     <Box sx={{ position: "relative", backgroundColor: "transparent", py: 2 }}>
@@ -479,20 +516,14 @@ export const TabsPage: React.FC = () => {
                 onChange={(_, val) => val && setView(val)}
                 sx={{ borderRadius: "12px", overflow: "hidden", height: "56px" }}
               >
-                <Tooltip title={isLoggedIn ? "" : "Login to view all tabs"}>
-                  <span>
-                    <ToggleButton value="all" sx={{ fontWeight: 600 }} disabled={!isLoggedIn}>
-                      All
-                    </ToggleButton>
-                  </span>
-                </Tooltip>
-                <Tooltip title={isLoggedIn ? "" : "Login to view your tabs"}>
-                  <span>
-                    <ToggleButton value="mine" sx={{ fontWeight: 600 }} disabled={!isLoggedIn}>
-                      My Tabs
-                    </ToggleButton>
-                  </span>
-                </Tooltip>
+                <ToggleButton value="all" sx={{ fontWeight: 600 }}>
+                  All
+                </ToggleButton>
+                {canManage && (
+                  <ToggleButton value="mine" sx={{ fontWeight: 600 }}>
+                    My Tabs
+                  </ToggleButton>
+                )}
               </ToggleButtonGroup>
             </Grid>
             <Grid item xs={12} sm="auto">
@@ -510,7 +541,7 @@ export const TabsPage: React.FC = () => {
               </Box>
             </Grid>
             <Grid item xs={12} sm="auto">
-              <Tooltip title={isLoggedIn ? "" : "Login to create a tab"}>
+              <Tooltip title={canManage ? "" : "Only administrators can create tabs"}>
                 <span>
                   <Button
                     label="Create New Tab"
@@ -518,7 +549,7 @@ export const TabsPage: React.FC = () => {
                     startIcon={<AddIcon />}
                     sx={{ height: 56 }}
                     onClick={handleOpenDialog}
-                    disabled={!isLoggedIn}
+                    disabled={!canManage}
                   />
                 </span>
               </Tooltip>
@@ -557,12 +588,26 @@ export const TabsPage: React.FC = () => {
             />
           </Box>
 
-          <CreateTabDialog open={openDialog} onClose={handleCloseDialog} onSave={handleSaveTab} onCreated={handleTabCreated}/>
+          <CreateTabDialog
+            open={openDialog}
+            onClose={handleCloseDialog}
+            onSave={handleSaveTab}
+            onCreated={handleTabCreated}
+          />
           <EditTabDialog
             open={editDialogOpen}
             onClose={handleCloseEditDialog}
             tabData={selectedTab}
             onSave={handleUpdateTab}
+          />
+          <MessageModal
+            open={guestInfoOpen}
+            type="info"
+            title="Browsing as guest"
+            message={GUEST_TABS_MESSAGE}
+            confirmText="Got it"
+            onConfirm={() => setGuestInfoOpen(false)}
+            onCancel={() => setGuestInfoOpen(false)}
           />
           <MessageModal
             open={modal.open}
