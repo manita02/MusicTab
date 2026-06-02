@@ -118,20 +118,40 @@ export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs, instruments }) => 
                 },
               }}
             >
-              <CardMedia
-                component="img"
-                image={tab.image}
-                alt={tab.title}
-                sx={{
-                  height: { xs: 180, sm: 220, md: 250 },
-                  objectFit: "cover",
-                  width: "100%",
-                  transition: "transform 0.3s ease",
-                  "&:hover": {
-                    transform: "scale(1.02)",
-                  },
-                }}
-              />
+              {tab.image ? (
+                <CardMedia
+                  component="img"
+                  image={tab.image}
+                  alt={tab.title}
+                  sx={{
+                    height: { xs: 180, sm: 220, md: 250 },
+                    objectFit: "cover",
+                    width: "100%",
+                    transition: "transform 0.3s ease",
+                    "&:hover": {
+                      transform: "scale(1.02)",
+                    },
+                  }}
+                />
+              ) : (
+                <Box
+                  sx={{
+                    height: { xs: 180, sm: 220, md: 250 },
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: `linear-gradient(135deg, ${theme.palette.primary.light}33, ${theme.palette.warning.light}44)`,
+                    color: theme.palette.text.secondary,
+                    px: 2,
+                    textAlign: "center",
+                  }}
+                >
+                  <Typography variant="body2">
+                    Sign in to see cover art for this tab
+                  </Typography>
+                </Box>
+              )}
               <CardContent>
                 <Box
                   sx={{
