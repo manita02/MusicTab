@@ -6,10 +6,13 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "build:domain": "npm --prefix ../../domain run build",
+    "prisma:generate": "npx prisma generate --schema prisma/schema.prisma",
+    "prebuild": "npm run prisma:generate && npm run build:domain",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "nest start --watch",
+    "start:dev": "npm run prisma:generate && npm run build:domain && nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -59,6 +62,9 @@
     "typescript-eslint": "^8.20.0"
   },
   "jest": {
+    "moduleNameMapper": {
+      "^@domain/(.*)$": "<rootDir>/../../../domain/dist/$1"
+    },
     "moduleFileExtensions": [
       "js",
       "json",
