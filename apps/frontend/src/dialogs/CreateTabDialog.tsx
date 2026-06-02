@@ -17,6 +17,8 @@ import { IconLoader } from "../components/IconLoader/IconLoader";
 import { MessageModal } from "../components/MessageModal/MessageModal";
 import { useGenres, useInstruments } from "../api/hooks/useCatalog";
 import { useCreateTab } from "../api/hooks/useCreateTab";
+import { useAuth } from "../api/hooks/useAuth";
+import { canManageTabs, normalizeRole } from "../auth/tabPermissions";
 
 interface CreateTabDialogProps {
   open: boolean;
@@ -52,6 +54,7 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
   const { data: genres = [], isLoading: loadingGenres } = useGenres();
   const { data: instruments = [], isLoading: loadingInstruments } = useInstruments();
   const { mutate: createTab, isPending } = useCreateTab();
+  const { isLoggedIn, userRole } = useAuth();
 
   const isLoading = loadingGenres || loadingInstruments || isPending;
 
@@ -86,10 +89,12 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
   };
 
   const handleSave = async () => {
-    const userId = Number(localStorage.getItem("userId"));
-
-    if (!userId) {
-      showModal("error", "User not logged in", "You must be logged in to create a tab.");
+    if (!canManageTabs(isLoggedIn, normalizeRole(userRole))) {
+      showModal(
+        "error",
+        "Not allowed",
+        "Only administrators can create tabs. If you need access, contact support.",
+      );
       return;
     }
 
@@ -100,7 +105,6 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
 
     const newTab = {
       title,
-      userId,
       genreId: Number(genre),
       instrumentId: Number(instrument),
       urlPdf: pdfUrl,
