@@ -96,6 +96,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             transformOrigin={{ vertical: "top", horizontal: "left" }}
             open={Boolean(anchorElNav)}
             onClose={handleCloseNavMenu}
+            disableScrollLock
           >
             {pages.map(({ label, path }) => (
               <MenuItem key={label} onClick={() => handleNavClick(path)}>
@@ -227,6 +228,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             transformOrigin={{ vertical: "top", horizontal: "right" }}
             open={Boolean(anchorElUser)}
             onClose={handleCloseUserMenu}
+            disableScrollLock
           >
             {isLoggedIn && userName && (
               <Tooltip title="Manage profile" arrow placement="left">
