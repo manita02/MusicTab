@@ -32,8 +32,8 @@ export class UpdateTab {
       throw new DomainError("UserError", "User not found");
     }
     
-    if (!user.isAdmin() && tab.userId !== dto.userId) {
-      throw new DomainError("AuthError", "You are not allowed to edit this tab");
+    if (!user.isAdmin()) {
+      throw new DomainError("AuthError", "Only administrators can edit tabs");
     }
 
     const updatedTab = tab.update({
