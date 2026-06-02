@@ -22,7 +22,7 @@ const Transition = React.forwardRef(function Transition(
 
 export interface MessageModalProps {
   open: boolean;
-  type?: "success" | "error" | "warning";
+  type?: "success" | "error" | "warning" | "info";
   title?: string;
   message?: string;
   confirmText?: string;
@@ -47,6 +47,8 @@ export const MessageModal: React.FC<MessageModalProps> = ({
       ? theme.palette.success.main
       : type === "warning"
       ? theme.palette.warning.main
+      : type === "info"
+      ? theme.palette.info.main
       : theme.palette.error.main;
 
   const handleKeyDown = (e: KeyboardEvent) => {
