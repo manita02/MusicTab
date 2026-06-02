@@ -1,12 +1,39 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
+function readStoredAuth() {
+  const token = localStorage.getItem("token");
+  const expiresAt = localStorage.getItem("expiresAt");
+
+  if (!token || !expiresAt || new Date(expiresAt).getTime() < Date.now()) {
+    return {
+      isLoggedIn: false,
+      userId: null as number | null,
+      userName: null as string | null,
+      userRole: null as "ADMIN" | "USER" | null,
+      userImg: null as string | null,
+    };
+  }
+
+  const id = localStorage.getItem("userId");
+  const role = localStorage.getItem("userRole");
+
+  return {
+    isLoggedIn: true,
+    userId: id ? Number(id) : null,
+    userName: localStorage.getItem("userName"),
+    userRole: role ? (role as "ADMIN" | "USER") : null,
+    userImg: localStorage.getItem("userImg"),
+  };
+}
+
 export const useAuth = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userId, setUserId] = useState<number | null>(null);
-  const [userName, setUserName] = useState<string | null>(null);
-  const [userRole, setUserRole] = useState<"ADMIN" | "USER" | null>(null);
-  const [userImg, setUserImg] = useState<string | null>(null);
+  const storedAuth = readStoredAuth();
+  const [isLoggedIn, setIsLoggedIn] = useState(storedAuth.isLoggedIn);
+  const [userId, setUserId] = useState<number | null>(storedAuth.userId);
+  const [userName, setUserName] = useState<string | null>(storedAuth.userName);
+  const [userRole, setUserRole] = useState<"ADMIN" | "USER" | null>(storedAuth.userRole);
+  const [userImg, setUserImg] = useState<string | null>(storedAuth.userImg);
   const logoutTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navigate = useNavigate();
 

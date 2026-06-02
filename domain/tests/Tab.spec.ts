@@ -56,7 +56,7 @@ describe("Tab entity (domain TDD)", () => {
     ).toThrow(DomainError);
   });
 
-  it("canEdit returns true for admin or owner", () => {
+  it("canEdit returns true only for admin", () => {
     const tab = Tab.create(
       "Song",
       2,
@@ -64,18 +64,30 @@ describe("Tab entity (domain TDD)", () => {
       1,
       "http://example.com/tab.pdf",
       "http://youtube.com/video",
-      "http://example.com/img.jpg"
+      "http://example.com/img.jpg",
     );
 
-    const admin = User.create("admin", "a@a.com", "pass", Role.ADMIN);
-    const owner = User.create("owner", "o@o.com", "pass");
-    (owner as any).id = 2;
+    const admin = User.create("admin", "a@a.com", "pass", Role.ADMIN, new Date("1990-01-01"), "https://x.com/a.png");
+    const owner = User.create(
+      "owner",
+      "o@o.com",
+      "pass",
+      Role.USER,
+      new Date("1990-01-01"),
+      "https://x.com/o.png",
+    );
 
-    const other = User.create("other", "x@x.com", "pass");
-    (other as any).id = 3;
+    const other = User.create(
+      "other",
+      "x@x.com",
+      "pass",
+      Role.USER,
+      new Date("1991-01-01"),
+      "https://x.com/x.png",
+    );
 
     expect(tab.canEdit(admin)).toBe(true);
-    expect(tab.canEdit(owner)).toBe(true);
+    expect(tab.canEdit(owner)).toBe(false);
     expect(tab.canEdit(other)).toBe(false);
   });
 

@@ -5,10 +5,12 @@ import { theme } from "../../theme/theme";
 import { Button } from "../Button/Button";
 import { useAuth } from "../../api/hooks/useAuth";
 import { CreateTabDialog } from "../../dialogs/CreateTabDialog";
+import { canManageTabs, normalizeRole } from "../../auth/tabPermissions";
 
 export const AboutSection: React.FC = () => {
   const navigate = useNavigate();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, userRole } = useAuth();
+  const canManage = canManageTabs(isLoggedIn, normalizeRole(userRole));
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const handleOpenDialog = () => setIsDialogOpen(true);
   const handleCloseDialog = () => setIsDialogOpen(false);
@@ -53,13 +55,13 @@ export const AboutSection: React.FC = () => {
       <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
         <Button label="View Tabs" variantType="primary" onClick={() => navigate("/tabs")} />
 
-        <Tooltip title={isLoggedIn ? "" : "Login to create a tab"} arrow>
+        <Tooltip title={canManage ? "" : "Only administrators can create tabs"} arrow>
           <span>
             <Button
               label="Create New Tab"
               variantType="secondary"
               onClick={handleOpenDialog}
-              disabled={!isLoggedIn}
+              disabled={!canManage}
             />
           </span>
         </Tooltip>

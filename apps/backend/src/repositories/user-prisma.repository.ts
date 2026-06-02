@@ -3,6 +3,11 @@ import { PrismaService } from '../prisma/prisma.service';
 import { IUserRepository } from '@domain/repositories/IUserRepository';
 import { User, Role } from '@domain/entities/User';
 
+function coerceRole(role: string): Role {
+  const r = (role ?? '').trim().toUpperCase();
+  return r === Role.ADMIN ? Role.ADMIN : Role.USER;
+}
+
 @Injectable()
 export class UserPrismaRepository implements IUserRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -18,7 +23,7 @@ export class UserPrismaRepository implements IUserRepository {
       record.username,
       record.email,
       record.passwordHash,
-      record.role as Role,
+      coerceRole(record.role),
       record.createdAt,
       record.birthDate,
       record.urlImg
@@ -36,7 +41,7 @@ export class UserPrismaRepository implements IUserRepository {
       record.username,
       record.email,
       record.passwordHash,
-      record.role as Role,
+      coerceRole(record.role),
       record.createdAt,
       record.birthDate,
       record.urlImg
@@ -53,7 +58,7 @@ export class UserPrismaRepository implements IUserRepository {
       record.username,
       record.email,
       record.passwordHash,
-      record.role as Role,
+      coerceRole(record.role),
       record.createdAt,
       record.birthDate,
       record.urlImg
@@ -94,7 +99,7 @@ export class UserPrismaRepository implements IUserRepository {
       record.username,
       record.email,
       record.passwordHash,
-      record.role as Role,
+      coerceRole(record.role),
       record.createdAt,
       record.birthDate,
       record.urlImg

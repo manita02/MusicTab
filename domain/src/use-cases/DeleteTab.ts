@@ -19,8 +19,8 @@ export class DeleteTab {
       throw new DomainError("UserError", "User not found");
     }
 
-    if (!user.isAdmin() && tab.userId !== user.id) {
-      throw new DomainError("TabError", "You don't have permission to delete this tab");
+    if (!user.isAdmin()) {
+      throw new DomainError("AuthError", "Only administrators can delete tabs");
     }
 
     await this.tabRepo.delete(id);

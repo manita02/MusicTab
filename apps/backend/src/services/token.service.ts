@@ -1,10 +1,15 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ITokenService } from '@domain/services/ITokenService';
 import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class TokenService implements ITokenService {
-  private readonly secret = 'super_secret_key';
+  constructor(private readonly config: ConfigService) {}
+
+  private get secret(): string {
+    return this.config.get<string>('JWT_SECRET') || 'super_secret_key';
+  }
 
   async generate(payload: any, expiresInSeconds: number): Promise<string> {
     return jwt.sign(payload, this.secret, { expiresIn: expiresInSeconds });

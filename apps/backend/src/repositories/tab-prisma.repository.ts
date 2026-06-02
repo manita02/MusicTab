@@ -3,6 +3,22 @@ import { ITabRepository } from '@domain/repositories/ITabRepository';
 import { Tab } from '@domain/entities/Tab';
 import { PrismaService } from '../prisma/prisma.service';
 
+/** Fila prisma.Tab sin relaciones */
+type DbTabRow = {
+  id: number;
+  title: string;
+  urlPdf: string;
+  urlYoutube: string | null;
+  urlImagen: string | null;
+  userId: number;
+  genreId: number;
+  instrumentId: number;
+  createdAt: Date;
+};
+
+/** Tab + usuario (include user en findLatest / findAll) */
+type TabRowWithUser = DbTabRow & { user: { username: string } };
+
 @Injectable()
 export class TabPrismaRepository implements ITabRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -54,7 +70,7 @@ export class TabPrismaRepository implements ITabRepository {
       where: { userId },
       orderBy: { createdAt: 'desc' },
     });
-    return records.map((r) =>
+    return records.map((r: DbTabRow) =>
       Tab.rehydrate(
         r.id,
         r.title,
@@ -121,7 +137,7 @@ export class TabPrismaRepository implements ITabRepository {
       include: { user: true },
     });
 
-    return records.map(r =>
+    return records.map((r: TabRowWithUser) =>
       Tab.rehydrate(
         r.id,
         r.title,
@@ -143,7 +159,7 @@ export class TabPrismaRepository implements ITabRepository {
       include: { user: true },
     });
 
-    return result.map((t) =>
+    return result.map((t: TabRowWithUser) =>
       Tab.rehydrate(
         t.id,
         t.title,
@@ -151,12 +167,44 @@ export class TabPrismaRepository implements ITabRepository {
         t.genreId,
         t.instrumentId,
         t.urlPdf,
-        t.urlYoutube,
-        t.urlImagen,
+        t.urlYoutube!,
+        t.urlImagen!,
         t.createdAt,
         t.user.username
       )
     );
+  }
+
+  /** Full authenticated view (URLs included), one row */
+  async findAuthorizedRow(id: number): Promise<{
+    id: number;
+    title: string;
+    userId: number;
+    genreId: number;
+    instrumentId: number;
+    urlPdf: string;
+    urlYoutube: string;
+    urlImg: string;
+    createdAt: Date;
+    userName: string;
+  } | null> {
+    const r = await this.prisma.tab.findUnique({
+      where: { id },
+      include: { user: true },
+    });
+    if (!r) return null;
+    return {
+      id: r.id,
+      title: r.title,
+      userId: r.userId,
+      genreId: r.genreId,
+      instrumentId: r.instrumentId,
+      urlPdf: r.urlPdf,
+      urlYoutube: r.urlYoutube ?? '',
+      urlImg: r.urlImagen ?? '',
+      createdAt: r.createdAt,
+      userName: r.user.username,
+    };
   }
 
   async update(tab: Tab): Promise<Tab> {

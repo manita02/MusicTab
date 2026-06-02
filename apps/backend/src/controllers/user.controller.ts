@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Put, Param, Delete, ForbiddenException } from '@nestjs/common';
 import { UserPrismaRepository } from '../repositories/user-prisma.repository';
 import { SessionPrismaRepository } from '../repositories/session-prisma.repository';
 import { PasswordHasherService } from '../services/password-hasher.service';
@@ -7,6 +7,8 @@ import { RegisterUser } from '@domain/use-cases/RegisterUser';
 import { LoginUser } from '@domain/use-cases/LoginUser';
 import { DomainError } from '@domain/errors/DomainError';
 import { User } from '@domain/entities/User';
+import { Public } from '../auth/decorators/public.decorator';
+import { CurrentUser, RequestUser } from '../auth/decorators/current-user.decorator';
 
 type RegisterDTO = {
   username: string;
@@ -51,6 +53,7 @@ export class UserController {
     );
   }
 
+  @Public()
   @Post('register')
   async register(@Body() dto: RegisterDTO) {
     const user = await this.registerUser.execute({
@@ -68,6 +71,7 @@ export class UserController {
     };
   }
 
+  @Public()
   @Post('login')
   async login(@Body() dto: LoginDTO) {
     const session = await this.loginUser.execute(dto);
@@ -88,10 +92,18 @@ export class UserController {
   }
 
   @Put(':id')
-  async updateUser(@Param('id') id: string, @Body() dto: UpdateUserDTO) {
+  async updateUser(
+    @CurrentUser() current: RequestUser,
+    @Param('id') id: string,
+    @Body() dto: UpdateUserDTO,
+  ) {
     const numericId = Number(id);
     if (isNaN(numericId)) {
       throw new DomainError('InvalidId', 'ID must be a number');
+    }
+
+    if (numericId !== current.id) {
+      throw new ForbiddenException('You can only update your own account');
     }
 
     const user = await this.userRepo.findById(numericId);
@@ -113,10 +125,14 @@ export class UserController {
   }
 
   @Delete(':id')
-  async deleteUser(@Param('id') id: string) {
+  async deleteUser(@CurrentUser() current: RequestUser, @Param('id') id: string) {
     const numericId = Number(id);
     if (isNaN(numericId)) {
       throw new DomainError('InvalidId', 'ID must be a number');
+    }
+
+    if (numericId !== current.id) {
+      throw new ForbiddenException('You can only delete your own account');
     }
 
     const user = await this.userRepo.findById(numericId);

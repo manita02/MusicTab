@@ -28,4 +28,12 @@ export class SessionPrismaRepository implements ISessionRepository {
   async delete(tokenId: string): Promise<void> {
     await this.prisma.session.delete({ where: { tokenId } });
   }
+
+  async isTokenValid(tokenId: string): Promise<boolean> {
+    const record = await this.prisma.session.findUnique({
+      where: { tokenId },
+    });
+    if (!record) return false;
+    return record.expiresAt.getTime() > Date.now();
+  }
 }

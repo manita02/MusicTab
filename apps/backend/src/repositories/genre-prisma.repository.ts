@@ -9,7 +9,9 @@ export class GenrePrismaRepository implements IGenreRepository {
 
   async findAll(): Promise<Genre[]> {
     const records = await this.prisma.genre.findMany();
-    return records.map(r => Genre.rehydrate(r.id, r.name));
+    return records.map((r: { id: number; name: string }) =>
+      Genre.rehydrate(r.id, r.name),
+    );
   }
 
   async findById(id: number): Promise<Genre | null> {

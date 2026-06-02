@@ -1,12 +1,18 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "resolvePackageJsonExports": false,
+    "resolvePackageJsonImports": false,
+    "noEmit": false,
     "outDir": "./dist",
     "rootDir": "./src",
     "removeComments": true,
     "sourceMap": true,
-    "incremental": true
+    "incremental": true,
+    "tsBuildInfoFile": "./dist/tsconfig.build.tsbuildinfo"
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "test"]
+  "exclude": ["node_modules", "test", "**/*.spec.ts"]
 }

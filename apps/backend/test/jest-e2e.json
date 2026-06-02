@@ -3,6 +3,9 @@
   "rootDir": ".",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
+  "moduleNameMapper": {
+    "^@domain/(.*)$": "<rootDir>/../../../domain/dist/$1"
+  },
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   }

@@ -15,7 +15,7 @@
     "useDefineForClassFields": false,
     "baseUrl": "./",
     "paths": {
-      "@domain/*": ["../../domain/src/*"]
+      "@domain/*": ["../../domain/dist/*"]
     }
   },
   "include": ["src/**/*.ts", "test/**/*.ts"]
