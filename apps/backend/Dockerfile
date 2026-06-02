@@ -6,6 +6,9 @@ COPY tsconfig.json tsconfig.json
 COPY domain domain
 COPY apps/backend apps/backend
 
+WORKDIR /usr/src/app/domain
+RUN npm install && npm run build
+
 WORKDIR /usr/src/app/apps/backend
 
 RUN npm install
