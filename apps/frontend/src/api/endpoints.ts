@@ -10,10 +10,15 @@ export const ENDPOINTS = {
     instruments: "/catalogs/instruments",
   },
   tabs: {
-    create: "/tabs/create",
+    public: "/tabs/public",
+    latestPublic: "/tabs/latest/public",
+    list: "/tabs",
     latest: "/tabs/latest",
-    all: "/tabs/all",
-    update: (id: number | string) => `/tabs/update/${id}`,
+    download: (id: number | string) => `/tabs/${id}/download`,
+    create: "/tabs",
+    legacyCreate: "/tabs/create",
+    update: (id: number | string) => `/tabs/${id}`,
+    legacyUpdate: (id: number | string) => `/tabs/update/${id}`,
     delete: (id: number) => `/tabs/${id}`,
   },
 };
