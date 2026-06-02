@@ -5,6 +5,7 @@
     "moduleResolution": "node",
     "resolvePackageJsonExports": false,
     "resolvePackageJsonImports": false,
+    "noEmit": false,
     "outDir": "./dist",
     "rootDir": "./src",
     "removeComments": true,
