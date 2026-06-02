@@ -11,6 +11,9 @@ package-lock.json
 # Build output
 dist/
 dist-ssr
+domain/src/**/*.js
+domain/src/**/*.js.map
+domain/src/**/*.d.ts
 
 # Environment
 .env
