@@ -19,6 +19,7 @@
 * [Prerequisites](#prerequisites)
 * [Project Installation](#project-installation)
     * [Running the Backend Locally](#running-the-backend-locally)
+    * [Prisma Client generation](#prisma-client-generation)
     * [Running Backend Tests](#running-backend-tests)
     * [Running the Frontend Locally](#running-the-frontend-locally)
     * [Running Frontend Tests](#running-frontend-tests)
@@ -93,12 +94,43 @@ yarn install
 ```
 
 ## Running the Backend Locally
-From the project root:
+
+From `apps/backend` (after `npm install` there):
+
 ```bash
-npx ts-node --project apps/backend/tsconfig.json -r tsconfig-paths/register apps/backend/src/main.ts
+cd apps/backend
+npm run start:dev
 ```
 
-The backend runs by default at: **http://localhost:3000**
+This script runs, in order: **`prisma:generate`** (Prisma Client), **`build:domain`** (shared domain package), then **`nest start --watch`**. The API listens by default at **http://localhost:3000**.
+
+Other useful commands from the same folder:
+
+| Command | Purpose |
+|--------|---------|
+| `npm run prisma:generate` | Regenerate the Prisma Client from `prisma/schema.prisma` |
+| `npm run build` | Production build (`prebuild` runs Prisma + domain build first) |
+| `npm run start:prod` | Run compiled output (`node dist/main`) after `npm run build` |
+
+### Prisma Client generation
+
+Nest imports `PrismaClient` from `@prisma/client`. That package is **not** complete until you run **`prisma generate`**, which writes the generated client under the workspace `node_modules` (for example `node_modules/@prisma/client` and `node_modules/.prisma/client` when dependencies are hoisted).
+
+You should **not** see this in normal flow because `npm run start:dev` and `npm run build` already invoke **`npm run prisma:generate`** via the backend scripts.
+
+If you still get:
+
+```text
+@prisma/client did not initialize yet. Please run "prisma generate"
+```
+
+typical causes are a fresh clone without having started the backend yet, removing `node_modules`, or clearing Prisma’s generated files. Fix it once from `apps/backend`:
+
+```bash
+npm run prisma:generate
+```
+
+After **any change** to `prisma/schema.prisma`, run `npm run prisma:generate` again (or rely on `start:dev` / `build`, which run it for you). The Docker image for the backend already runs `npx prisma generate` during the image build.
 
 ## Running Backend Tests
 ```bash
@@ -157,34 +189,36 @@ docker-compose down
 
 - **User Authentication**
   - User **sign up** and **sign in**
-  - Secure session handling
+  - JWT-based sessions validated on the server (with Prisma `Session` records)
+  - Protected routes require a valid `Authorization: Bearer` token
 
 - **User Account Management**
-  - Update account information
-  - Delete user account
+  - Authenticated users can **update** or **delete only their own** profile (`PUT` / `DELETE /users/:id` must match the logged-in user)
   - Upload and update profile image
 
-- **Tabs Management (CRUD)**
-  - Authenticated users can **create**, **edit**, and **delete** their own tabs
-  - Tabs include YouTube link, preview image, PDF file, genre and instrument
+- **Roles & tab permissions (source of truth: backend)**
+  - **Admin (`ADMIN`)** — Full tablature **CRUD**: create, edit, delete; browse all tabs; download PDFs; admin-only UI controls.
+  - **Registered user (`USER`)** — Browse tabs with full details (including PDF links from authenticated APIs), **download** PDFs; **cannot** create, edit, or delete tabs or call admin mutation endpoints.
+  - **Guest (not signed in)** — Can browse the **public** tab catalogue and see previews (YouTube embed via `youtubeVideoId`, cover image via a **same-origin proxy** so stored image URLs are not exposed in public JSON). **Download**, **create**, **edit**, and **delete** are disabled in the UI and blocked by the API for mutations; PDF is not returned on public list endpoints.
 
-- **Public Tabs Access**
-  - Non-authenticated users can **browse** all tabs
-  - Public users can **view** and **download** tablatures
-  - Access to tab details without creating an account
+- **Tabs Management**
+  - Tabs include YouTube link, preview image, PDF file, genre, and instrument
+  - **Only admins** perform create / update / delete (domain rules + NestJS `RolesGuard`)
+  - Public read endpoints: `GET /tabs/public`, `GET /tabs/latest/public`; authenticated listing: `GET /tabs`, `GET /tabs/latest`
 
 - **Filtering & Categorization**
   - Tabs categorized by **genre** and **instrument**
-  - User-specific tabs page
+  - **“My tabs”** filter is available **only to admins** (they are the only role that can manage tabs)
 
 - **Responsive UI**
   - Desktop and mobile layout
+  - Route-level **lazy loading** for heavier pages (Home, Tabs, Login, Sign In)
 
 - **Developer Experience**
   - API built with **NestJS + Prisma**
   - Frontend built with **React + Vite**
   - Storybook for isolated UI component development
-  - Unit tests with **Vitest**
+  - Unit tests with **Vitest** (domain + frontend)
   - Fully Dockerized with **Docker Compose** for one-command startup
 
 ## Screenshots
