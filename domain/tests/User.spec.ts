@@ -2,9 +2,12 @@ import { describe, it, expect } from "vitest";
 import { User, Role } from "../src/entities/User";
 import { DomainError } from "../src/errors/DomainError";
 
+const birth = () => new Date("1993-06-06");
+const img = () => "https://example.com/u.png";
+
 describe("User entity (domain TDD)", () => {
   it("create a valid user with default values", () => {
-    const user = User.create("felipe", "felipe@example.com", "hashed-secret");
+    const user = User.create("felipe", "felipe@example.com", "hashed-secret", Role.USER, birth(), img());
 
     expect(user.id).toBeNull();
     expect(user.username).toBe("felipe");
@@ -16,17 +19,21 @@ describe("User entity (domain TDD)", () => {
   });
 
   it("create an administrator user explicitly", () => {
-    const admin = User.create("root", "admin@example.com", "hashed-pass", Role.ADMIN);
+    const admin = User.create("root", "admin@example.com", "hashed-pass", Role.ADMIN, birth(), img());
 
     expect(admin.isAdmin()).toBe(true);
   });
 
   it("throws error if the username is too short", () => {
-    expect(() => User.create("s", "short@example.com", "secret")).toThrow(DomainError);
+    expect(() => User.create("s", "short@example.com", "secret", Role.USER, birth(), img())).toThrow(
+      DomainError,
+    );
   });
 
   it("throws error if the email is invalid", () => {
-    expect(() => User.create("graciela", "invalid-email", "secret")).toThrow(DomainError);
+    expect(() => User.create("graciela", "invalid-email", "secret", Role.USER, birth(), img())).toThrow(
+      DomainError,
+    );
   });
 
   it("rehydrate rebuilds a user from the database", () => {
@@ -36,7 +43,9 @@ describe("User entity (domain TDD)", () => {
       "db@example.com",
       "hashed-dbpass",
       Role.USER,
-      new Date("2024-01-01")
+      new Date("2024-01-01"),
+      birth(),
+      img(),
     );
 
     expect(persisted.id).toBe(42);
