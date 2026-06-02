@@ -20,7 +20,16 @@ class InMemoryUserRepository implements IUserRepository {
     }
     async save(user: User) {
       const id = this.users.length + 1;
-      const rehydrated = User.rehydrate(id, user.username, user.email.toString(), user.passwordHash, user.role, user.createdAt);
+      const rehydrated = User.rehydrate(
+        id,
+        user.username,
+        user.email.toString(),
+        user.passwordHash,
+        user.role,
+        user.createdAt,
+        user.birthDate,
+        user.urlImg.toString()
+      );
       this.users.push(rehydrated);
       return rehydrated;
     }
@@ -43,6 +52,10 @@ class InMemoryUserRepository implements IUserRepository {
     }
     async delete(token: string) {
       this.sessions = this.sessions.filter(s => s.token !== token);
+    }
+    async isTokenValid(tokenId: string): Promise<boolean> {
+      const session = await this.findByToken(tokenId);
+      return !!session && !session.isExpired();
     }
   }
   
@@ -77,7 +90,9 @@ describe("LoginUser use-case", () => {
     tokenService = new FakeTokenService();
     useCase = new LoginUser(userRepo, hasher, tokenService, sessionRepo);
 
-    user = await userRepo.save(User.create("pepe", "pepe@gmail.com", await hasher.hash("secret"), Role.USER));
+    user = await userRepo.save(
+      User.create("pepe", "pepe@gmail.com", await hasher.hash("secret"), Role.USER, new Date("1990-01-01"), "https://example.com/a.png")
+    );
   });
 
   it("logs in a user with correct credentials", async () => {
