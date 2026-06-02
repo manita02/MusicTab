@@ -5,7 +5,6 @@ import type { AxiosError } from "axios";
 
 type CreateTabRequest = {
   title: string;
-  userId: number;
   genreId: number;
   instrumentId: number;
   urlPdf: string;
