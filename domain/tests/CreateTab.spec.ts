@@ -6,7 +6,6 @@ import { Role, User } from "../src/entities/User";
 import { IUserRepository } from "../src/repositories/IUserRepository";
 import { DomainError } from "../src/errors/DomainError";
 
-/** In-memory Tab repository */
 class InMemoryTabRepository implements ITabRepository {
   private tabs: Tab[] = [];
   private idCounter = 1;
@@ -22,138 +21,144 @@ class InMemoryTabRepository implements ITabRepository {
         tab.urlPdf.getValue(),
         tab.urlYoutube.getValue(),
         tab.urlImg.getValue(),
-        tab.createdAt
+        tab.createdAt,
       );
       this.tabs.push(newTab);
       return newTab;
-    } else {
-      const index = this.tabs.findIndex(t => t.id === tab.id);
-      if (index >= 0) this.tabs[index] = tab;
-      return tab;
     }
+    const index = this.tabs.findIndex((t) => t.id === tab.id);
+    if (index >= 0) this.tabs[index] = tab;
+    return tab;
   }
 
   async findById(id: number): Promise<Tab | null> {
-    return this.tabs.find(t => t.id === id) ?? null;
+    return this.tabs.find((t) => t.id === id) ?? null;
   }
 
   async findByUser(userId: number): Promise<Tab[]> {
-    return this.tabs.filter(t => t.userId === userId);
+    return this.tabs.filter((t) => t.userId === userId);
   }
 
   async countByUserAndDate(userId: number, date: Date): Promise<number> {
-    const dateString = date.toISOString().split("T")[0];
+    const day = date.toISOString().split("T")[0];
     return this.tabs.filter(
-      t => t.userId === userId && t.createdAt.toISOString().split("T")[0] === dateString
+      (t) => t.userId === userId && t.createdAt.toISOString().split("T")[0] === day,
     ).length;
   }
 
   async delete(id: number): Promise<void> {
-    this.tabs = this.tabs.filter(t => t.id !== id);
+    this.tabs = this.tabs.filter((t) => t.id !== id);
   }
 
   async findByTitle(title: string): Promise<Tab | null> {
-    return this.tabs.find(t => t.title === title) ?? null;
-  }  
+    return this.tabs.find((t) => t.title === title) ?? null;
+  }
+
+  async findLatest(limit: number): Promise<Tab[]> {
+    return [...this.tabs].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, limit);
+  }
+
+  async findAll(): Promise<Tab[]> {
+    return [...this.tabs];
+  }
+
+  async update(tab: Tab): Promise<Tab> {
+    await this.delete(tab.id!);
+    await this.save(tab);
+    const found = await this.findById(tab.id!);
+    return found!;
+  }
 }
 
-/** In-memory User repo */
 class InMemoryUserRepository implements IUserRepository {
   private users: User[] = [];
 
   async findById(id: number) {
-    return this.users.find(u => u.id === id) ?? null;
+    return this.users.find((u) => u.id === id) ?? null;
   }
 
   async save(user: User) {
-    const newId = this.users.length + 1;
-    const rehydrated = User.rehydrate(newId, user.username, user.email.toString(), user.passwordHash, user.role, user.createdAt);
-    this.users.push(rehydrated);
+    const newId = user.id ?? this.users.length + 1;
+    const rehydrated = User.rehydrate(
+      newId,
+      user.username,
+      user.email.toString(),
+      user.passwordHash,
+      user.role,
+      user.createdAt,
+      user.birthDate,
+      user.urlImg.toString(),
+    );
+    const idx = this.users.findIndex((u) => u.id === newId);
+    if (idx >= 0) this.users[idx] = rehydrated;
+    else this.users.push(rehydrated);
     return rehydrated;
   }
 
   async deleteById(id: number) {
-    this.users = this.users.filter(u => u.id !== id);
+    this.users = this.users.filter((u) => u.id !== id);
   }
 
   async findByEmail(email: string) {
-    return this.users.find(u => u.email.toString() === email) ?? null;
+    return this.users.find((u) => u.email.toString() === email.toLowerCase()) ?? null;
   }
 
   async findByUsername(username: string): Promise<User | null> {
-    return this.users.find(u => u.username === username) ?? null;
-  }  
+    return this.users.find((u) => u.username === username) ?? null;
+  }
 }
 
-describe("CreateTab use case (domain TDD)", () => {
+const birth = () => new Date("1995-06-01");
+const img = () => "https://example.com/avatar.png";
+
+describe("CreateTab use case", () => {
   let tabRepo: InMemoryTabRepository;
   let userRepo: InMemoryUserRepository;
   let useCase: CreateTab;
-  let normalUser: User;
-  let adminUser: User;
 
   beforeEach(async () => {
     tabRepo = new InMemoryTabRepository();
     userRepo = new InMemoryUserRepository();
     useCase = new CreateTab(tabRepo, userRepo);
-
-    normalUser = await userRepo.save(User.create("user", "user@u.com", "pass"));
-    adminUser = await userRepo.save(User.create("admin", "admin@a.com", "pass", Role.ADMIN));
+    await userRepo.save(User.create("user", "user@u.com", "hash", Role.USER, birth(), img()));
+    await userRepo.save(User.create("admin", "admin@a.com", "hash", Role.ADMIN, birth(), img()));
   });
 
-  it("allows a normal user to create up to 3 tabs per day", async () => {
-    for (let i = 0; i < 3; i++) {
-      const tab = await useCase.execute({
-        title: `Song ${i + 1}`,
-        userId: normalUser.id!,
-        genreId: 1,
-        instrumentId: 1,
-        urlPdf: "http://example.com/tab.pdf",
-        urlYoutube: "http://youtube.com/video",
-        urlImg: "http://example.com/img.jpg"
-      });
-      expect(tab.id).toBeDefined();
-    }
+  const payload = {
+    title: "Song 1",
+    genreId: 1,
+    instrumentId: 1,
+    urlPdf: "http://example.com/tab.pdf",
+    urlYoutube: "http://youtube.com/video",
+    urlImg: "http://example.com/img.jpg",
+  };
 
+  it("rejects creation for normal users", async () => {
+    const user = (await userRepo.findByEmail("user@u.com"))!;
     await expect(
       useCase.execute({
-        title: "Song 4",
-        userId: normalUser.id!,
-        genreId: 1,
-        instrumentId: 1,
-        urlPdf: "http://example.com/tab.pdf",
-        urlYoutube: "http://youtube.com/video",
-        urlImg: "http://example.com/img.jpg"
-      })
+        ...payload,
+        userId: user.id!,
+      }),
     ).rejects.toThrow(DomainError);
   });
 
-  it("allows admin user to create more than 3 tabs", async () => {
-    for (let i = 0; i < 5; i++) {
-      const tab = await useCase.execute({
-        title: `Admin Song ${i + 1}`,
-        userId: adminUser.id!,
-        genreId: 2,
-        instrumentId: 2,
-        urlPdf: "http://example.com/tab.pdf",
-        urlYoutube: "http://youtube.com/video",
-        urlImg: "http://example.com/img.jpg"
-      });
-      expect(tab.id).toBeDefined();
-    }
+  it("allows admin to create tabs", async () => {
+    const admin = (await userRepo.findByEmail("admin@a.com"))!;
+    const tab = await useCase.execute({
+      ...payload,
+      userId: admin.id!,
+    });
+    expect(tab.id).toBeDefined();
+    expect(tab.title).toBe(payload.title);
   });
 
   it("throws if user does not exist", async () => {
     await expect(
       useCase.execute({
-        title: "Song X",
+        ...payload,
         userId: 999,
-        genreId: 1,
-        instrumentId: 1,
-        urlPdf: "http://example.com/tab.pdf",
-        urlYoutube: "http://youtube.com/video",
-        urlImg: "http://example.com/img.jpg"
-      })
+      }),
     ).rejects.toThrow(DomainError);
   });
 });
