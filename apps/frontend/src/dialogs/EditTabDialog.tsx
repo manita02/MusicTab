@@ -94,7 +94,6 @@ export const EditTabDialog: React.FC<EditTabDialogProps> = ({
       urlPdf: pdfUrl,
       urlYoutube: youtubeUrl,
       urlImg: imageUrl,
-      userId: tabData.userId,
     };
 
     updateTab(updatedTab, {
