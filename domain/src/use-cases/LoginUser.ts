@@ -26,7 +26,10 @@ export class LoginUser {
     const valid = await this.passwordHasher.compare(dto.password, user.passwordHash);
     if (!valid) throw new DomainError("LoginError", "Invalid password");
 
-    const token = await this.tokenService.generate({ userId: user.id }, dto.expiresInSeconds);
+    const token = await this.tokenService.generate(
+      { userId: user.id, role: user.role },
+      dto.expiresInSeconds
+    );
     const session = Session.create(token, user.id!, dto.expiresInSeconds);
 
     await this.sessionRepo.save(session);
