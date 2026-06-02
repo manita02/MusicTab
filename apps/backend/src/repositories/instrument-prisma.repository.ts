@@ -9,7 +9,9 @@ export class InstrumentPrismaRepository implements IInstrumentRepository {
 
   async findAll(): Promise<Instrument[]> {
     const records = await this.prisma.instrument.findMany();
-    return records.map(r => Instrument.rehydrate(r.id, r.name));
+    return records.map((r: { id: number; name: string }) =>
+      Instrument.rehydrate(r.id, r.name),
+    );
   }
 
   async findById(id: number): Promise<Instrument | null> {
