@@ -6,7 +6,6 @@ import type { AxiosError } from "axios";
 type UpdateTabRequest = {
   id: number;
   title: string;
-  userId: number;
   genreId: number;
   instrumentId: number;
   urlPdf: string;
@@ -20,10 +19,11 @@ type UpdateTabResponse = {
   genreId: number;
   instrumentId: number;
   userId: number;
-  createdAt: string;
+  createdAt?: string;
   urlPdf: string;
   urlYoutube: string;
   urlImg: string;
+  userName?: string | null;
 };
 
 type ApiErrorResponse = {
@@ -38,7 +38,8 @@ export const useUpdateTab = () => {
     mutationFn: async (tab: UpdateTabRequest) => {
       const token = localStorage.getItem("token");
       try {
-        const response = await api.put(ENDPOINTS.tabs.update(tab.id), tab, {
+        const { id, ...body } = tab;
+        const response = await api.put(ENDPOINTS.tabs.update(id), body, {
           headers: { Authorization: `Bearer ${token}` },
         });
         return response.data;
