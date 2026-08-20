@@ -6,6 +6,9 @@
     "apps/*"
   ],
   "packageManager": "yarn@4.10.3",
+  "resolutions": {
+    "rollup": "npm:@rollup/wasm-node@4.61.0"
+  },
   "scripts": {
     "lint": "eslint . --ext .ts --max-warnings=0",
     "format": "prettier --write ."
