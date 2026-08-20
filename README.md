@@ -63,11 +63,20 @@ It includes:
 Before installing or running the project, ensure you have:
 
 ### Required Tools
-* **Node.js** ($\ge$ 18)
-* **Yarn** or **npm**
-* **Docker & Docker Compose**
+* **Node.js** ($\ge$ 18; **20** recommended, matching the Dockerfiles)
+* **Corepack** (ships with Node $\ge$ 16.10) — this repo pins **Yarn 4.10.3** (`packageManager` in the root `package.json`). Do not install classic Yarn globally.
+* **npm** (for backend scripts such as `start:dev`)
+* **Docker & Docker Compose** (optional if you run Node locally; required for the Docker setup)
 * **Git**
 * **A code editor** like **VS Code**
+
+On a **fresh clone** (including **Windows** / PowerShell), enable Yarn 4 before `yarn install`:
+
+```bash
+corepack enable
+corepack prepare yarn@4.10.3 --activate
+yarn -v
+```
 
 ## Project Installation
 ### 1. Clone the repository
@@ -95,10 +104,33 @@ yarn install
 
 ## Running the Backend Locally
 
-From `apps/backend` (after `npm install` there):
+From `apps/backend` (after `npm install` there). On a **fresh clone** (including **Windows**), apply Prisma migrations first so SQLite exists (`apps/backend/prisma/music_tab.db`):
 
 ```bash
 cd apps/backend
+npx prisma migrate deploy
+npx prisma generate
+npm run prisma:seed
+```
+
+The seed is **idempotent**. It creates a default **ADMIN** (registration always assigns `USER`) and the catalog rows needed to create tabs:
+
+| Field | Value |
+|--------|--------|
+| Username | `admin` |
+| Email (login) | `admin@admin.com` |
+| Password | `admin` |
+
+| Catalog | Values |
+|--------|--------|
+| Instruments | Guitar, Piano, Ukulele |
+| Genres | Rock, Jazz, Pop, Blues, Metal, Folklore, Classical, Country, Reggae, Funk, Soul, R&B, Indie, Alternative, Punk, Latin, Flamenco, Soundtrack |
+
+The login form uses **email**, not username.
+
+Then start the API:
+
+```bash
 npm run start:dev
 ```
 
@@ -108,6 +140,8 @@ Other useful commands from the same folder:
 
 | Command | Purpose |
 |--------|---------|
+| `npx prisma migrate deploy` | Apply existing migrations and create the SQLite file on a fresh clone |
+| `npm run prisma:seed` | Create (or promote) the default admin user and seed instruments/genres |
 | `npm run prisma:generate` | Regenerate the Prisma Client from `prisma/schema.prisma` |
 | `npm run build` | Production build (`prebuild` runs Prisma + domain build first) |
 | `npm run start:prod` | Run compiled output (`node dist/main`) after `npm run build` |
