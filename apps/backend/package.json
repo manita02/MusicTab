@@ -8,6 +8,7 @@
   "scripts": {
     "build:domain": "npm --prefix ../../domain run build",
     "prisma:generate": "npx prisma generate --schema prisma/schema.prisma",
+    "prisma:seed": "npx prisma db seed --schema prisma/schema.prisma",
     "prebuild": "npm run prisma:generate && npm run build:domain",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -80,5 +81,9 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "prisma": {
+    "schema": "prisma/schema.prisma",
+    "seed": "npx ts-node --compiler-options {\"module\":\"CommonJS\",\"moduleResolution\":\"node\"} prisma/seed.ts"
   }
 }
