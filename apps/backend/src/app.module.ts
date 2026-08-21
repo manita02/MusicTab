@@ -1,3 +1,4 @@
+import { join } from 'path';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
@@ -25,6 +26,11 @@ import { RolesGuard } from './auth/roles.guard';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: [
+        join(process.cwd(), '.env'),
+        join(process.cwd(), 'apps/backend/.env'),
+        join(__dirname, '..', '.env'),
+      ],
     }),
     PrismaModule,
     CopilotModule,
