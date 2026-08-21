@@ -6,6 +6,7 @@ import type { AxiosError } from "axios";
 type UpdateTabRequest = {
   id: number;
   title: string;
+  artist: string;
   genreId: number;
   instrumentId: number;
   urlPdf: string;
@@ -16,6 +17,7 @@ type UpdateTabRequest = {
 type UpdateTabResponse = {
   id: number;
   title: string;
+  artist: string;
   genreId: number;
   instrumentId: number;
   userId: number;

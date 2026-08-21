@@ -6,6 +6,7 @@ import { useAuth } from "./useAuth";
 export type TabAuthenticated = {
   id: number;
   title: string;
+  artist: string;
   genreId: number;
   instrumentId: number;
   userId: number;
@@ -14,6 +15,7 @@ export type TabAuthenticated = {
   urlPdf: string;
   urlYoutube: string;
   urlImg: string;
+  viewCount?: number;
 };
 
 export type ViewerTabRow = TabAuthenticated;
@@ -22,6 +24,7 @@ export type ViewerTabRow = TabAuthenticated;
 export type PublicTabListItem = {
   id: number;
   title: string;
+  artist?: string;
   genreId: number;
   instrumentId: number;
   userId: number;
@@ -44,6 +47,7 @@ export function mapPublicTabsToViewerRows(data: unknown): ViewerTabRow[] {
     return {
       id,
       title: String(t.title ?? ""),
+      artist: String(t.artist ?? ""),
       genreId: Number(t.genreId),
       instrumentId: Number(t.instrumentId),
       userId: Number(t.userId) || 0,
@@ -61,6 +65,7 @@ export function normalizeAuthenticatedTabRows(data: unknown): ViewerTabRow[] {
   return data.map((t: Record<string, unknown>) => ({
     id: Number(t.id),
     title: String(t.title ?? ""),
+    artist: String(t.artist ?? ""),
     genreId: Number(t.genreId),
     instrumentId: Number(t.instrumentId),
     userId: typeof t.userId === "number" ? t.userId : Number(t.userId) || 0,
