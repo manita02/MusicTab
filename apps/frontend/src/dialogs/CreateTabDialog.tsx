@@ -37,6 +37,7 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   const [title, setTitle] = useState("");
+  const [artist, setArtist] = useState("");
   const [genre, setGenre] = useState("");
   const [instrument, setInstrument] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
@@ -60,6 +61,7 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
 
   const resetForm = () => {
     setTitle("");
+    setArtist("");
     setGenre("");
     setInstrument("");
     setYoutubeUrl("");
@@ -98,13 +100,14 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
       return;
     }
 
-    if (!title.trim() || !genre || !instrument) {
+    if (!title.trim() || !artist.trim() || !genre || !instrument) {
       showModal("warning", "Incomplete Form", "Please complete all required fields before saving.");
       return;
     }
 
     const newTab = {
       title,
+      artist: artist.trim(),
       genreId: Number(genre),
       instrumentId: Number(instrument),
       urlPdf: pdfUrl,
@@ -203,6 +206,7 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
         <DialogContent dividers sx={{ px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 } }}>
           <Grid container spacing={3} direction="column">
             <InputField label="Title *" value={title} onChange={(e) => setTitle(e.target.value)} fullWidth />
+            <InputField label="Artist *" value={artist} onChange={(e) => setArtist(e.target.value)} fullWidth />
 
             <SelectField
               label="Instrument *"

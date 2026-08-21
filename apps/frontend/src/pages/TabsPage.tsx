@@ -33,6 +33,8 @@ import {
   canManageTabs,
   normalizeRole,
 } from "../auth/tabPermissions";
+import { api } from "../api/client";
+import { ENDPOINTS } from "../api/endpoints";
 
 const GUEST_TABS_MESSAGE =
   "You can browse all published tabs below. Buttons for PDF download and tab editing are locked until you sign in. Sign in or create an account to unlock downloads; only admins can manage (create/edit/delete) tabs.";
@@ -201,6 +203,15 @@ export const TabsPage: React.FC = () => {
     setModal((prev) => ({ ...prev, open: false }));
   };
 
+  const handleViewPdf = async (tabId: number, pdfUrl: string) => {
+    try {
+      await api.post(ENDPOINTS.tabs.view(tabId));
+      window.open(pdfUrl, "_blank", "noopener,noreferrer");
+    } catch {
+      // 401 is handled by the axios interceptor (redirect to login).
+    }
+  };
+
   const getGenreName = (id: number) =>
     genres.find((g: any) => g.id === id)?.name || "-";
 
@@ -218,6 +229,7 @@ export const TabsPage: React.FC = () => {
     filteredTabs?.map((tab: any) => ({
       id: tab.id,
       title: tab.title,
+      artist: tab.artist || "",
       imageUrl: tab.urlImg || "",
       youtubeUrl: tab.urlYoutube || "",
       pdf: tab.urlPdf || null,
@@ -290,10 +302,10 @@ export const TabsPage: React.FC = () => {
               <Tooltip title="View PDF" arrow>
                 <IconButton
                   size="small"
-                  component="a"
-                  href={params.row.pdf}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    void handleViewPdf(params.row.id, params.row.pdf);
+                  }}
                   sx={{
                     color: theme.palette.info.main,
                     "&:hover": { backgroundColor: "rgba(0,0,255,0.08)" },
@@ -330,6 +342,11 @@ export const TabsPage: React.FC = () => {
           }}
         >
           <Typography fontWeight={600}>{params.row.title}</Typography>
+          {params.row.artist ? (
+            <Typography variant="caption" color="text.secondary">
+              {params.row.artist}
+            </Typography>
+          ) : null}
           {params.row.imageUrl ? (
             <Box
               component="img"

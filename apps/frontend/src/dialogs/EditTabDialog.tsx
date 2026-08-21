@@ -35,6 +35,7 @@ export const EditTabDialog: React.FC<EditTabDialogProps> = ({
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   const [title, setTitle] = useState("");
+  const [artist, setArtist] = useState("");
   const [genre, setGenre] = useState("");
   const [instrument, setInstrument] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
@@ -58,6 +59,7 @@ export const EditTabDialog: React.FC<EditTabDialogProps> = ({
   useEffect(() => {
     if (tabData) {
       setTitle(tabData.title || "");
+      setArtist(tabData.artist || "");
       setGenre(tabData.genreId?.toString() || "");
       setInstrument(tabData.instrumentId?.toString() || "");
       setYoutubeUrl(tabData.urlYoutube || "");
@@ -81,7 +83,7 @@ export const EditTabDialog: React.FC<EditTabDialogProps> = ({
   };
 
   const handleSave = () => {
-    if (!title.trim() || !genre || !instrument) {
+    if (!title.trim() || !artist.trim() || !genre || !instrument) {
       showModal("warning", "Incomplete Form", "Please complete all required fields before saving.");
       return;
     }
@@ -89,6 +91,7 @@ export const EditTabDialog: React.FC<EditTabDialogProps> = ({
     const updatedTab = {
       id: tabData.id,
       title,
+      artist: artist.trim(),
       genreId: Number(genre),
       instrumentId: Number(instrument),
       urlPdf: pdfUrl,
@@ -174,6 +177,7 @@ export const EditTabDialog: React.FC<EditTabDialogProps> = ({
         <DialogContent dividers sx={{ px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 } }}>
           <Grid container spacing={3} direction="column">
             <InputField label="Title *" value={title} onChange={e => setTitle(e.target.value)} fullWidth />
+            <InputField label="Artist *" value={artist} onChange={e => setArtist(e.target.value)} fullWidth />
             <SelectField
               label="Instrument *"
               value={instrument}
