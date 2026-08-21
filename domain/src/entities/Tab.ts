@@ -6,6 +6,7 @@ export class Tab {
   private constructor(
     public readonly id: number | null,
     public readonly title: string,
+    public readonly artist: string,
     public readonly userId: number,
     public readonly genreId: number,
     public readonly instrumentId: number,
@@ -13,7 +14,8 @@ export class Tab {
     public readonly urlYoutube: Url,
     public readonly urlImg: Url,
     public readonly createdAt: Date = new Date(),
-    public readonly userName?: string
+    public readonly userName?: string,
+    public readonly viewCount: number = 0
   ) {}
 
   static create(
@@ -23,7 +25,8 @@ export class Tab {
     instrumentId: number,
     urlPdf: string,
     urlYoutube: string,
-    urlImg: string
+    urlImg: string,
+    artist: string = ""
   ): Tab {
     if (!title || title.trim().length === 0) {
       throw new DomainError("TabError", "Title cannot be empty");
@@ -40,8 +43,9 @@ export class Tab {
     const pdf = Url.create(urlPdf, "PDF URL");
     const youtube = Url.create(urlYoutube, "YouTube URL");
     const img = Url.create(urlImg, "Image URL");
+    const normalizedArtist = (artist ?? "").trim();
 
-    return new Tab(null, title, userId, genreId, instrumentId, pdf, youtube, img);
+    return new Tab(null, title, normalizedArtist, userId, genreId, instrumentId, pdf, youtube, img);
   }
 
   static rehydrate(
@@ -54,13 +58,30 @@ export class Tab {
     urlYoutube: string,
     urlImg: string,
     createdAt?: Date,
-    userName?: string
+    userName?: string,
+    artist: string = "",
+    viewCount: number = 0
   ): Tab {
     const pdf = Url.create(urlPdf, "PDF URL");
     const youtube = Url.create(urlYoutube, "YouTube URL");
     const img = Url.create(urlImg, "Image URL");
+    const normalizedArtist = (artist ?? "").trim();
+    const safeViewCount = Number.isInteger(viewCount) && viewCount >= 0 ? viewCount : 0;
 
-    return new Tab(id, title, userId, genreId, instrumentId, pdf, youtube, img, createdAt ?? new Date(), userName);
+    return new Tab(
+      id,
+      title,
+      normalizedArtist,
+      userId,
+      genreId,
+      instrumentId,
+      pdf,
+      youtube,
+      img,
+      createdAt ?? new Date(),
+      userName,
+      safeViewCount
+    );
   }
 
   canEdit(user: User): boolean {
@@ -69,15 +90,20 @@ export class Tab {
 
   update(props: {
     title?: string;
+    artist?: string;
     genreId?: number;
     instrumentId?: number;
     urlPdf?: string;
     urlYoutube?: string;
     urlImg?: string;
   }): Tab {
+    const artist =
+      props.artist !== undefined ? props.artist.trim() : this.artist;
+
     return new Tab(
       this.id,
       props.title ?? this.title,
+      artist,
       this.userId,
       props.genreId ?? this.genreId,
       props.instrumentId ?? this.instrumentId,
@@ -85,7 +111,8 @@ export class Tab {
       Url.create(props.urlYoutube ?? this.urlYoutube.toString(), "YouTube URL"),
       Url.create(props.urlImg ?? this.urlImg.toString(), "Image URL"),
       this.createdAt,
-      this.userName
+      this.userName,
+      this.viewCount
     );
   }
 }
