@@ -5,7 +5,8 @@ import { AppController } from './app.controller';
 import { UserController } from './controllers/user.controller';
 import { TabController } from './controllers/tab.controller';
 
-import { PrismaService } from './prisma/prisma.service';
+import { PrismaModule } from './prisma/prisma.module';
+import { CopilotModule } from './copilot/copilot.module';
 
 import { UserPrismaRepository } from './repositories/user-prisma.repository';
 import { TabPrismaRepository } from './repositories/tab-prisma.repository';
@@ -25,6 +26,8 @@ import { RolesGuard } from './auth/roles.guard';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    PrismaModule,
+    CopilotModule,
   ],
   controllers: [
     AppController,
@@ -34,7 +37,6 @@ import { RolesGuard } from './auth/roles.guard';
   ],
   providers: [
     AppService,
-    PrismaService,
     UserPrismaRepository,
     TabPrismaRepository,
     SessionPrismaRepository,
