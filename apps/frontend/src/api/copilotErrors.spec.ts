@@ -20,7 +20,7 @@ describe("copilotErrorFromUnknown", () => {
   it("401 invita a login", () => {
     const mapped = copilotErrorFromUnknown(axiosError(401, { code: "UNAUTHORIZED" }));
     expect(mapped.redirectToLogin).toBe(true);
-    expect(mapped.message).toMatch(/iniciar sesión/i);
+    expect(mapped.message).toMatch(/sign in/i);
   });
 
   it("400 INPUT_TOO_LONG explica el máximo", () => {
@@ -35,7 +35,7 @@ describe("copilotErrorFromUnknown", () => {
     const mapped = copilotErrorFromUnknown(
       axiosError(429, { code: "COPILOT_DAILY_LIMIT" }),
     );
-    expect(mapped.message).toBe("Llegaste al límite de 5 mensajes hoy");
+    expect(mapped.message).toBe("You've reached the 5-message limit for today");
   });
 
   it("503 avisa que la IA no está disponible", () => {
@@ -43,7 +43,7 @@ describe("copilotErrorFromUnknown", () => {
       axiosError(503, { code: "GEMINI_UNAVAILABLE" }),
     );
     expect(mapped.message).toBe(
-      "El servicio de IA no está disponible, probá en un rato",
+      "The AI service is unavailable, try again in a bit",
     );
   });
 });

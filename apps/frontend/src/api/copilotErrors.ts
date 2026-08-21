@@ -12,7 +12,7 @@ export type CopilotClientError = {
 };
 
 const FALLBACK =
-  "No se pudo enviar el mensaje. Probá de nuevo en un momento.";
+  "Could not send the message. Try again in a moment.";
 
 function bodyOf(error: unknown): CopilotApiErrorBody | undefined {
   if (!axios.isAxiosError(error)) return undefined;
@@ -31,28 +31,28 @@ export function copilotErrorFromUnknown(error: unknown): CopilotClientError {
 
   if (status === 401) {
     return {
-      message: "Tenés que iniciar sesión para usar Copilot",
+      message: "You need to sign in to use Copilot",
       redirectToLogin: true,
     };
   }
 
   if (status === 400 && code === "INPUT_TOO_LONG") {
     return {
-      message: `El mensaje es demasiado largo: máximo ${COPILOT_UI.MAX_INPUT_CHARS} caracteres`,
+      message: `Message is too long: maximum ${COPILOT_UI.MAX_INPUT_CHARS} characters`,
       redirectToLogin: false,
     };
   }
 
   if (status === 429 || code === "COPILOT_DAILY_LIMIT") {
     return {
-      message: "Llegaste al límite de 5 mensajes hoy",
+      message: "You've reached the 5-message limit for today",
       redirectToLogin: false,
     };
   }
 
   if (status === 503) {
     return {
-      message: "El servicio de IA no está disponible, probá en un rato",
+      message: "The AI service is unavailable, try again in a bit",
       redirectToLogin: false,
     };
   }
