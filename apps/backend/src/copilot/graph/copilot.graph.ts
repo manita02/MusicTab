@@ -419,7 +419,7 @@ export class CopilotGraphService {
         [
           new SystemMessage(REPLY_SYSTEM),
           new HumanMessage(
-            `Intent: ${state.intent}\nPregunta: ${state.message}\nHits (JSON, máximo 3, sin URLs):\n${JSON.stringify(payload)}`,
+            `Intent: ${state.intent}\nQuestion: ${state.message}\nHits (JSON, max 3, no URLs):\n${JSON.stringify(payload)}`,
           ),
         ],
         { timeout: COPILOT.GEMINI_TIMEOUT_MS },
@@ -483,7 +483,7 @@ export class CopilotGraphService {
   ): Promise<{ id: number; username: string } | null> {
     if (!uploader || SELF_UPLOADER.test(uploader)) {
       const me = await this.userRepo.findById(viewerUserId);
-      return { id: me?.id ?? viewerUserId, username: me?.username ?? 'vos' };
+      return { id: me?.id ?? viewerUserId, username: me?.username ?? 'you' };
     }
     const user = await this.userRepo.findByUsernameInsensitive(uploader);
     if (!user || user.id == null) return null;
