@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ITabRepository, SearchTabsParams, ViewOrder } from '@domain/repositories/ITabRepository';
+import { ITabRepository, SearchTabsParams, ViewOrder, CountCatalogParams, UserViewStats } from '@domain/repositories/ITabRepository';
 import { Tab } from '@domain/entities/Tab';
 import { CopilotTabHit } from '@domain/dto/CopilotTabHit';
 import { PrismaService } from '../prisma/prisma.service';
@@ -177,6 +177,104 @@ export class TabPrismaRepository implements ITabRepository {
 
   async search(params: SearchTabsParams): Promise<CopilotTabHit[]> {
     const take = Math.min(Math.max(params.take, 1), COPILOT_TAKE_CAP);
+    const where = await this.buildCatalogWhere(params);
+    if (where === null) return [];
+
+    if (params.artist?.trim()) {
+      (where as { artist?: { contains: string } }).artist = { contains: params.artist.trim() };
+    }
+
+    const records = await this.prisma.tab.findMany({
+      where,
+      orderBy:
+        params.sort === 'views'
+          ? [{ viewCount: 'desc' }, { createdAt: 'desc' }]
+          : [{ createdAt: 'desc' }],
+      include: { genre: true, instrument: true },
+    });
+
+    let hits = records.map((r: TabRowWithCatalog) => this.toHit(r));
+    if (params.title) {
+      const q = params.title.trim().toLowerCase();
+      hits = hits.filter((h) => h.title.toLowerCase().includes(q));
+    }
+    return hits.slice(0, take);
+  }
+
+  async countCatalog(params: CountCatalogParams): Promise<number> {
+    const where = await this.buildCatalogWhere(params);
+    if (where === null) return 0;
+
+    if (params.artist?.trim()) {
+      const q = params.artist.trim().toLowerCase();
+      const rows = await this.prisma.tab.findMany({
+        where,
+        select: { artist: true },
+      });
+      return rows.filter((row: { artist: string }) => row.artist.toLowerCase().includes(q)).length;
+    }
+
+    return this.prisma.tab.count({ where });
+  }
+
+  async countByArtist(artist: string): Promise<number> {
+    return this.countCatalog({ artist });
+  }
+
+  async listDistinctArtists(): Promise<string[]> {
+    const rows = await this.prisma.tab.findMany({ select: { artist: true } });
+    const seen = new Set<string>();
+    const names: string[] = [];
+    for (const row of rows) {
+      const name = String(row.artist ?? '').trim();
+      if (!name) continue;
+      const key = name.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      names.push(name);
+    }
+    return names.sort((a, b) => a.localeCompare(b, 'es'));
+  }
+
+  async findHitsByUserId(userId: number, take: number): Promise<CopilotTabHit[]> {
+    const capped = Math.min(Math.max(take, 1), COPILOT_TAKE_CAP);
+    const records = await this.prisma.tab.findMany({
+      where: { userId },
+      take: capped,
+      orderBy: { createdAt: 'desc' },
+      include: { genre: true, instrument: true },
+    });
+    return records.map((r: TabRowWithCatalog) => this.toHit(r));
+  }
+
+  async countByUserId(userId: number): Promise<number> {
+    return this.prisma.tab.count({ where: { userId } });
+  }
+
+  async findLastViewedByUser(userId: number): Promise<CopilotTabHit | null> {
+    const last = await this.prisma.tabView.findFirst({
+      where: { userId },
+      orderBy: { viewedAt: 'desc' },
+    });
+    if (!last) return null;
+    const hits = await this.loadHitsByIds([last.tabId], { [last.tabId]: last.viewedAt });
+    return hits[0] ?? null;
+  }
+
+  async countViewsByUser(userId: number): Promise<UserViewStats> {
+    const events = await this.prisma.tabView.count({ where: { userId } });
+    const grouped = await this.prisma.tabView.groupBy({
+      by: ['tabId'],
+      where: { userId },
+    });
+    return { events, distinctTabs: grouped.length };
+  }
+
+  private async buildCatalogWhere(params: {
+    artist?: string;
+    genreName?: string;
+    instrumentName?: string;
+  }): Promise<Record<string, unknown> | null> {
     const where: {
       artist?: { contains: string };
       genreId?: number;
@@ -185,31 +283,17 @@ export class TabPrismaRepository implements ITabRepository {
 
     if (params.genreName) {
       const genreId = await this.resolveGenreIdByName(params.genreName);
-      if (genreId == null) return [];
+      if (genreId == null) return null;
       where.genreId = genreId;
     }
 
     if (params.instrumentName) {
       const instrumentId = await this.resolveInstrumentIdByName(params.instrumentName);
-      if (instrumentId == null) return [];
+      if (instrumentId == null) return null;
       where.instrumentId = instrumentId;
     }
 
-    if (params.artist) {
-      where.artist = { contains: params.artist };
-    }
-
-    const records = await this.prisma.tab.findMany({
-      where,
-      take,
-      orderBy:
-        params.sort === 'views'
-          ? [{ viewCount: 'desc' }, { createdAt: 'desc' }]
-          : [{ createdAt: 'desc' }],
-      include: { genre: true, instrument: true },
-    });
-
-    return records.map((r: TabRowWithCatalog) => this.toHit(r));
+    return where;
   }
 
   async findLatestViewAt(userId: number, tabId: number): Promise<Date | null> {
