@@ -100,9 +100,9 @@ describe("SearchTabs", () => {
     expect(hits).toEqual([]);
   });
 
-  it("filters by instrument name", async () => {
-    const hits = await useCase.execute({ instrumentName: "Ukulele" });
-    expect(hits.length).toBeGreaterThan(0);
-    expect(hits.every((h) => h.instrument === "Ukulele")).toBe(true);
+  it("filters by title case-insensitive", async () => {
+    const hits = await useCase.execute({ title: "uke song" });
+    expect(hits).toHaveLength(1);
+    expect(hits[0]?.title).toBe("Uke Song");
   });
 });
