@@ -20,7 +20,7 @@ type DbTabRow = {
 };
 
 /** Tab + usuario (include user en findLatest / findAll) */
-type TabRowWithUser = DbTabRow & { user: { username: string } };
+type TabRowWithUser = DbTabRow & { user: { username: string; urlImg: string } };
 
 type TabRowWithCatalog = DbTabRow & {
   genre: { name: string };
@@ -106,7 +106,7 @@ export class TabPrismaRepository implements ITabRepository {
       include: { user: true },
     });
 
-    return records.map((r: TabRowWithUser) => this.toTab(r, r.user.username));
+    return records.map((r: TabRowWithUser) => this.toTab(r, r.user.username, r.user.urlImg));
   }
 
   async findAll(): Promise<Tab[]> {
@@ -115,7 +115,7 @@ export class TabPrismaRepository implements ITabRepository {
       include: { user: true },
     });
 
-    return result.map((t: TabRowWithUser) => this.toTab(t, t.user.username));
+    return result.map((t: TabRowWithUser) => this.toTab(t, t.user.username, t.user.urlImg));
   }
 
   /** Full authenticated view (URLs included), one row */
@@ -131,6 +131,7 @@ export class TabPrismaRepository implements ITabRepository {
     urlImg: string;
     createdAt: Date;
     userName: string;
+    userImg: string;
     viewCount: number;
   } | null> {
     const r = await this.prisma.tab.findUnique({
@@ -150,6 +151,7 @@ export class TabPrismaRepository implements ITabRepository {
       urlImg: r.urlImagen ?? '',
       createdAt: r.createdAt,
       userName: r.user.username,
+      userImg: r.user.urlImg,
       viewCount: r.viewCount ?? 0,
     };
   }
@@ -423,7 +425,7 @@ export class TabPrismaRepository implements ITabRepository {
     });
   }
 
-  private toTab(r: DbTabRow, userName?: string): Tab {
+  private toTab(r: DbTabRow, userName?: string, userImg?: string): Tab {
     return Tab.rehydrate(
       r.id,
       r.title,
@@ -437,6 +439,7 @@ export class TabPrismaRepository implements ITabRepository {
       userName,
       r.artist ?? '',
       r.viewCount ?? 0,
+      userImg,
     );
   }
 
