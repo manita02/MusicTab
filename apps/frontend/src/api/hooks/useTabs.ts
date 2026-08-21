@@ -11,6 +11,7 @@ export type TabAuthenticated = {
   instrumentId: number;
   userId: number;
   userName: string | null;
+  userImg?: string | null;
   createdAt: string;
   urlPdf: string;
   urlYoutube: string;
@@ -29,6 +30,7 @@ export type PublicTabListItem = {
   instrumentId: number;
   userId: number;
   userName: string | null;
+  userImg?: string | null;
   createdAt: string;
   youtubeVideoId: string | null;
   coverPath: string;
@@ -52,6 +54,7 @@ export function mapPublicTabsToViewerRows(data: unknown): ViewerTabRow[] {
       instrumentId: Number(t.instrumentId),
       userId: Number(t.userId) || 0,
       userName: t.userName ?? null,
+      userImg: t.userImg ?? null,
       createdAt: String(t.createdAt ?? ""),
       urlPdf: "",
       urlYoutube: vid ? `https://www.youtube.com/watch?v=${vid}` : "",
@@ -70,6 +73,7 @@ export function normalizeAuthenticatedTabRows(data: unknown): ViewerTabRow[] {
     instrumentId: Number(t.instrumentId),
     userId: typeof t.userId === "number" ? t.userId : Number(t.userId) || 0,
     userName: (t.userName as string | null) ?? null,
+    userImg: (t.userImg as string | null) ?? null,
     createdAt: String(t.createdAt ?? ""),
     urlPdf: String(t.urlPdf ?? ""),
     urlYoutube: String(t.urlYoutube ?? ""),

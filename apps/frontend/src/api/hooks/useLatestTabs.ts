@@ -11,6 +11,7 @@ export interface TabPreview {
   instrumentId: number;
   userId: number;
   userName: string;
+  userImg?: string | null;
   createdAt: string;
   urlPdf: string;
   urlYoutube: string;
@@ -26,6 +27,7 @@ function toTabPreview(v: ViewerTabRow): TabPreview {
     instrumentId: v.instrumentId,
     userId: uid,
     userName: v.userName != null && v.userName !== "" ? v.userName : uid ? `User #${uid}` : "-",
+    userImg: v.userImg ?? null,
     createdAt: v.createdAt,
     urlPdf: v.urlPdf,
     urlYoutube: v.urlYoutube,
