@@ -59,7 +59,7 @@ describe('CopilotService', () => {
     quota.increment.mockResolvedValue({ used: 3, remaining: 2, limit: 5 });
 
     const result = await service.chat(7, 'cuántos mensajes me quedan');
-    expect(result.reply).toContain('3 de 5');
-    expect(result.reply).toContain('Te quedan 2');
+    expect(result.reply).toContain('3 of 5');
+    expect(result.reply).toContain('You have 2 left');
   });
 });

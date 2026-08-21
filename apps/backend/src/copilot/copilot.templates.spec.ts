@@ -8,18 +8,18 @@ describe('countByArtistReply', () => {
       { id: 3, title: 'C', artist: 'Milo J', genre: 'Jazz', instrument: 'Ukulele', viewCount: 0, createdAt: '2024' },
     ];
     const text = countByArtistReply('Milo J', 4, hits);
-    expect(text).toContain('Hay 4 tabs de Milo J');
+    expect(text).toContain('There are 4 tabs for Milo J');
     expect(text).toContain('A');
     expect(text).not.toContain('urlPdf');
   });
 
   it('es honesto si no hay resultados', () => {
-    expect(countByArtistReply('Nadie', 0, [])).toBe('No hay tabs de Nadie en MusicTab.');
+    expect(countByArtistReply('Nadie', 0, [])).toBe('There are no tabs for Nadie in MusicTab.');
   });
 });
 
 describe('quotaReply', () => {
   it('informa usados y restantes', () => {
-    expect(quotaReply(2, 3, 5)).toContain('2 de 5');
+    expect(quotaReply(2, 3, 5)).toContain('2 of 5');
   });
 });
