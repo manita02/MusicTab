@@ -1,12 +1,12 @@
 export const COPILOT = {
-  MODEL: 'gemini-2.5-flash', // ID Flash vigente en AI Studio
-  MAX_OUTPUT_TOKENS: 384, // banda 256–512
+  MODEL: 'gemini-3.6-flash', // ID Flash vigente en AI Studio (2.5 ya no acepta cuentas nuevas)
+  MAX_OUTPUT_TOKENS: 1024, // Gemini 3 thinking cuenta contra el budget; 384 recortaba el JSON de understand
   HISTORY_MESSAGES: 4,
   RESULT_LIMIT: 3, // top N de TODAS las consultas del bot
-  MAX_INPUT_CHARS: 280,
+  MAX_INPUT_CHARS: 100,
   DAILY_MESSAGE_LIMIT: 5, // por usuario, calendario AR
   MAX_TOOL_ROUNDS: 1,
-  GEMINI_TIMEOUT_MS: 15_000,
+  GEMINI_TIMEOUT_MS: 25_000,
   SEND_COOLDOWN_MS: 2_500, // UI: pausa entre envíos (RPM de Google ~10–15/min)
   STALE_AFTER_DAYS: 7, // “hace rato no visito”
 } as const;

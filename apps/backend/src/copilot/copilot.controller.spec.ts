@@ -31,7 +31,7 @@ describe('CopilotController', () => {
     copilot.getQuota.mockReset();
   });
 
-  it('POST /copilot/chat con 281 caracteres responde 400 INPUT_TOO_LONG y no llama al servicio', async () => {
+  it('POST /copilot/chat con 101 caracteres responde 400 INPUT_TOO_LONG y no llama al servicio', async () => {
     const res = await request(app.getHttpServer())
       .post('/copilot/chat')
       .send({ message: 'a'.repeat(COPILOT.MAX_INPUT_CHARS + 1) });

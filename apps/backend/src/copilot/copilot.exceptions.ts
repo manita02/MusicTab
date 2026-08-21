@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { COPILOT } from './copilot.constants';
 
 export class CopilotHttpException extends HttpException {
   readonly copilotCode: string;
@@ -13,7 +14,7 @@ export function inputTooLong(): CopilotHttpException {
   return new CopilotHttpException(
     HttpStatus.BAD_REQUEST,
     'INPUT_TOO_LONG',
-    'El mensaje debe tener entre 1 y 280 caracteres',
+    `El mensaje debe tener entre 1 y ${COPILOT.MAX_INPUT_CHARS} caracteres`,
   );
 }
 

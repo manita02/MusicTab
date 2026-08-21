@@ -6,6 +6,7 @@ import { CopilotGraphService } from './graph/copilot.graph';
 import { TabPrismaRepository } from '../repositories/tab-prisma.repository';
 import { GenrePrismaRepository } from '../repositories/genre-prisma.repository';
 import { InstrumentPrismaRepository } from '../repositories/instrument-prisma.repository';
+import { UserPrismaRepository } from '../repositories/user-prisma.repository';
 
 @Module({
   controllers: [CopilotController],
@@ -16,6 +17,7 @@ import { InstrumentPrismaRepository } from '../repositories/instrument-prisma.re
     TabPrismaRepository,
     GenrePrismaRepository,
     InstrumentPrismaRepository,
+    UserPrismaRepository,
   ],
 })
 export class CopilotModule {}

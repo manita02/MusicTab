@@ -3,6 +3,7 @@ import { COPILOT } from './copilot.constants';
 import { CopilotGraphService, CopilotHistoryTurn } from './graph/copilot.graph';
 import { CopilotQuotaService } from './quota/copilot-quota.service';
 import { assertMessageLength } from './copilot.validation';
+import { quotaReply } from './copilot.templates';
 
 @Injectable()
 export class CopilotService {
@@ -21,13 +22,15 @@ export class CopilotService {
 
     await this.quota.assertCanConsume(userId);
 
-    const { reply, hits } = await this.graph.run({
+    const { reply, hits, intent } = await this.graph.run({
       userId,
       message: trimmed,
       history: clippedHistory,
     });
 
     const quota = await this.quota.increment(userId);
-    return { reply, hits, quota };
+    const text =
+      intent === 'my_quota' ? quotaReply(quota.used, quota.remaining, quota.limit) : reply;
+    return { reply: text, hits, quota };
   }
 }

@@ -23,7 +23,7 @@ describe('CopilotService', () => {
     quota.increment.mockReset();
   });
 
-  it('no llama a Gemini ni incrementa cuota si el mensaje supera 280 caracteres', async () => {
+  it('no llama a Gemini ni incrementa cuota si el mensaje supera 100 caracteres', async () => {
     await expect(service.chat(1, 'x'.repeat(COPILOT.MAX_INPUT_CHARS + 1))).rejects.toMatchObject({
       copilotCode: 'INPUT_TOO_LONG',
     });
@@ -33,7 +33,7 @@ describe('CopilotService', () => {
   });
 
   it('incrementa la cuota solo después de un turno 2xx del grafo', async () => {
-    graph.run.mockResolvedValue({ reply: 'ok', hits: [] });
+    graph.run.mockResolvedValue({ reply: 'ok', hits: [], intent: 'search_catalog' });
     quota.assertCanConsume.mockResolvedValue(undefined);
     quota.increment.mockResolvedValue({ used: 1, remaining: 4, limit: 5 });
 
@@ -51,5 +51,15 @@ describe('CopilotService', () => {
 
     await expect(service.chat(7, 'hola')).rejects.toThrow('gemini down');
     expect(quota.increment).not.toHaveBeenCalled();
+  });
+
+  it('alinea my_quota con el cupo ya incrementado', async () => {
+    graph.run.mockResolvedValue({ reply: 'desfasado', hits: [], intent: 'my_quota' });
+    quota.assertCanConsume.mockResolvedValue(undefined);
+    quota.increment.mockResolvedValue({ used: 3, remaining: 2, limit: 5 });
+
+    const result = await service.chat(7, 'cuántos mensajes me quedan');
+    expect(result.reply).toContain('3 de 5');
+    expect(result.reply).toContain('Te quedan 2');
   });
 });
