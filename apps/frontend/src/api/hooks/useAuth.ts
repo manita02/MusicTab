@@ -83,7 +83,6 @@ export const useAuth = () => {
     const role = localStorage.getItem("userRole");
     const expiresAt = localStorage.getItem("expiresAt");
     const img = localStorage.getItem("userImg");
-    const email = localStorage.getItem("email");
 
     if (!token || !expiresAt) {
       setIsLoggedIn(false);
