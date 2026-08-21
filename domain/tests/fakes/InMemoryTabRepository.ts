@@ -3,6 +3,8 @@ import {
   ITabRepository,
   SearchTabsParams,
   ViewOrder,
+  CountCatalogParams,
+  UserViewStats,
 } from "../../src/repositories/ITabRepository";
 import { CopilotTabHit } from "../../src/dto/CopilotTabHit";
 
@@ -125,6 +127,10 @@ export class InMemoryTabRepository implements ITabRepository {
       const q = params.instrumentName.toLowerCase();
       rows = rows.filter((r) => r.instrument.toLowerCase() === q);
     }
+    if (params.title) {
+      const q = params.title.toLowerCase();
+      rows = rows.filter((r) => r.title.toLowerCase().includes(q));
+    }
 
     if (params.sort === "views") {
       rows.sort((a, b) => b.viewCount - a.viewCount || Date.parse(b.createdAt) - Date.parse(a.createdAt));
@@ -133,6 +139,73 @@ export class InMemoryTabRepository implements ITabRepository {
     }
 
     return rows.slice(0, params.take);
+  }
+
+  async countCatalog(params: CountCatalogParams): Promise<number> {
+    let rows = this.tabs.map((t) => this.toHit(t));
+    if (params.genreName) {
+      if (this.resolveGenreId(params.genreName) == null) return 0;
+      const q = params.genreName.toLowerCase();
+      rows = rows.filter((r) => r.genre.toLowerCase() === q);
+    }
+    if (params.instrumentName) {
+      if (this.resolveInstrumentId(params.instrumentName) == null) return 0;
+      const q = params.instrumentName.toLowerCase();
+      rows = rows.filter((r) => r.instrument.toLowerCase() === q);
+    }
+    if (params.artist?.trim()) {
+      const q = params.artist.trim().toLowerCase();
+      rows = rows.filter((r) => r.artist.toLowerCase().includes(q));
+    }
+    return rows.length;
+  }
+
+  async countByArtist(artist: string): Promise<number> {
+    return this.countCatalog({ artist });
+  }
+
+  async listDistinctArtists(): Promise<string[]> {
+    const seen = new Set<string>();
+    const names: string[] = [];
+    for (const tab of this.tabs) {
+      const name = tab.artist.trim();
+      if (!name) continue;
+      const key = name.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      names.push(name);
+    }
+    return names.sort((a, b) => a.localeCompare(b, "es"));
+  }
+
+  async findHitsByUserId(userId: number, take: number): Promise<CopilotTabHit[]> {
+    return this.tabs
+      .filter((t) => t.userId === userId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, take)
+      .map((t) => this.toHit(t));
+  }
+
+  async countByUserId(userId: number): Promise<number> {
+    return this.tabs.filter((t) => t.userId === userId).length;
+  }
+
+  async findLastViewedByUser(userId: number): Promise<CopilotTabHit | null> {
+    const mine = this.views
+      .filter((v) => v.userId === userId)
+      .sort((a, b) => b.viewedAt.getTime() - a.viewedAt.getTime());
+    const last = mine[0];
+    if (!last) return null;
+    const tab = this.tabs.find((t) => t.id === last.tabId);
+    return tab ? this.toHit(tab, last.viewedAt) : null;
+  }
+
+  async countViewsByUser(userId: number): Promise<UserViewStats> {
+    const mine = this.views.filter((v) => v.userId === userId);
+    return {
+      events: mine.length,
+      distinctTabs: new Set(mine.map((v) => v.tabId)).size,
+    };
   }
 
   async findLatestViewAt(userId: number, tabId: number): Promise<Date | null> {
