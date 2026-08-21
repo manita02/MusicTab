@@ -177,6 +177,7 @@ export class TabController {
       instrumentId: row.instrumentId,
       userId: row.userId,
       userName: row.userName,
+      userImg: row.userImg ?? null,
       createdAt: row.createdAt,
       urlPdf: row.urlPdf,
       urlYoutube: row.urlYoutube,
@@ -242,6 +243,7 @@ export class TabController {
       urlYoutube: row.urlYoutube,
       urlImg: row.urlImg,
       userName: row.userName,
+      userImg: row.userImg ?? null,
       viewCount: row.viewCount,
     };
   }
@@ -275,6 +277,7 @@ export class TabController {
       instrumentId: tab.instrumentId,
       userId: tab.userId,
       userName: tab.userName ?? null,
+      userImg: tab.userImg ?? null,
       createdAt: tab.createdAt,
       urlPdf: tab.urlPdf.toString(),
       urlYoutube: tab.urlYoutube.toString(),
@@ -295,6 +298,7 @@ export class TabController {
       instrumentId: tab.instrumentId,
       userId: tab.userId,
       userName: tab.userName ?? null,
+      userImg: tab.userImg ?? null,
       createdAt: tab.createdAt,
       youtubeVideoId: extractYouTubeVideoId(tab.urlYoutube.toString()),
       coverPath: `/tabs/public/${tab.id}/cover`,
