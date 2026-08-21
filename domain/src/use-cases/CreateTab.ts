@@ -5,6 +5,7 @@ import { IUserRepository } from "../repositories/IUserRepository";
 
 type CreateTabDTO = {
   title: string;
+  artist: string;
   userId: number;
   genreId: number;
   instrumentId: number;
@@ -29,6 +30,11 @@ export class CreateTab {
       throw new DomainError("AuthError", "Only administrators can create tabs");
     }
 
+    const artist = (dto.artist ?? "").trim();
+    if (!artist) {
+      throw new DomainError("TabError", "Artist cannot be empty");
+    }
+
     const existing = await this.tabRepo.findByTitle(dto.title);
     if (existing) {
       throw new DomainError(`A tab with the title "${dto.title}" already exists`);
@@ -41,7 +47,8 @@ export class CreateTab {
       dto.instrumentId,
       dto.urlPdf,
       dto.urlYoutube,
-      dto.urlImg
+      dto.urlImg,
+      artist
     );
 
     const saved = await this.tabRepo.save(tab);
