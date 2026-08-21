@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { Box, Typography, Tooltip, useTheme, TextField, useMediaQuery } from "@mui/material";
+import { Box, Typography, Tooltip, useTheme, TextField } from "@mui/material";
 import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
 import { InputField } from "../components/InputField/InputField";
 import { Button } from "../components/Button/Button";
@@ -10,7 +10,6 @@ import { useRegister } from "../api/hooks/useRegister";
 
 export const SignInPage: React.FC = () => {
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const { mutate: registerUser, isPending } = useRegister();
 
   const [username, setUsername] = useState("");

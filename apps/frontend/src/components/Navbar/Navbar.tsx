@@ -42,8 +42,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   userName,
   userRole,
   userAvatar,
-  onLogin,
-  onSignUp,
   onManageProfile,
   onLogout,
 }) => {

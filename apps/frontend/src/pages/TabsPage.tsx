@@ -41,8 +41,7 @@ const GUEST_TABS_MESSAGE =
 
 export const TabsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const initialSearch = searchParams.get("search") || "";
-  const [search, setSearch] = useState(initialSearch);
+  const [search, setSearch] = useState(searchParams.get("search") || "");
   const { isLoggedIn, userRole: rawRole } = useAuth();
   const viewerRole = normalizeRole(rawRole);
   const canManage = canManageTabs(isLoggedIn, viewerRole);
@@ -95,6 +94,10 @@ export const TabsPage: React.FC = () => {
 
   const [tabs, setTabs] = useState<any[]>([]);
   const [filteredTabs, setFilteredTabs] = useState<any[]>([]);
+
+  useEffect(() => {
+    setSearch(searchParams.get("search") || "");
+  }, [searchParams]);
 
   useEffect(() => {
     if (data) {
@@ -517,7 +520,7 @@ export const TabsPage: React.FC = () => {
               flexDirection: { xs: "column", sm: "row" },
             }}
           >
-            <Grid item xs={12} sm="auto" sx={{ minWidth: "200px" }}>
+            <Grid size={{ xs: 12, sm: "auto" }} sx={{ minWidth: "200px" }}>
               <InputField
                 label="Search"
                 value={search}
@@ -526,7 +529,7 @@ export const TabsPage: React.FC = () => {
                 onSearch={handleSearch}
               />
             </Grid>
-            <Grid item xs={12} sm="auto">
+            <Grid size={{ xs: 12, sm: "auto" }}>
               <ToggleButtonGroup
                 value={view}
                 exclusive
@@ -543,7 +546,7 @@ export const TabsPage: React.FC = () => {
                 )}
               </ToggleButtonGroup>
             </Grid>
-            <Grid item xs={12} sm="auto">
+            <Grid size={{ xs: 12, sm: "auto" }}>
               <Box sx={{ minWidth: 180 }}>
                 <SelectField
                   label="Order by"
@@ -557,7 +560,7 @@ export const TabsPage: React.FC = () => {
                 />
               </Box>
             </Grid>
-            <Grid item xs={12} sm="auto">
+            <Grid size={{ xs: 12, sm: "auto" }}>
               <Tooltip title={canManage ? "" : "Only administrators can create tabs"}>
                 <span>
                   <Button

@@ -17,7 +17,7 @@ export const AboutSection: React.FC = () => {
   const handleSaveTab = (data: any) => {
     console.log("Saved tab:", data);
   };
-  const handleTabCreated = (data: any) => {
+  const handleTabCreated = () => {
     setIsDialogOpen(false);
     navigate("/");
     setTimeout(() => {

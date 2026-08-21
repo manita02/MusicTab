@@ -314,6 +314,7 @@ export const ManageProfileDialog: React.FC<{
             <InputField
             label="Age"
             value={age ? `${age} years old` : ""}
+            onChange={() => {}}
             fullWidth
             disabled
             />
