@@ -22,4 +22,8 @@ export const ENDPOINTS = {
     legacyUpdate: (id: number | string) => `/tabs/update/${id}`,
     delete: (id: number) => `/tabs/${id}`,
   },
+  copilot: {
+    chat: "/copilot/chat",
+    quota: "/copilot/quota",
+  },
 };
