@@ -1,74 +1,9 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { CreateTab } from "../src/use-cases/CreateTab";
-import { ITabRepository } from "../src/repositories/ITabRepository";
-import { Tab } from "../src/entities/Tab";
 import { Role, User } from "../src/entities/User";
 import { IUserRepository } from "../src/repositories/IUserRepository";
 import { DomainError } from "../src/errors/DomainError";
-
-class InMemoryTabRepository implements ITabRepository {
-  private tabs: Tab[] = [];
-  private idCounter = 1;
-
-  async save(tab: Tab): Promise<Tab> {
-    if (tab.id === null) {
-      const newTab = Tab.rehydrate(
-        this.idCounter++,
-        tab.title,
-        tab.userId,
-        tab.genreId,
-        tab.instrumentId,
-        tab.urlPdf.getValue(),
-        tab.urlYoutube.getValue(),
-        tab.urlImg.getValue(),
-        tab.createdAt,
-      );
-      this.tabs.push(newTab);
-      return newTab;
-    }
-    const index = this.tabs.findIndex((t) => t.id === tab.id);
-    if (index >= 0) this.tabs[index] = tab;
-    return tab;
-  }
-
-  async findById(id: number): Promise<Tab | null> {
-    return this.tabs.find((t) => t.id === id) ?? null;
-  }
-
-  async findByUser(userId: number): Promise<Tab[]> {
-    return this.tabs.filter((t) => t.userId === userId);
-  }
-
-  async countByUserAndDate(userId: number, date: Date): Promise<number> {
-    const day = date.toISOString().split("T")[0];
-    return this.tabs.filter(
-      (t) => t.userId === userId && t.createdAt.toISOString().split("T")[0] === day,
-    ).length;
-  }
-
-  async delete(id: number): Promise<void> {
-    this.tabs = this.tabs.filter((t) => t.id !== id);
-  }
-
-  async findByTitle(title: string): Promise<Tab | null> {
-    return this.tabs.find((t) => t.title === title) ?? null;
-  }
-
-  async findLatest(limit: number): Promise<Tab[]> {
-    return [...this.tabs].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, limit);
-  }
-
-  async findAll(): Promise<Tab[]> {
-    return [...this.tabs];
-  }
-
-  async update(tab: Tab): Promise<Tab> {
-    await this.delete(tab.id!);
-    await this.save(tab);
-    const found = await this.findById(tab.id!);
-    return found!;
-  }
-}
+import { InMemoryTabRepository } from "./fakes/InMemoryTabRepository";
 
 class InMemoryUserRepository implements IUserRepository {
   private users: User[] = [];
@@ -126,6 +61,7 @@ describe("CreateTab use case", () => {
 
   const payload = {
     title: "Song 1",
+    artist: "Test Artist",
     genreId: 1,
     instrumentId: 1,
     urlPdf: "http://example.com/tab.pdf",
@@ -151,6 +87,18 @@ describe("CreateTab use case", () => {
     });
     expect(tab.id).toBeDefined();
     expect(tab.title).toBe(payload.title);
+    expect(tab.artist).toBe("Test Artist");
+  });
+
+  it("rejects empty artist on new tabs", async () => {
+    const admin = (await userRepo.findByEmail("admin@a.com"))!;
+    await expect(
+      useCase.execute({
+        ...payload,
+        artist: "   ",
+        userId: admin.id!,
+      }),
+    ).rejects.toThrow(DomainError);
   });
 
   it("throws if user does not exist", async () => {

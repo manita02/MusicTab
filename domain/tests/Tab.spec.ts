@@ -17,6 +17,8 @@ describe("Tab entity (domain TDD)", () => {
 
     expect(tab.id).toBeNull();
     expect(tab.title).toBe("Song 1");
+    expect(tab.artist).toBe("");
+    expect(tab.viewCount).toBe(0);
     expect(tab.userId).toBe(1);
     expect(tab.genreId).toBe(2);
     expect(tab.instrumentId).toBe(3);
@@ -110,5 +112,49 @@ describe("Tab entity (domain TDD)", () => {
     expect(tab.genreId).toBe(2);
     expect(tab.instrumentId).toBe(3);
     expect(tab.createdAt).toEqual(new Date("2024-01-01"));
+    expect(tab.artist).toBe("");
+    expect(tab.viewCount).toBe(0);
+  });
+
+  it("trims artist on create and allows empty artist on rehydrate (legacy rows)", () => {
+    const created = Tab.create(
+      "Song",
+      1,
+      1,
+      1,
+      "http://example.com/tab.pdf",
+      "http://youtube.com/video",
+      "http://example.com/img.jpg",
+      "  Milo J  "
+    );
+    expect(created.artist).toBe("Milo J");
+
+    const legacy = Tab.rehydrate(
+      1,
+      "Old Song",
+      1,
+      1,
+      1,
+      "http://example.com/tab.pdf",
+      "http://youtube.com/video",
+      "http://example.com/img.jpg"
+    );
+    expect(legacy.artist).toBe("");
+  });
+
+  it("updates artist", () => {
+    const tab = Tab.create(
+      "Song",
+      1,
+      1,
+      1,
+      "http://example.com/tab.pdf",
+      "http://youtube.com/video",
+      "http://example.com/img.jpg",
+      "Old"
+    );
+    const updated = tab.update({ artist: "  New Artist  " });
+    expect(updated.artist).toBe("New Artist");
+    expect(updated.title).toBe("Song");
   });
 });
