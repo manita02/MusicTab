@@ -7,6 +7,7 @@ type SearchTabsDTO = {
   artist?: string;
   genreName?: string;
   instrumentName?: string;
+  title?: string;
   sort?: TabSearchSort;
   take?: number;
 };
@@ -19,11 +20,13 @@ export class SearchTabs {
     const artist = dto.artist?.trim();
     const genreName = dto.genreName?.trim();
     const instrumentName = dto.instrumentName?.trim();
+    const title = dto.title?.trim();
 
     return this.tabRepo.search({
       artist: artist || undefined,
       genreName: genreName || undefined,
       instrumentName: instrumentName || undefined,
+      title: title || undefined,
       sort: dto.sort ?? "recent",
       take,
     });
