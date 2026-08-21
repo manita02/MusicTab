@@ -48,6 +48,10 @@ describe('Tabs authorization (e2e)', () => {
     await request(app.getHttpServer()).get('/tabs/1/download').expect(401);
   });
 
+  it('POST /tabs/:id/view requires authentication', async () => {
+    await request(app.getHttpServer()).post('/tabs/1/view').expect(401);
+  });
+
   it('GET /tabs/latest/public accepts anonymous clients', async () => {
     const res = await request(app.getHttpServer()).get('/tabs/latest/public').query({ limit: 2 });
     expect(res.status).toBe(200);
