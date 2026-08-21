@@ -139,12 +139,12 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
   return (
     <>
       <Tooltip
-        title={isLoggedIn ? "Copilot" : "Iniciá sesión para usar Copilot"}
+        title={isLoggedIn ? "Copilot" : "Sign in to use Copilot"}
         arrow
       >
         <Fab
           color="secondary"
-          aria-label="Abrir Copilot"
+          aria-label="Open Copilot"
           data-testid="copilot-fab"
           onClick={handleOpen}
           sx={{
@@ -190,11 +190,11 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
             </Typography>
             {isLoggedIn && (
               <Typography variant="caption" color="text.secondary">
-                mensajes hoy {used}/{limit}
+                messages today {used}/{limit}
               </Typography>
             )}
           </Box>
-          <IconButton aria-label="Cerrar Copilot" onClick={handleClose}>
+          <IconButton aria-label="Close Copilot" onClick={handleClose}>
             <CloseIcon />
           </IconButton>
         </Box>
@@ -216,21 +216,21 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
               severity="info"
               action={
                 <Button
-                  label="Ir a login"
+                  label="Go to login"
                   variantType="primary"
                   size="small"
                   onClick={goLogin}
                 />
               }
             >
-              Iniciá sesión para chatear con Copilot y buscar tabs del catálogo.
+              Sign in to chat with Copilot and search the catalog.
             </Alert>
           )}
 
           {isLoggedIn && messages.length === 0 && !chat.isPending && (
             <Typography variant="body2" color="text.secondary">
-              Preguntame por un artista, género o instrumento. Por ejemplo: ¿hay
-              tabs de Milo J? o tabs de rock.
+              Ask me about an artist, genre, or instrument. For example: are there
+              tabs by Milo J? or rock tabs.
             </Typography>
           )}
 
@@ -275,7 +275,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
                       clickable
                       color="secondary"
                       onClick={() => handleChip(hit.title)}
-                      aria-label={`Buscar tab ${hit.title}`}
+                      aria-label={`Search tab ${hit.title}`}
                     />
                   ))}
                 </Box>
@@ -287,7 +287,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <CircularProgress size={18} />
               <Typography variant="caption" color="text.secondary">
-                Pensando…
+                Thinking…
               </Typography>
             </Box>
           )}
@@ -305,7 +305,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
           )}
           {isLoggedIn && atDailyLimit && (
             <Alert severity="warning" sx={{ mb: 1 }}>
-              Llegaste al límite de 5 mensajes hoy
+              You've reached the 5-message limit for today
             </Alert>
           )}
           <TextField
@@ -323,24 +323,24 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
             }}
             inputProps={{
               maxLength: COPILOT_UI.MAX_INPUT_CHARS,
-              "aria-label": "Mensaje para Copilot",
+              "aria-label": "Message for Copilot",
             }}
             placeholder={
               isLoggedIn
-                ? "Preguntá por un artista, género o instrumento…"
-                : "Iniciá sesión para chatear"
+                ? "Ask about an artist, genre, or instrument…"
+                : "Sign in to chat"
             }
             helperText={`${draft.length}/${COPILOT_UI.MAX_INPUT_CHARS}`}
             FormHelperTextProps={{ sx: { textAlign: "right", m: 0, mt: 0.5 } }}
           />
           <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
             <Button
-              label="Enviar"
+              label="Send"
               variantType="primary"
               disabled={sendDisabled}
               onClick={handleSend}
               startIcon={<SendIcon />}
-              aria-label="Enviar mensaje a Copilot"
+              aria-label="Send message to Copilot"
             />
           </Box>
         </Box>

@@ -43,10 +43,10 @@ describe("CopilotDrawer", () => {
     await user.click(screen.getByTestId("copilot-fab"));
 
     expect(
-      await screen.findByText(/Iniciá sesión para chatear con Copilot/i),
+      await screen.findByText(/Sign in to chat with Copilot/i),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText("Mensaje para Copilot")).toBeDisabled();
-    expect(screen.getByRole("button", { name: /Enviar/i })).toBeDisabled();
+    expect(screen.getByLabelText("Message for Copilot")).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Send/i })).toBeDisabled();
     expect(api.get).not.toHaveBeenCalled();
     expect(api.post).not.toHaveBeenCalled();
   });
@@ -58,7 +58,7 @@ describe("CopilotDrawer", () => {
     });
     vi.mocked(api.post).mockResolvedValue({
       data: {
-        reply: "Encontré estas tabs de Milo J.",
+        reply: "I found these tabs by Milo J.",
         hits: [
           {
             id: 10,
@@ -78,16 +78,16 @@ describe("CopilotDrawer", () => {
     renderDrawer(true);
     await user.click(screen.getByTestId("copilot-fab"));
 
-    expect(await screen.findByText("mensajes hoy 1/5")).toBeInTheDocument();
+    expect(await screen.findByText("messages today 1/5")).toBeInTheDocument();
     await waitFor(() => {
       expect(api.get).toHaveBeenCalledWith("/copilot/quota");
     });
 
-    await user.type(screen.getByLabelText("Mensaje para Copilot"), "Milo J");
-    await user.click(screen.getByRole("button", { name: /Enviar/i }));
+    await user.type(screen.getByLabelText("Message for Copilot"), "Milo J");
+    await user.click(screen.getByRole("button", { name: /Send/i }));
 
-    expect(await screen.findByText("Encontré estas tabs de Milo J.")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Buscar tab Rara Vez/i })).toBeInTheDocument();
+    expect(await screen.findByText("I found these tabs by Milo J.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Search tab Rara Vez/i })).toBeInTheDocument();
     expect(screen.queryByText(/hidden.example/)).not.toBeInTheDocument();
     expect(api.post).toHaveBeenCalledWith("/copilot/chat", {
       message: "Milo J",
