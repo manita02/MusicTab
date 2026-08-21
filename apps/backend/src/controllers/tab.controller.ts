@@ -11,6 +11,7 @@ import {
   NotFoundException,
   BadGatewayException,
   Res,
+  HttpCode,
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { UserPrismaRepository } from '../repositories/user-prisma.repository';
@@ -20,6 +21,7 @@ import { GetLatestTabs } from '@domain/use-cases/GetLatestTabs';
 import { GetAllTabs } from '@domain/use-cases/GetAllTabs';
 import { UpdateTab } from '@domain/use-cases/UpdateTab';
 import { DeleteTab } from '@domain/use-cases/DeleteTab';
+import { RecordTabView } from '@domain/use-cases/RecordTabView';
 import { Role } from '@domain/entities/User';
 import { Public } from '../auth/decorators/public.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -30,6 +32,7 @@ import { extractYouTubeVideoId } from '../utils/youtube';
 
 type CreateTabBody = {
   title: string;
+  artist: string;
   genreId: number;
   instrumentId: number;
   urlPdf: string;
@@ -39,6 +42,7 @@ type CreateTabBody = {
 
 type UpdateTabBody = {
   title?: string;
+  artist?: string;
   genreId?: number;
   instrumentId?: number;
   urlPdf?: string;
@@ -53,6 +57,7 @@ export class TabController {
   private readonly getAllTabs: GetAllTabs;
   private readonly updateTab: UpdateTab;
   private readonly deleteTab: DeleteTab;
+  private readonly recordTabView: RecordTabView;
 
   constructor(
     private readonly userRepo: UserPrismaRepository,
@@ -63,6 +68,7 @@ export class TabController {
     this.getAllTabs = new GetAllTabs(this.tabRepo);
     this.updateTab = new UpdateTab(this.tabRepo, this.userRepo);
     this.deleteTab = new DeleteTab(this.tabRepo, this.userRepo);
+    this.recordTabView = new RecordTabView(this.tabRepo);
   }
 
   /**
@@ -166,6 +172,7 @@ export class TabController {
     return {
       id: row.id,
       title: row.title,
+      artist: row.artist,
       genreId: row.genreId,
       instrumentId: row.instrumentId,
       userId: row.userId,
@@ -174,7 +181,19 @@ export class TabController {
       urlPdf: row.urlPdf,
       urlYoutube: row.urlYoutube,
       urlImg: row.urlImg,
+      viewCount: row.viewCount,
     };
+  }
+
+  @HttpCode(200)
+  @Post(':id/view')
+  async recordViewAuthenticated(@CurrentUser() user: RequestUser, @Param('id') id: string) {
+    const tabId = Number(id);
+    if (!Number.isInteger(tabId) || tabId <= 0) {
+      throw new NotFoundException('Tab not found');
+    }
+    const result = await this.recordTabView.execute(user.id, tabId);
+    return { ok: true, counted: result.counted };
   }
 
   @Roles(Role.ADMIN)
@@ -189,6 +208,7 @@ export class TabController {
       id: Number(id),
       userId: user.id,
       title: dto.title,
+      artist: dto.artist,
       genreId: dto.genreId,
       instrumentId: dto.instrumentId,
       urlPdf: dto.urlPdf,
@@ -200,17 +220,20 @@ export class TabController {
       return {
         id: updated.id,
         title: updated.title,
+        artist: updated.artist,
         userId: updated.userId,
         genreId: updated.genreId,
         instrumentId: updated.instrumentId,
         urlPdf: updated.urlPdf.toString(),
         urlYoutube: updated.urlYoutube.toString(),
         urlImg: updated.urlImg.toString(),
+        viewCount: updated.viewCount,
       };
     }
     return {
       id: row.id,
       title: row.title,
+      artist: row.artist,
       userId: row.userId,
       genreId: row.genreId,
       instrumentId: row.instrumentId,
@@ -219,6 +242,7 @@ export class TabController {
       urlYoutube: row.urlYoutube,
       urlImg: row.urlImg,
       userName: row.userName,
+      viewCount: row.viewCount,
     };
   }
 
@@ -246,6 +270,7 @@ export class TabController {
     return {
       id: tab.id,
       title: tab.title,
+      artist: tab.artist,
       genreId: tab.genreId,
       instrumentId: tab.instrumentId,
       userId: tab.userId,
@@ -254,6 +279,7 @@ export class TabController {
       urlPdf: tab.urlPdf.toString(),
       urlYoutube: tab.urlYoutube.toString(),
       urlImg: tab.urlImg.toString(),
+      viewCount: tab.viewCount,
     };
   }
 
@@ -264,6 +290,7 @@ export class TabController {
     return {
       id: tab.id,
       title: tab.title,
+      artist: tab.artist,
       genreId: tab.genreId,
       instrumentId: tab.instrumentId,
       userId: tab.userId,
