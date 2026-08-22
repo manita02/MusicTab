@@ -64,7 +64,27 @@ export class UserPrismaRepository implements IUserRepository {
       record.urlImg
     );
   }
-  
+
+  async findByUsernameInsensitive(username: string): Promise<User | null> {
+    const exact = await this.findByUsername(username.trim());
+    if (exact) return exact;
+    const q = username.trim().toLowerCase();
+    if (!q) return null;
+    const rows = await this.prisma.user.findMany();
+    const record = rows.find((row: { username: string }) => row.username.toLowerCase() === q);
+    if (!record) return null;
+    return User.rehydrate(
+      record.id,
+      record.username,
+      record.email,
+      record.passwordHash,
+      coerceRole(record.role),
+      record.createdAt,
+      record.birthDate,
+      record.urlImg
+    );
+  }
+
   async save(user: User): Promise<User> {
     // If id exists, update; if not, create
     let record;

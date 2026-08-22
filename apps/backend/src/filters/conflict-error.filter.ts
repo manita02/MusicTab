@@ -10,9 +10,11 @@ export class DomainErrorFilter implements ExceptionFilter {
     let status =
       exception.code === 'Conflict'
         ? HttpStatus.CONFLICT
-        : exception.code === 'AuthError'
-          ? HttpStatus.FORBIDDEN
-          : HttpStatus.BAD_REQUEST;
+        : exception.code === 'NotFound'
+          ? HttpStatus.NOT_FOUND
+          : exception.code === 'AuthError'
+            ? HttpStatus.FORBIDDEN
+            : HttpStatus.BAD_REQUEST;
 
     response.status(status).json({
       statusCode: status,

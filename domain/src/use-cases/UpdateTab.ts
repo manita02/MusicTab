@@ -8,6 +8,7 @@ type UpdateTabDTO = {
   id: number;
   userId: number;
   title?: string;
+  artist?: string;
   genreId?: number;
   instrumentId?: number;
   urlPdf?: string;
@@ -38,6 +39,7 @@ export class UpdateTab {
 
     const updatedTab = tab.update({
         title: dto.title,
+        artist: dto.artist,
         genreId: dto.genreId,
         instrumentId: dto.instrumentId,
         urlPdf: dto.urlPdf,

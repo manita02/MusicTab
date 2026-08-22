@@ -42,8 +42,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   userName,
   userRole,
   userAvatar,
-  onLogin,
-  onSignUp,
   onManageProfile,
   onLogout,
 }) => {
@@ -72,8 +70,16 @@ export const Navbar: React.FC<NavbarProps> = ({
       ];
 
   return (
-    <AppBar position="static" color="primary" sx={{ backgroundColor: theme.palette.primary.main, boxShadow: "none", px: 2 }}>
-      <Toolbar sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <AppBar position="static" color="primary" sx={{ backgroundColor: theme.palette.primary.main, boxShadow: "none", px: { xs: 1, md: 2 } }}>
+      <Toolbar
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          minHeight: { xs: 52, md: 56 },
+          py: { xs: 0.25, md: 0.5 },
+        }}
+      >
         {/* Mobile Menu */}
         <Box sx={{ display: { xs: "flex", md: "none" }, flexGrow: 0 }}>
           <IconButton
@@ -126,7 +132,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             }}
             onClick={() => navigate("/")}
           >
-            <LibraryMusicIcon className="logo-icon" sx={{ mr: 1, color: theme.palette.primary.contrastText, fontSize: 30, transition: "color 0.3s ease" }} />
+            <LibraryMusicIcon className="logo-icon" sx={{ mr: 1, color: theme.palette.primary.contrastText, fontSize: { xs: 26, md: 28 }, transition: "color 0.3s ease" }} />
             <Typography className="logo-text" variant="h6" component="div"
               sx={{ fontWeight: 700, color: theme.palette.primary.contrastText, letterSpacing: ".05rem", display: { xs: "none", sm: "flex" }, transition: "color 0.3s ease" }}
             >
@@ -142,7 +148,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               key={label}
               onClick={() => handleNavClick(path)}
               sx={{
-                my: 2,
+                my: 0.75,
                 color: theme.palette.primary.contrastText,
                 textTransform: "none",
                 fontWeight: 600,

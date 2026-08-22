@@ -6,14 +6,17 @@ import { useAuth } from "./useAuth";
 export type TabAuthenticated = {
   id: number;
   title: string;
+  artist: string;
   genreId: number;
   instrumentId: number;
   userId: number;
   userName: string | null;
+  userImg?: string | null;
   createdAt: string;
   urlPdf: string;
   urlYoutube: string;
   urlImg: string;
+  viewCount?: number;
 };
 
 export type ViewerTabRow = TabAuthenticated;
@@ -22,10 +25,12 @@ export type ViewerTabRow = TabAuthenticated;
 export type PublicTabListItem = {
   id: number;
   title: string;
+  artist?: string;
   genreId: number;
   instrumentId: number;
   userId: number;
   userName: string | null;
+  userImg?: string | null;
   createdAt: string;
   youtubeVideoId: string | null;
   coverPath: string;
@@ -44,10 +49,12 @@ export function mapPublicTabsToViewerRows(data: unknown): ViewerTabRow[] {
     return {
       id,
       title: String(t.title ?? ""),
+      artist: String(t.artist ?? ""),
       genreId: Number(t.genreId),
       instrumentId: Number(t.instrumentId),
       userId: Number(t.userId) || 0,
       userName: t.userName ?? null,
+      userImg: t.userImg ?? null,
       createdAt: String(t.createdAt ?? ""),
       urlPdf: "",
       urlYoutube: vid ? `https://www.youtube.com/watch?v=${vid}` : "",
@@ -61,10 +68,12 @@ export function normalizeAuthenticatedTabRows(data: unknown): ViewerTabRow[] {
   return data.map((t: Record<string, unknown>) => ({
     id: Number(t.id),
     title: String(t.title ?? ""),
+    artist: String(t.artist ?? ""),
     genreId: Number(t.genreId),
     instrumentId: Number(t.instrumentId),
     userId: typeof t.userId === "number" ? t.userId : Number(t.userId) || 0,
     userName: (t.userName as string | null) ?? null,
+    userImg: (t.userImg as string | null) ?? null,
     createdAt: String(t.createdAt ?? ""),
     urlPdf: String(t.urlPdf ?? ""),
     urlYoutube: String(t.urlYoutube ?? ""),

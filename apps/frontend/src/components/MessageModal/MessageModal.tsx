@@ -74,12 +74,22 @@ export const MessageModal: React.FC<MessageModalProps> = ({
       TransitionComponent={Transition}
       onClose={type === "error" ? undefined : onCancel}
       aria-describedby="alert-dialog-slide-description"
+      fullWidth
+      maxWidth="sm"
       slotProps={{
         backdrop: {
           sx: {
             backdropFilter: "blur(6px)",
             backgroundColor: "rgba(0, 0, 0, 0.25)",
           },
+        },
+      }}
+      PaperProps={{
+        sx: {
+          m: { xs: 2, sm: 3 },
+          width: { xs: "calc(100% - 32px)", sm: "auto" },
+          maxWidth: "100%",
+          borderRadius: 2,
         },
       }}
     >
@@ -122,7 +132,7 @@ export const MessageModal: React.FC<MessageModalProps> = ({
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
+      <DialogActions sx={{ justifyContent: "center", pb: 2, px: 2, gap: 1, flexWrap: "wrap" }}>
         {type === "warning" ? (
           <>
             <Button

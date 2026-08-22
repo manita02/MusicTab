@@ -15,10 +15,15 @@ export const ENDPOINTS = {
     list: "/tabs",
     latest: "/tabs/latest",
     download: (id: number | string) => `/tabs/${id}/download`,
+    view: (id: number | string) => `/tabs/${id}/view`,
     create: "/tabs",
     legacyCreate: "/tabs/create",
     update: (id: number | string) => `/tabs/${id}`,
     legacyUpdate: (id: number | string) => `/tabs/update/${id}`,
     delete: (id: number) => `/tabs/${id}`,
+  },
+  copilot: {
+    chat: "/copilot/chat",
+    quota: "/copilot/quota",
   },
 };

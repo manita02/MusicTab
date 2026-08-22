@@ -37,6 +37,7 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   const [title, setTitle] = useState("");
+  const [artist, setArtist] = useState("");
   const [genre, setGenre] = useState("");
   const [instrument, setInstrument] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
@@ -60,6 +61,7 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
 
   const resetForm = () => {
     setTitle("");
+    setArtist("");
     setGenre("");
     setInstrument("");
     setYoutubeUrl("");
@@ -98,13 +100,14 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
       return;
     }
 
-    if (!title.trim() || !genre || !instrument) {
+    if (!title.trim() || !artist.trim() || !genre || !instrument) {
       showModal("warning", "Incomplete Form", "Please complete all required fields before saving.");
       return;
     }
 
     const newTab = {
       title,
+      artist: artist.trim(),
       genreId: Number(genre),
       instrumentId: Number(instrument),
       urlPdf: pdfUrl,
@@ -142,8 +145,9 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
 
   const previewBoxStyles = {
     width: "100%",
-    maxWidth: 400,
-    height: 225,
+    maxWidth: 220,
+    aspectRatio: "3 / 4",
+    mx: "auto",
     borderRadius: 2,
     boxShadow: 3,
     border: `1px solid ${theme.palette.divider}`,
@@ -152,6 +156,19 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.7)",
     color: "#fff",
+  };
+
+  const coverPreviewSx = {
+    width: "100%",
+    maxWidth: 220,
+    aspectRatio: "3 / 4",
+    mx: "auto",
+    borderRadius: 2,
+    boxShadow: 3,
+    objectFit: "cover",
+    objectPosition: "center",
+    border: `1px solid ${theme.palette.divider}`,
+    display: "block",
   };
 
   useEffect(() => {
@@ -183,9 +200,11 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
         fullScreen={fullScreen}
         PaperProps={{
           sx: {
-            borderRadius: 3,
-            p: { xs: 1, sm: 2 },
+            borderRadius: { xs: 0, md: 3 },
+            p: { xs: 0.5, sm: 1.5, md: 2 },
             backgroundColor: theme.palette.background.paper,
+            m: { xs: 0, sm: 2 },
+            maxHeight: { xs: "100dvh", md: "90dvh" },
           },
         }}
       >
@@ -201,43 +220,47 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
         </DialogTitle>
 
         <DialogContent dividers sx={{ px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 } }}>
-          <Grid container spacing={3} direction="column">
-            <InputField label="Title *" value={title} onChange={(e) => setTitle(e.target.value)} fullWidth />
-
-            <SelectField
-              label="Instrument *"
-              value={instrument}
-              onChange={(e) => setInstrument(e.target.value)}
-              options={loadingInstruments ? [] : instruments.map((i) => ({ value: i.id.toString(), label: i.name }))}
-              fullWidth
-            />
-
-            <SelectField
-              label="Genre *"
-              value={genre}
-              onChange={(e) => setGenre(e.target.value)}
-              options={loadingGenres ? [] : genres.map((g) => ({ value: g.id.toString(), label: g.name }))}
-              fullWidth
-            />
-
-            <InputField label="PDF URL" value={pdfUrl} onChange={(e) => setPdfUrl(e.target.value)} fullWidth />
-            <InputField label="Image URL" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} fullWidth />
-
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <InputField label="Title *" value={title} onChange={(e) => setTitle(e.target.value)} fullWidth />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <InputField label="Artist *" value={artist} onChange={(e) => setArtist(e.target.value)} fullWidth />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <SelectField
+                label="Instrument *"
+                value={instrument}
+                onChange={(e) => setInstrument(e.target.value)}
+                options={loadingInstruments ? [] : instruments.map((i) => ({ value: i.id.toString(), label: i.name }))}
+                fullWidth
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <SelectField
+                label="Genre *"
+                value={genre}
+                onChange={(e) => setGenre(e.target.value)}
+                options={loadingGenres ? [] : genres.map((g) => ({ value: g.id.toString(), label: g.name }))}
+                fullWidth
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6, lg: 4 }}>
+              <InputField label="PDF URL" value={pdfUrl} onChange={(e) => setPdfUrl(e.target.value)} fullWidth />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6, lg: 4 }}>
+              <InputField label="Image URL" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} fullWidth />
+            </Grid>
+            <Grid size={{ xs: 12, lg: 4 }}>
+              <InputField label="YouTube URL" value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} fullWidth />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
               {debouncedImageUrl && imageValid ? (
                 <Box
                   component="img"
                   src={debouncedImageUrl}
                   alt="Preview"
-                  sx={{
-                    width: "100%",
-                    maxWidth: 400,
-                    height: 225,
-                    borderRadius: 2,
-                    boxShadow: 3,
-                    objectFit: "cover",
-                    border: `1px solid ${theme.palette.divider}`,
-                  }}
+                  sx={coverPreviewSx}
                   onError={() => setImageValid(false)}
                 />
               ) : (
@@ -245,11 +268,8 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
                   <Typography>No image</Typography>
                 </Box>
               )}
-            </Box>
-
-            <InputField label="YouTube URL" value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} fullWidth />
-
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
               {embedUrl ? (
                 <Box
                   component="iframe"
@@ -258,19 +278,32 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
                   allowFullScreen
                   sx={{
                     width: "100%",
-                    maxWidth: 400,
-                    aspectRatio: "16/9",
+                    aspectRatio: "16 / 9",
                     borderRadius: 2,
                     boxShadow: 3,
                     border: `1px solid ${theme.palette.divider}`,
+                    display: "block",
                   }}
                 />
               ) : (
-                <Box sx={previewBoxStyles}>
+                <Box
+                  sx={{
+                    width: "100%",
+                    aspectRatio: "16 / 9",
+                    borderRadius: 2,
+                    boxShadow: 3,
+                    border: `1px solid ${theme.palette.divider}`,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "rgba(0,0,0,0.7)",
+                    color: "#fff",
+                  }}
+                >
                   <Typography>No video</Typography>
                 </Box>
               )}
-            </Box>
+            </Grid>
           </Grid>
         </DialogContent>
 

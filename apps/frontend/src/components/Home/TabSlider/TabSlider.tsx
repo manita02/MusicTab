@@ -7,13 +7,14 @@ import {
   CardContent,
   Typography,
   useTheme,
-  Chip
+  Chip,
 } from "@mui/material";
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useNavigate } from "react-router-dom";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import { UserAvatar } from "../../UserAvatar/UserAvatar";
 
 interface TabItem {
   id: number;
@@ -21,6 +22,7 @@ interface TabItem {
   image: string;
   date: string;
   user: string;
+  userImg?: string | null;
   instrumentId: number;
 }
 
@@ -34,26 +36,33 @@ interface TabsSliderProps {
   instruments: Instrument[];
 }
 
+const COVER_SX = {
+  width: "100%",
+  height: { xs: 180, sm: 220, md: 250 },
+  objectFit: "cover" as const,
+  objectPosition: "center",
+};
+
 export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs, instruments }) => {
   const theme = useTheme();
   const navigate = useNavigate();
-  
+
   const handleCardClick = (tab: TabItem) => {
     navigate(`/tabs?search=${encodeURIComponent(tab.title)}`);
   };
 
   const getInstrumentName = (id: number) =>
-    instruments.find((i: any) => i.id === id)?.name || "-";
+    instruments.find((i: { id: number }) => i.id === id)?.name || "-";
 
   const settings = {
     dots: false,
-    infinite: true,
+    infinite: tabs.length > 4,
     speed: 600,
     slidesToShow: 4,
     slidesToScroll: 4,
     responsive: [
-      { breakpoint: 1200, settings: { slidesToShow: 3, slidesToScroll: 3 } },
-      { breakpoint: 900, settings: { slidesToShow: 2, slidesToScroll: 2 } },
+      { breakpoint: 1200, settings: { slidesToShow: 3, slidesToScroll: 3, infinite: tabs.length > 3 } },
+      { breakpoint: 900, settings: { slidesToShow: 2, slidesToScroll: 2, infinite: tabs.length > 2 } },
       {
         breakpoint: 600,
         settings: {
@@ -62,6 +71,7 @@ export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs, instruments }) => 
           centerMode: false,
           variableWidth: false,
           arrows: true,
+          infinite: tabs.length > 1,
         },
       },
     ],
@@ -72,14 +82,17 @@ export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs, instruments }) => 
       sx={{
         position: "relative",
         width: "100%",
-        py: 4,
+        py: { xs: 1.5, md: 2 },
         overflow: "hidden",
         "& .slick-list": {
-          px: { xs: 0, sm: 0 },
+          px: 0,
+        },
+        "& .slick-slide": {
+          px: { xs: 0.5, sm: 0.75 },
         },
         "& .slick-prev, & .slick-next": {
-          width: 35,
-          height: 35,
+          width: { xs: 28, md: 32 },
+          height: { xs: 28, md: 32 },
           zIndex: 10,
           top: "50%",
           transform: "translateY(-50%)",
@@ -95,22 +108,22 @@ export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs, instruments }) => 
           backgroundColor: theme.palette.background.default,
           color: theme.palette.warning.main,
         },
-        "& .slick-prev": { left: { xs: 8, sm: 0 } },
-        "& .slick-next": { right: { xs: 8, sm: 0 } },
+        "& .slick-prev": { left: { xs: 4, sm: -4 } },
+        "& .slick-next": { right: { xs: 4, sm: -4 } },
       }}
     >
-
       <Slider {...settings}>
         {tabs.map((tab) => (
-          <Box key={tab.id} px={1}>
+          <Box key={tab.id}>
             <Card
               onClick={() => handleCardClick(tab)}
               sx={{
-                borderRadius: 3,
+                borderRadius: 2,
                 overflow: "hidden",
                 boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                 backgroundColor: theme.palette.background.paper,
                 cursor: "pointer",
+                height: "100%",
                 transition: "transform 0.3s ease, box-shadow 0.3s ease",
                 "&:hover": {
                   boxShadow: `0 0 16px ${theme.palette.warning.main}`,
@@ -124,9 +137,7 @@ export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs, instruments }) => 
                   image={tab.image}
                   alt={tab.title}
                   sx={{
-                    height: { xs: 180, sm: 220, md: 250 },
-                    objectFit: "cover",
-                    width: "100%",
+                    ...COVER_SX,
                     transition: "transform 0.3s ease",
                     "&:hover": {
                       transform: "scale(1.02)",
@@ -136,8 +147,7 @@ export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs, instruments }) => 
               ) : (
                 <Box
                   sx={{
-                    height: { xs: 180, sm: 220, md: 250 },
-                    width: "100%",
+                    ...COVER_SX,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -147,29 +157,31 @@ export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs, instruments }) => 
                     textAlign: "center",
                   }}
                 >
-                  <Typography variant="body2">
+                  <Typography variant="caption">
                     Sign in to see cover art for this tab
                   </Typography>
                 </Box>
               )}
-              <CardContent>
+              <CardContent sx={{ py: 1.25, px: 1.5, "&:last-child": { pb: 1.25 } }}>
                 <Box
                   sx={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    mb: 0.5,
+                    gap: 0.75,
+                    mb: 0.75,
                   }}
                 >
                   <Typography
-                    variant="h6"
+                    variant="subtitle1"
                     fontWeight={600}
                     color={theme.palette.text.primary}
                     sx={{
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
-                      maxWidth: "70%",
+                      minWidth: 0,
+                      fontSize: { xs: "0.95rem", md: "1rem" },
                     }}
                   >
                     {tab.title}
@@ -182,8 +194,8 @@ export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs, instruments }) => 
                       fontWeight: 600,
                       backgroundColor: theme.palette.warning.main,
                       color: theme.palette.warning.contrastText,
-                      ml: 1,
                       flexShrink: 0,
+                      height: 22,
                       "&:hover": {
                         backgroundColor: theme.palette.warning.dark,
                       },
@@ -195,21 +207,35 @@ export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs, instruments }) => 
                   sx={{
                     display: "flex",
                     alignItems: "center",
-                    gap: 0.5,
-                    flexWrap: "wrap",
+                    gap: 0.75,
+                    minWidth: 0,
                     color: theme.palette.text.secondary,
                   }}
                 >
-                  <Typography variant="body2">
-                    By <strong>{tab.user}</strong> •{" "}
-                  </Typography>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                    <CalendarMonthIcon
-                      sx={{ fontSize: 16, color: theme.palette.text.secondary }}
-                    />
-                    <Typography variant="body2">
-                      {new Date(tab.date).toLocaleDateString()}
+                  <UserAvatar name={tab.user} src={tab.userImg} size={26} />
+                  <Box sx={{ minWidth: 0, flex: 1 }}>
+                    <Typography
+                      variant="caption"
+                      component="p"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        fontWeight: 600,
+                        color: theme.palette.text.primary,
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      {tab.user}
                     </Typography>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.4 }}>
+                      <CalendarMonthIcon
+                        sx={{ fontSize: 13, color: theme.palette.text.secondary }}
+                      />
+                      <Typography variant="caption" sx={{ lineHeight: 1.2 }}>
+                        {new Date(tab.date).toLocaleDateString()}
+                      </Typography>
+                    </Box>
                   </Box>
                 </Box>
               </CardContent>

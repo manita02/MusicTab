@@ -46,6 +46,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
           </MenuItem>
         ))}
       </Select>
+      {helperText ? <FormHelperText>{helperText}</FormHelperText> : null}
     </FormControl>
   );
 };

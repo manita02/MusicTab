@@ -191,13 +191,15 @@ export const ManageProfileDialog: React.FC<{
         open={open}
         onClose={onClose}
         fullWidth
-        maxWidth="sm"
+        maxWidth="md"
         fullScreen={fullScreen}
         PaperProps={{
           sx: {
-            borderRadius: 3,
-            p: { xs: 1, sm: 2 },
+            borderRadius: { xs: 0, md: 3 },
+            p: { xs: 0.5, sm: 1.5, md: 2 },
             backgroundColor: theme.palette.background.paper,
+            m: { xs: 0, sm: 2 },
+            maxHeight: { xs: "100dvh", md: "90dvh" },
           },
         }}
       >
@@ -231,13 +233,13 @@ export const ManageProfileDialog: React.FC<{
         </DialogTitle>
 
         <DialogContent dividers sx={{ px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 } }}>
-          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 3 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 2 }}>
             <Avatar
                 src={previewImg}
                 alt={username}
                 sx={{
-                width: 120,
-                height: 120,
+                width: { xs: 88, md: 112 },
+                height: { xs: 88, md: 112 },
                 mb: 1,
                 border: `3px solid ${isAdmin ? "#FF9100" : "#2979FF"}`,
                 boxShadow: isAdmin
@@ -268,7 +270,8 @@ export const ManageProfileDialog: React.FC<{
             />
           </Box>
 
-          <Grid container spacing={2} direction="column">
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, md: 6 }}>
             <InputField
               label="Username"
               value={username}
@@ -276,6 +279,8 @@ export const ManageProfileDialog: React.FC<{
               fullWidth
               disabled={!isEditing}
             />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
             <InputField
               label="Email"
               value={email}
@@ -283,6 +288,8 @@ export const ManageProfileDialog: React.FC<{
               fullWidth
               disabled={!isEditing}
             />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
             <InputField
               label="Password"
               type="password"
@@ -292,6 +299,8 @@ export const ManageProfileDialog: React.FC<{
               fullWidth
               disabled={!isEditing}
             />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
             <InputField
               label="Profile Image URL"
               value={profileImg}
@@ -299,6 +308,8 @@ export const ManageProfileDialog: React.FC<{
               fullWidth
               disabled={!isEditing}
             />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
             <InputField
              label="Date of Birth"
              type="date"
@@ -311,12 +322,16 @@ export const ManageProfileDialog: React.FC<{
              fullWidth
              disabled={!isEditing}
             />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
             <InputField
             label="Age"
             value={age ? `${age} years old` : ""}
+            onChange={() => {}}
             fullWidth
             disabled
             />
+            </Grid>
           </Grid>
         </DialogContent>
 

@@ -1,3 +1,4 @@
+import { join } from 'path';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
@@ -5,7 +6,8 @@ import { AppController } from './app.controller';
 import { UserController } from './controllers/user.controller';
 import { TabController } from './controllers/tab.controller';
 
-import { PrismaService } from './prisma/prisma.service';
+import { PrismaModule } from './prisma/prisma.module';
+import { CopilotModule } from './copilot/copilot.module';
 
 import { UserPrismaRepository } from './repositories/user-prisma.repository';
 import { TabPrismaRepository } from './repositories/tab-prisma.repository';
@@ -24,7 +26,14 @@ import { RolesGuard } from './auth/roles.guard';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: [
+        join(process.cwd(), '.env'),
+        join(process.cwd(), 'apps/backend/.env'),
+        join(__dirname, '..', '.env'),
+      ],
     }),
+    PrismaModule,
+    CopilotModule,
   ],
   controllers: [
     AppController,
@@ -34,7 +43,6 @@ import { RolesGuard } from './auth/roles.guard';
   ],
   providers: [
     AppService,
-    PrismaService,
     UserPrismaRepository,
     TabPrismaRepository,
     SessionPrismaRepository,
