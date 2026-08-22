@@ -43,10 +43,17 @@ describe("Stats use cases", () => {
     expect(hits).toHaveLength(3);
   });
 
+  it("omits never-opened tabs from global most", async () => {
+    const { most } = await new GetStatsGlobal(repo).execute(3);
+    expect(most.every((h) => h.viewCount > 0)).toBe(true);
+    expect(most.some((h) => h.title === "Song 6")).toBe(false);
+  });
+
   it("returns up to 3 global most/least with least excluding zero views", async () => {
     const { most, least } = await new GetStatsGlobal(repo).execute(10);
     expect(most.length).toBeLessThanOrEqual(3);
     expect(most[0]?.title).toBe("Song 1");
+    expect(most.every((h) => h.viewCount > 0)).toBe(true);
     expect(least.every((h) => h.viewCount > 0)).toBe(true);
     expect(least.every((h) => !most.some((m) => m.id === h.id))).toBe(true);
     const mostMin = Math.min(...most.map((h) => h.viewCount));

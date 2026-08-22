@@ -69,10 +69,10 @@ describe("Tab entity (domain TDD)", () => {
       "http://example.com/img.jpg",
     );
 
-    const admin = User.create("admin", "a@a.com", "pass", Role.ADMIN, new Date("1990-01-01"), "https://x.com/a.png");
+    const admin = User.create("admin", "admin@gmail.com", "pass", Role.ADMIN, new Date("1990-01-01"), "https://x.com/a.png");
     const owner = User.create(
       "owner",
-      "o@o.com",
+      "owner@gmail.com",
       "pass",
       Role.USER,
       new Date("1990-01-01"),
@@ -81,7 +81,7 @@ describe("Tab entity (domain TDD)", () => {
 
     const other = User.create(
       "other",
-      "x@x.com",
+      "other@outlook.com",
       "pass",
       Role.USER,
       new Date("1991-01-01"),
