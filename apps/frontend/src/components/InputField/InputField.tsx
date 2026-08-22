@@ -14,6 +14,9 @@ export interface InputFieldProps {
   fullWidth?: boolean;
   isSearch?: boolean;
   onSearch?: () => void;
+  onPaste?: (e: React.ClipboardEvent<HTMLInputElement>) => void;
+  onDrop?: (e: React.DragEvent<HTMLInputElement>) => void;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
 }
 
 export const InputField: React.FC<InputFieldProps> = ({
@@ -28,7 +31,16 @@ export const InputField: React.FC<InputFieldProps> = ({
   fullWidth = true,
   isSearch = false,
   onSearch,
+  onPaste,
+  onDrop,
+  onBlur,
 }) => {
+  const preventDropOver = onDrop
+    ? (e: React.DragEvent<HTMLInputElement>) => {
+        e.preventDefault();
+      }
+    : undefined;
+
   return (
     <TextField
       label={label}
@@ -41,6 +53,17 @@ export const InputField: React.FC<InputFieldProps> = ({
       type={type}
       fullWidth={fullWidth}
       variant="outlined"
+      onPaste={onPaste}
+      onDrop={onDrop}
+      onDragOver={preventDropOver}
+      onBlur={onBlur}
+      slotProps={{
+        htmlInput: {
+          onPaste,
+          onDrop,
+          onDragOver: preventDropOver,
+        },
+      }}
       InputProps={{
         endAdornment: isSearch && onSearch ? (
           <InputAdornment position="end">
