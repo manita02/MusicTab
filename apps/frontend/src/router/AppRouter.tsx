@@ -2,12 +2,16 @@ import React, { lazy, Suspense } from "react";
 import { RouterProvider, createBrowserRouter, Outlet } from "react-router-dom";
 import { Box, CircularProgress } from "@mui/material";
 import { MainLayout } from "../layouts/MainLayout";
+import { AdminRoute } from "./AdminRoute";
 
 const HomePage = lazy(() => import("../pages/HomePage").then((m) => ({ default: m.HomePage })));
 const TabsPage = lazy(() => import("../pages/TabsPage").then((m) => ({ default: m.TabsPage })));
 const LoginPage = lazy(() => import("../pages/LoginPage").then((m) => ({ default: m.LoginPage })));
 const SignInPage = lazy(() => import("../pages/SignInPage").then((m) => ({ default: m.SignInPage })));
 const StatsPage = lazy(() => import("../pages/StatsPage").then((m) => ({ default: m.StatsPage })));
+const AdminUsersPage = lazy(() =>
+  import("../pages/AdminUsersPage").then((m) => ({ default: m.AdminUsersPage })),
+);
 
 const RouteFallback = () => (
   <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "40vh" }}>
@@ -64,6 +68,16 @@ const router = createBrowserRouter([
             element: (
               <Suspense fallback={<RouteFallback />}>
                 <StatsPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: "admin/users",
+            element: (
+              <Suspense fallback={<RouteFallback />}>
+                <AdminRoute>
+                  <AdminUsersPage />
+                </AdminRoute>
               </Suspense>
             ),
           },
