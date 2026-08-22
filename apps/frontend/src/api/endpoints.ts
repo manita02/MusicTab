@@ -26,4 +26,8 @@ export const ENDPOINTS = {
     chat: "/copilot/chat",
     quota: "/copilot/quota",
   },
+  stats: {
+    global: "/stats/global",
+    me: "/stats/me",
+  },
 };
