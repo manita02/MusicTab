@@ -35,6 +35,7 @@ const pages = [
   { label: "HOME", path: "/" },
   //{ label: "HOW IT WORKS", path: "/how-it-works" },
   { label: "TABS", path: "/tabs" },
+  { label: "STATS", path: "/stats" },
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({
