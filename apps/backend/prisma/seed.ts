@@ -4,8 +4,10 @@ import * as bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 const ADMIN_USERNAME = 'admin';
-const ADMIN_EMAIL = 'admin@admin.com';
+const ADMIN_EMAIL = 'admin@gmail.com';
+const LEGACY_ADMIN_EMAIL = 'admin@admin.com';
 const ADMIN_PASSWORD = 'admin';
+const ADMIN_SIGNUP_IP = '127.0.0.1';
 const ADMIN_IMG =
   'https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg';
 
@@ -131,20 +133,34 @@ const DEMO_TABS: DemoTab[] = [
 async function seedAdmin() {
   const existing = await prisma.user.findFirst({
     where: {
-      OR: [{ username: ADMIN_USERNAME }, { email: ADMIN_EMAIL }],
+      OR: [{ username: ADMIN_USERNAME }, { email: ADMIN_EMAIL }, { email: LEGACY_ADMIN_EMAIL }],
     },
   });
 
   if (existing) {
+    const data: { role?: string; email?: string; signupIp?: string } = {};
     if (existing.role !== 'ADMIN') {
-      await prisma.user.update({
-        where: { id: existing.id },
-        data: { role: 'ADMIN' },
-      });
-      console.log(`Promoted existing user "${existing.username}" to ADMIN`);
-    } else {
-      console.log(`Admin user already exists (${existing.username} / ${existing.email})`);
+      data.role = 'ADMIN';
     }
+    if (existing.email === LEGACY_ADMIN_EMAIL) {
+      data.email = ADMIN_EMAIL;
+    }
+    if (!existing.signupIp) {
+      data.signupIp = ADMIN_SIGNUP_IP;
+    }
+
+    if (Object.keys(data).length > 0) {
+      const updated = await prisma.user.update({
+        where: { id: existing.id },
+        data,
+      });
+      console.log(
+        `Updated admin user (${updated.username} / ${updated.email}, signupIp=${updated.signupIp})`,
+      );
+      return updated;
+    }
+
+    console.log(`Admin user already exists (${existing.username} / ${existing.email})`);
     return existing;
   }
 
@@ -158,6 +174,7 @@ async function seedAdmin() {
       role: 'ADMIN',
       birthDate: new Date('1990-01-01'),
       urlImg: ADMIN_IMG,
+      signupIp: ADMIN_SIGNUP_IP,
     },
   });
 
