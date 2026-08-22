@@ -1,0 +1,23 @@
+/** Exact hosts rejected as throwaway inboxes. */
+export const DISPOSABLE_EMAIL_DOMAINS = [
+  "mailinator.com",
+  "guerrillamail.com",
+  "10minutemail.com",
+  "tempmail.com",
+  "temp-mail.org",
+  "yopmail.com",
+  "trashmail.com",
+  "discard.email",
+  "getnada.com",
+  "moakt.com",
+  "sharklasers.com",
+  "guerrillamailblock.com",
+  "mailnesia.com",
+  "maildrop.cc",
+  "throwaway.email",
+  "fakeinbox.com",
+  "emailondeck.com",
+  "tmpmail.org",
+  "minuteinbox.com",
+  "trashmail.de",
+] as const;

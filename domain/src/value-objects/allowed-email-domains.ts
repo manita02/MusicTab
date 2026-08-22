@@ -1,0 +1,21 @@
+/** Exact hosts accepted on user registration. Extend here; no wildcards. */
+export const ALLOWED_EMAIL_DOMAINS = [
+  "gmail.com",
+  "googlemail.com",
+  "outlook.com",
+  "hotmail.com",
+  "live.com",
+  "msn.com",
+  "yahoo.com",
+  "ymail.com",
+  "yahoo.com.ar",
+  "icloud.com",
+  "me.com",
+  "mac.com",
+  "proton.me",
+  "protonmail.com",
+  "aol.com",
+  "zoho.com",
+  "gmx.com",
+  "gmx.net",
+] as const;
