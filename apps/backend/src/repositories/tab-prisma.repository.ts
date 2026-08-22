@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ITabRepository, SearchTabsParams, ViewOrder, CountCatalogParams, UserViewStats } from '@domain/repositories/ITabRepository';
 import { Tab } from '@domain/entities/Tab';
 import { CopilotTabHit } from '@domain/dto/CopilotTabHit';
+import { STATS_LIST_LIMIT } from '@domain/stats.constants';
 import { PrismaService } from '../prisma/prisma.service';
 
 /** Fila prisma.Tab sin relaciones */
@@ -27,7 +28,7 @@ type TabRowWithCatalog = DbTabRow & {
   instrument: { name: string };
 };
 
-const COPILOT_TAKE_CAP = 3;
+const QUERY_TAKE_CAP = STATS_LIST_LIMIT;
 
 @Injectable()
 export class TabPrismaRepository implements ITabRepository {
@@ -178,7 +179,7 @@ export class TabPrismaRepository implements ITabRepository {
   }
 
   async search(params: SearchTabsParams): Promise<CopilotTabHit[]> {
-    const take = Math.min(Math.max(params.take, 1), COPILOT_TAKE_CAP);
+    const take = Math.min(Math.max(params.take, 1), QUERY_TAKE_CAP);
     const where = await this.buildCatalogWhere(params);
     if (where === null) return [];
 
@@ -239,7 +240,7 @@ export class TabPrismaRepository implements ITabRepository {
   }
 
   async findHitsByUserId(userId: number, take: number): Promise<CopilotTabHit[]> {
-    const capped = Math.min(Math.max(take, 1), COPILOT_TAKE_CAP);
+    const capped = Math.min(Math.max(take, 1), QUERY_TAKE_CAP);
     const records = await this.prisma.tab.findMany({
       where: { userId },
       take: capped,
@@ -319,7 +320,7 @@ export class TabPrismaRepository implements ITabRepository {
   }
 
   async findTopViewedByUser(userId: number, order: ViewOrder, take: number): Promise<CopilotTabHit[]> {
-    const capped = Math.min(Math.max(take, 1), COPILOT_TAKE_CAP);
+    const capped = Math.min(Math.max(take, 1), QUERY_TAKE_CAP);
     const grouped = await this.prisma.tabView.groupBy({
       by: ['tabId'],
       where: { userId },
@@ -336,16 +337,26 @@ export class TabPrismaRepository implements ITabRepository {
     });
 
     const selected = grouped.slice(0, capped);
-    return this.loadHitsByIds(
+    const hits = await this.loadHitsByIds(
       selected.map((g) => g.tabId),
       Object.fromEntries(selected.map((g) => [g.tabId, g._max.viewedAt ?? undefined])),
     );
+    const countById = new Map(selected.map((g) => [g.tabId, g._count.id]));
+    return hits.map((h) => {
+      const n = countById.get(h.id);
+      return n != null ? { ...h, userViewCount: n } : h;
+    });
   }
 
-  async findTopViewedGlobal(order: ViewOrder, take: number): Promise<CopilotTabHit[]> {
-    const capped = Math.min(Math.max(take, 1), COPILOT_TAKE_CAP);
+  async findTopViewedGlobal(
+    order: ViewOrder,
+    take: number,
+    minViewCount = 0,
+  ): Promise<CopilotTabHit[]> {
+    const capped = Math.min(Math.max(take, 1), QUERY_TAKE_CAP);
     const records = await this.prisma.tab.findMany({
       take: capped,
+      where: minViewCount > 0 ? { viewCount: { gte: minViewCount } } : undefined,
       orderBy:
         order === 'desc'
           ? [{ viewCount: 'desc' }, { id: 'desc' }]
@@ -359,8 +370,9 @@ export class TabPrismaRepository implements ITabRepository {
     userId: number,
     staleAfterDays: number,
     take: number,
+    options?: { onlyStale?: boolean },
   ): Promise<CopilotTabHit[]> {
-    const capped = Math.min(Math.max(take, 1), COPILOT_TAKE_CAP);
+    const capped = Math.min(Math.max(take, 1), QUERY_TAKE_CAP);
     const grouped = await this.prisma.tabView.groupBy({
       by: ['tabId'],
       where: { userId },
@@ -370,7 +382,7 @@ export class TabPrismaRepository implements ITabRepository {
 
     const cutoff = new Date(Date.now() - staleAfterDays * 24 * 60 * 60 * 1000);
     const stale = grouped.filter((g) => g._max.viewedAt && g._max.viewedAt < cutoff);
-    const pool = stale.length > 0 ? stale : grouped;
+    const pool = options?.onlyStale ? stale : stale.length > 0 ? stale : grouped;
     pool.sort((a, b) => {
       const aTime = a._max.viewedAt?.getTime() ?? 0;
       const bTime = b._max.viewedAt?.getTime() ?? 0;
@@ -385,7 +397,7 @@ export class TabPrismaRepository implements ITabRepository {
   }
 
   async findNeverViewedByUser(userId: number, take: number): Promise<CopilotTabHit[]> {
-    const capped = Math.min(Math.max(take, 1), COPILOT_TAKE_CAP);
+    const capped = Math.min(Math.max(take, 1), QUERY_TAKE_CAP);
     const records = await this.prisma.tab.findMany({
       where: {
         views: { none: { userId } },
