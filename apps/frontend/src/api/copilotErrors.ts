@@ -31,7 +31,7 @@ export function copilotErrorFromUnknown(error: unknown): CopilotClientError {
 
   if (status === 401) {
     return {
-      message: "You need to sign in to use Copilot",
+      message: `You need to sign in to use ${COPILOT_UI.BRAND_NAME}`,
       redirectToLogin: true,
     };
   }
