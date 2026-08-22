@@ -8,7 +8,12 @@ export class TokenService implements ITokenService {
   constructor(private readonly config: ConfigService) {}
 
   private get secret(): string {
-    return this.config.get<string>('JWT_SECRET') || 'super_secret_key';
+    const secret = this.config.get<string>('JWT_SECRET')?.trim();
+    if (secret) return secret;
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('JWT_SECRET is required in production');
+    }
+    return 'super_secret_key';
   }
 
   async generate(payload: any, expiresInSeconds: number): Promise<string> {
