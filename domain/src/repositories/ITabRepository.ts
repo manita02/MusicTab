@@ -46,7 +46,16 @@ export interface ITabRepository {
   findLatestViewAt(userId: number, tabId: number): Promise<Date | null>;
   recordView(userId: number, tabId: number): Promise<void>;
   findTopViewedByUser(userId: number, order: ViewOrder, take: number): Promise<CopilotTabHit[]>;
-  findTopViewedGlobal(order: ViewOrder, take: number): Promise<CopilotTabHit[]>;
-  findStaleViewedByUser(userId: number, staleAfterDays: number, take: number): Promise<CopilotTabHit[]>;
+  findTopViewedGlobal(
+    order: ViewOrder,
+    take: number,
+    minViewCount?: number
+  ): Promise<CopilotTabHit[]>;
+  findStaleViewedByUser(
+    userId: number,
+    staleAfterDays: number,
+    take: number,
+    options?: { onlyStale?: boolean }
+  ): Promise<CopilotTabHit[]>;
   findNeverViewedByUser(userId: number, take: number): Promise<CopilotTabHit[]>;
 }
