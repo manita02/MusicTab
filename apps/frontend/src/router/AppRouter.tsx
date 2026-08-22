@@ -7,6 +7,7 @@ const HomePage = lazy(() => import("../pages/HomePage").then((m) => ({ default: 
 const TabsPage = lazy(() => import("../pages/TabsPage").then((m) => ({ default: m.TabsPage })));
 const LoginPage = lazy(() => import("../pages/LoginPage").then((m) => ({ default: m.LoginPage })));
 const SignInPage = lazy(() => import("../pages/SignInPage").then((m) => ({ default: m.SignInPage })));
+const StatsPage = lazy(() => import("../pages/StatsPage").then((m) => ({ default: m.StatsPage })));
 
 const RouteFallback = () => (
   <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "40vh" }}>
@@ -55,6 +56,14 @@ const router = createBrowserRouter([
             element: (
               <Suspense fallback={<RouteFallback />}>
                 <SignInPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: "stats",
+            element: (
+              <Suspense fallback={<RouteFallback />}>
+                <StatsPage />
               </Suspense>
             ),
           },
