@@ -5,11 +5,13 @@ import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
 import { InputField } from "../components/InputField/InputField";
 import { Button } from "../components/Button/Button";
 import { useLogin } from "../api/hooks/useLogin";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { safeInternalPath } from "../router/safeInternalPath";
 
 export const LoginPage: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const loginMutation = useLogin();
@@ -24,7 +26,7 @@ export const LoginPage: React.FC = () => {
           localStorage.setItem("userName", data.userName);
           localStorage.setItem("userId", String(data.userId));
           localStorage.setItem("userRole", data.userRole);
-          navigate("/");
+          navigate(safeInternalPath(searchParams.get("redirect")));
           window.location.reload();
         },
       }

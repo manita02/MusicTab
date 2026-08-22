@@ -19,6 +19,7 @@ import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium"; // 👑
 import PersonIcon from "@mui/icons-material/Person"; // 👤 user icon
 import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
+import { canManageUsers, normalizeRole } from "../../auth/tabPermissions";
 
 interface NavbarProps {
   isLoggedIn: boolean;
@@ -50,6 +51,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const theme = useTheme();
   const navigate = useNavigate();
+  const canSeeManageUsers = canManageUsers(isLoggedIn, normalizeRole(userRole));
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => setAnchorElNav(event.currentTarget);
   const handleCloseNavMenu = () => setAnchorElNav(null);
@@ -297,7 +299,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </MenuItem>
               </Tooltip>
             )}
-            {isLoggedIn && userRole === "ADMIN" && (
+            {canSeeManageUsers && (
               <MenuItem
                 onClick={() => {
                   handleCloseUserMenu();
