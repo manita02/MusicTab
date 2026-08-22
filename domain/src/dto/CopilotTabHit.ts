@@ -7,4 +7,5 @@ export type CopilotTabHit = {
   viewCount: number;
   lastViewedAt?: string;
   createdAt: string;
+  userViewCount?: number;
 };
