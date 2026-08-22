@@ -2,6 +2,7 @@ export const ENDPOINTS = {
   users: {
     login: "/users/login",
     register: "/users/register",
+    list: "/users",
     update: (id: number | string) => `/users/${id}`,
     delete: (id: number | string) => `/users/${id}`,
   },
