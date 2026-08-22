@@ -6,9 +6,11 @@ import type { AxiosError } from "axios";
 type RegisterRequest = {
   username: string;
   email: string;
+  emailConfirm: string;
   password: string;
   birthDate: string;
   urlImg: string;
+  turnstileToken: string;
 };
 
 type RegisterResponse = {
@@ -33,7 +35,7 @@ export const useRegister = () => {
     mutationFn: async (data: RegisterRequest) => {
       const res = await api.post(ENDPOINTS.users.register, {
         ...data,
-        birthDate: new Date(data.birthDate).toISOString(), // ISO format
+        birthDate: new Date(data.birthDate).toISOString(),
       });
       return res.data;
     },
