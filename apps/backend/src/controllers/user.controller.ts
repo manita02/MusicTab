@@ -1,4 +1,5 @@
-import { Controller, Post, Body, Put, Param, Delete, ForbiddenException } from '@nestjs/common';
+import { Controller, Post, Body, Put, Param, Delete, ForbiddenException, Req } from '@nestjs/common';
+import type { Request } from 'express';
 import { UserPrismaRepository } from '../repositories/user-prisma.repository';
 import { SessionPrismaRepository } from '../repositories/session-prisma.repository';
 import { PasswordHasherService } from '../services/password-hasher.service';
@@ -9,13 +10,17 @@ import { DomainError } from '@domain/errors/DomainError';
 import { User } from '@domain/entities/User';
 import { Public } from '../auth/decorators/public.decorator';
 import { CurrentUser, RequestUser } from '../auth/decorators/current-user.decorator';
+import { TurnstileService } from '../auth/turnstile.service';
+import { extractClientIp } from '../auth/extract-client-ip';
 
 type RegisterDTO = {
   username: string;
   email: string;
+  emailConfirm: string;
   password: string;
   birthDate: Date;
   urlImg: string;
+  turnstileToken: string;
 };
 
 type LoginDTO = {
@@ -43,6 +48,7 @@ export class UserController {
     private readonly passwordHasher: PasswordHasherService,
     private readonly tokenService: TokenService,
     private readonly sessionRepo: SessionPrismaRepository,
+    private readonly turnstile: TurnstileService,
   ) {
     this.registerUser = new RegisterUser(this.userRepo, this.passwordHasher);
     this.loginUser = new LoginUser(
@@ -55,10 +61,23 @@ export class UserController {
 
   @Public()
   @Post('register')
-  async register(@Body() dto: RegisterDTO) {
+  async register(@Body() dto: RegisterDTO, @Req() req: Request) {
+    const email = (dto.email ?? '').trim();
+    const emailConfirm = (dto.emailConfirm ?? '').trim();
+    if (email.toLowerCase() !== emailConfirm.toLowerCase()) {
+      throw new DomainError('EmailMismatch', 'Email addresses do not match');
+    }
+
+    const ip = extractClientIp(req);
+    await this.turnstile.verify(dto.turnstileToken, ip);
+
     const user = await this.registerUser.execute({
-      ...dto,
+      username: dto.username,
+      email,
+      password: dto.password,
       birthDate: new Date(dto.birthDate),
+      urlImg: dto.urlImg,
+      signupIp: ip,
     });
     return {
       id: user.id,
@@ -117,7 +136,8 @@ export class UserController {
       user.role,
       user.createdAt,
       dto.birthDate ? new Date(dto.birthDate) : user.birthDate,
-      dto.urlImg ?? user.urlImg.toString()
+      dto.urlImg ?? user.urlImg.toString(),
+      user.signupIp,
     );
 
     const savedUser = await this.userRepo.save(updatedUser);

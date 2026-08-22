@@ -2,10 +2,37 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { IUserRepository } from '@domain/repositories/IUserRepository';
 import { User, Role } from '@domain/entities/User';
+import { signupIpLookupValues } from '@domain/value-objects/SignupIp';
+
+type UserRecord = {
+  id: number;
+  username: string;
+  email: string;
+  passwordHash: string;
+  role: string;
+  createdAt: Date;
+  birthDate: Date;
+  urlImg: string;
+  signupIp: string | null;
+};
 
 function coerceRole(role: string): Role {
   const r = (role ?? '').trim().toUpperCase();
   return r === Role.ADMIN ? Role.ADMIN : Role.USER;
+}
+
+function toUser(record: UserRecord): User {
+  return User.rehydrate(
+    record.id,
+    record.username,
+    record.email,
+    record.passwordHash,
+    coerceRole(record.role),
+    record.createdAt,
+    record.birthDate,
+    record.urlImg,
+    record.signupIp,
+  );
 }
 
 @Injectable()
@@ -17,17 +44,7 @@ export class UserPrismaRepository implements IUserRepository {
       where: { id },
     });
     if (!record) return null;
-
-    return User.rehydrate(
-      record.id,
-      record.username,
-      record.email,
-      record.passwordHash,
-      coerceRole(record.role),
-      record.createdAt,
-      record.birthDate,
-      record.urlImg
-    );
+    return toUser(record);
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -35,17 +52,7 @@ export class UserPrismaRepository implements IUserRepository {
       where: { email },
     });
     if (!record) return null;
-
-    return User.rehydrate(
-      record.id,
-      record.username,
-      record.email,
-      record.passwordHash,
-      coerceRole(record.role),
-      record.createdAt,
-      record.birthDate,
-      record.urlImg
-    );
+    return toUser(record);
   }
 
   async findByUsername(username: string): Promise<User | null> {
@@ -53,16 +60,15 @@ export class UserPrismaRepository implements IUserRepository {
       where: { username },
     });
     if (!record) return null;
-    return User.rehydrate(
-      record.id,
-      record.username,
-      record.email,
-      record.passwordHash,
-      coerceRole(record.role),
-      record.createdAt,
-      record.birthDate,
-      record.urlImg
-    );
+    return toUser(record);
+  }
+
+  async findBySignupIp(ip: string): Promise<User[]> {
+    const values = signupIpLookupValues(ip);
+    const records = await this.prisma.user.findMany({
+      where: { signupIp: { in: values } },
+    });
+    return records.map(toUser);
   }
 
   async findByUsernameInsensitive(username: string): Promise<User | null> {
@@ -73,20 +79,10 @@ export class UserPrismaRepository implements IUserRepository {
     const rows = await this.prisma.user.findMany();
     const record = rows.find((row: { username: string }) => row.username.toLowerCase() === q);
     if (!record) return null;
-    return User.rehydrate(
-      record.id,
-      record.username,
-      record.email,
-      record.passwordHash,
-      coerceRole(record.role),
-      record.createdAt,
-      record.birthDate,
-      record.urlImg
-    );
+    return toUser(record);
   }
 
   async save(user: User): Promise<User> {
-    // If id exists, update; if not, create
     let record;
     if (user.id) {
       record = await this.prisma.user.update({
@@ -110,20 +106,12 @@ export class UserPrismaRepository implements IUserRepository {
           createdAt: user.createdAt,
           birthDate: user.birthDate,
           urlImg: user.urlImg.toString(),
+          signupIp: user.signupIp,
         },
       });
     }
 
-    return User.rehydrate(
-      record.id,
-      record.username,
-      record.email,
-      record.passwordHash,
-      coerceRole(record.role),
-      record.createdAt,
-      record.birthDate,
-      record.urlImg
-    );
+    return toUser(record);
   }
 
   async deleteById(id: number): Promise<void> {
