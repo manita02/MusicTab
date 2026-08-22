@@ -32,6 +32,19 @@ describe("Navbar component", () => {
     const menu = screen.getByRole("menu");
     expect(within(menu).getByText(/Pepe123/i)).toBeVisible();
     expect(within(menu).getByText(/Log Out/i)).toBeVisible();
+    expect(within(menu).queryByText(/Manage users/i)).not.toBeInTheDocument();
+  });
+
+  test("shows Manage users only for ADMIN", () => {
+    renderNavbar({ isLoggedIn: true, userName: "root", userRole: "ADMIN" });
+    fireEvent.click(screen.getByLabelText(/root menu/i));
+    expect(within(screen.getByRole("menu")).getByText(/Manage users/i)).toBeVisible();
+  });
+
+  test("hides Manage users for USER", () => {
+    renderNavbar({ isLoggedIn: true, userName: "Pepe123", userRole: "USER" });
+    fireEvent.click(screen.getByLabelText(/Pepe123 menu/i));
+    expect(within(screen.getByRole("menu")).queryByText(/Manage users/i)).not.toBeInTheDocument();
   });
 
   test("shows login options when not logged in", () => {

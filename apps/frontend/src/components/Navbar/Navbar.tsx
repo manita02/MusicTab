@@ -297,6 +297,17 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </MenuItem>
               </Tooltip>
             )}
+            {isLoggedIn && userRole === "ADMIN" && (
+              <MenuItem
+                onClick={() => {
+                  handleCloseUserMenu();
+                  navigate("/admin/users");
+                }}
+                sx={{ justifyContent: "center" }}
+              >
+                <Typography sx={{ width: "100%", textAlign: "center" }}>Manage users</Typography>
+              </MenuItem>
+            )}
             {menuItems.map(({ label, action }) => (
               <MenuItem
                 key={label}
