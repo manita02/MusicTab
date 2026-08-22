@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: musictab-api
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm --prefix domain install && npm --prefix apps/backend install && npm --prefix apps/backend run build
+    startCommand: npm --prefix apps/backend run start:prod
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: COPILOT_MODEL
+        value: gemini-3.6-flash
+      - key: SEED_ON_BOOT
+        value: "true"
+      - key: TURNSTILE_SECRET_KEY
+        sync: false
+      - key: TURNSTILE_VERIFY_URL
+        value: https://challenges.cloudflare.com/turnstile/v0/siteverify
