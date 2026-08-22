@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Put, Param, Delete, ForbiddenException, Req } from '@nestjs/common';
+import { Controller, Post, Body, Put, Param, Delete, Get, UseGuards, Req } from '@nestjs/common';
 import type { Request } from 'express';
 import { UserPrismaRepository } from '../repositories/user-prisma.repository';
 import { SessionPrismaRepository } from '../repositories/session-prisma.repository';
@@ -6,9 +6,14 @@ import { PasswordHasherService } from '../services/password-hasher.service';
 import { TokenService } from '../services/token.service';
 import { RegisterUser } from '@domain/use-cases/RegisterUser';
 import { LoginUser } from '@domain/use-cases/LoginUser';
+import { ListUsers } from '@domain/use-cases/ListUsers';
+import { UpdateUser } from '@domain/use-cases/UpdateUser';
+import { DeleteUser } from '@domain/use-cases/DeleteUser';
 import { DomainError } from '@domain/errors/DomainError';
-import { User } from '@domain/entities/User';
+import { Role } from '@domain/entities/User';
 import { Public } from '../auth/decorators/public.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { RolesGuard } from '../auth/roles.guard';
 import { CurrentUser, RequestUser } from '../auth/decorators/current-user.decorator';
 import { TurnstileService } from '../auth/turnstile.service';
 import { extractClientIp } from '../auth/extract-client-ip';
@@ -36,12 +41,16 @@ type UpdateUserDTO = {
   password?: string;
   birthDate?: Date;
   urlImg?: string;
+  role?: string;
 };
 
 @Controller('users')
 export class UserController {
   private readonly registerUser: RegisterUser;
   private readonly loginUser: LoginUser;
+  private readonly listUsers: ListUsers;
+  private readonly updateUserUseCase: UpdateUser;
+  private readonly deleteUserUseCase: DeleteUser;
 
   constructor(
     private readonly userRepo: UserPrismaRepository,
@@ -57,6 +66,16 @@ export class UserController {
       this.tokenService,
       this.sessionRepo,
     );
+    this.listUsers = new ListUsers(this.userRepo);
+    this.updateUserUseCase = new UpdateUser(this.userRepo, this.passwordHasher);
+    this.deleteUserUseCase = new DeleteUser(this.userRepo);
+  }
+
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
+  @Get()
+  async list() {
+    return this.listUsers.execute();
   }
 
   @Public()
@@ -121,27 +140,17 @@ export class UserController {
       throw new DomainError('InvalidId', 'ID must be a number');
     }
 
-    if (numericId !== current.id) {
-      throw new ForbiddenException('You can only update your own account');
-    }
-
-    const user = await this.userRepo.findById(numericId);
-    if (!user) throw new DomainError('UserNotFound', 'User not found');
-
-    const updatedUser = User.rehydrate(
-      user.id!,
-      dto.username ?? user.username,
-      dto.email ?? user.email.toString(),
-      dto.password ? await this.passwordHasher.hash(dto.password) : user.passwordHash,
-      user.role,
-      user.createdAt,
-      dto.birthDate ? new Date(dto.birthDate) : user.birthDate,
-      dto.urlImg ?? user.urlImg.toString(),
-      user.signupIp,
-    );
-
-    const savedUser = await this.userRepo.save(updatedUser);
-    return savedUser;
+    return this.updateUserUseCase.execute({
+      actorId: current.id,
+      actorRole: current.role,
+      targetId: numericId,
+      username: dto.username,
+      email: dto.email,
+      password: dto.password,
+      birthDate: dto.birthDate ? new Date(dto.birthDate) : undefined,
+      urlImg: dto.urlImg,
+      role: dto.role,
+    });
   }
 
   @Delete(':id')
@@ -151,14 +160,11 @@ export class UserController {
       throw new DomainError('InvalidId', 'ID must be a number');
     }
 
-    if (numericId !== current.id) {
-      throw new ForbiddenException('You can only delete your own account');
-    }
-
-    const user = await this.userRepo.findById(numericId);
-    if (!user) throw new DomainError('UserNotFound', 'User not found');
-
-    await this.userRepo.deleteById(numericId);
+    await this.deleteUserUseCase.execute({
+      actorId: current.id,
+      actorRole: current.role,
+      targetId: numericId,
+    });
 
     return { message: 'User deleted successfully' };
   }

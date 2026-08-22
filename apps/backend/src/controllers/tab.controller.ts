@@ -29,6 +29,7 @@ import { CurrentUser, RequestUser } from '../auth/decorators/current-user.decora
 import { RolesGuard } from '../auth/roles.guard';
 import type { Tab } from '@domain/entities/Tab';
 import { extractYouTubeVideoId } from '../utils/youtube';
+import { fetchSafeCover } from '../utils/safe-cover-url';
 
 type CreateTabBody = {
   title: string;
@@ -85,7 +86,7 @@ export class TabController {
     try {
       const ac = new AbortController();
       const t = setTimeout(() => ac.abort(), 12_000);
-      const r = await fetch(upstream, { redirect: 'follow', signal: ac.signal });
+      const r = await fetchSafeCover(upstream, ac.signal);
       clearTimeout(t);
       if (!r.ok) {
         throw new BadGatewayException('Cover upstream error');

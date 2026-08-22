@@ -1,55 +1,12 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { RegisterUser } from "../src/use-cases/RegisterUser";
-import { IUserRepository } from "../src/repositories/IUserRepository";
 import { IPasswordHasher } from "../src/services/IPasswordHasher";
 import { User, Role } from "../src/entities/User";
 import { ConflictError, DomainError } from "../src/errors/DomainError";
-import { signupIpLookupValues } from "../src/value-objects/SignupIp";
+import { InMemoryUserRepository } from "./fakes/InMemoryUserRepository";
 
 const birth = () => new Date("1993-06-06");
 const img = () => "https://example.com/u.png";
-
-class InMemoryUserRepository implements IUserRepository {
-  private users: User[] = [];
-
-  async findById(id: number) {
-    return this.users.find((u) => u.id === id) ?? null;
-  }
-
-  async findByEmail(email: string) {
-    return this.users.find((u) => u.email.toString() === email.toLowerCase()) ?? null;
-  }
-
-  async findByUsername(username: string): Promise<User | null> {
-    return this.users.find((u) => u.username === username) ?? null;
-  }
-
-  async findBySignupIp(ip: string): Promise<User[]> {
-    const aliases = signupIpLookupValues(ip);
-    return this.users.filter((u) => u.signupIp !== null && aliases.includes(u.signupIp));
-  }
-
-  async save(user: User) {
-    const newId = this.users.length + 1;
-    const rehydrated = User.rehydrate(
-      newId,
-      user.username,
-      user.email.toString(),
-      user.passwordHash,
-      user.role,
-      user.createdAt,
-      user.birthDate,
-      user.urlImg.toString(),
-      user.signupIp,
-    );
-    this.users.push(rehydrated);
-    return rehydrated;
-  }
-
-  async deleteById(id: number) {
-    this.users = this.users.filter((u) => u.id !== id);
-  }
-}
 
 class FakeHasher implements IPasswordHasher {
   async hash(password: string) {

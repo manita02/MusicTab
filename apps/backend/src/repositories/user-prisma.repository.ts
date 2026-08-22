@@ -71,6 +71,13 @@ export class UserPrismaRepository implements IUserRepository {
     return records.map(toUser);
   }
 
+  async findAll(): Promise<User[]> {
+    const records = await this.prisma.user.findMany({
+      orderBy: [{ createdAt: 'desc' }, { username: 'asc' }],
+    });
+    return records.map(toUser);
+  }
+
   async findByUsernameInsensitive(username: string): Promise<User | null> {
     const exact = await this.findByUsername(username.trim());
     if (exact) return exact;

@@ -2,12 +2,20 @@ import React, { lazy, Suspense } from "react";
 import { RouterProvider, createBrowserRouter, Outlet } from "react-router-dom";
 import { Box, CircularProgress } from "@mui/material";
 import { MainLayout } from "../layouts/MainLayout";
+import { AdminRoute } from "./AdminRoute";
+import { GuestOnlyRoute } from "./GuestOnlyRoute";
 
 const HomePage = lazy(() => import("../pages/HomePage").then((m) => ({ default: m.HomePage })));
 const TabsPage = lazy(() => import("../pages/TabsPage").then((m) => ({ default: m.TabsPage })));
 const LoginPage = lazy(() => import("../pages/LoginPage").then((m) => ({ default: m.LoginPage })));
 const SignInPage = lazy(() => import("../pages/SignInPage").then((m) => ({ default: m.SignInPage })));
 const StatsPage = lazy(() => import("../pages/StatsPage").then((m) => ({ default: m.StatsPage })));
+const AdminUsersPage = lazy(() =>
+  import("../pages/AdminUsersPage").then((m) => ({ default: m.AdminUsersPage })),
+);
+const NotFoundPage = lazy(() =>
+  import("../pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })),
+);
 
 const RouteFallback = () => (
   <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "40vh" }}>
@@ -47,7 +55,9 @@ const router = createBrowserRouter([
             path: "login",
             element: (
               <Suspense fallback={<RouteFallback />}>
-                <LoginPage />
+                <GuestOnlyRoute>
+                  <LoginPage />
+                </GuestOnlyRoute>
               </Suspense>
             ),
           },
@@ -55,7 +65,9 @@ const router = createBrowserRouter([
             path: "signin",
             element: (
               <Suspense fallback={<RouteFallback />}>
-                <SignInPage />
+                <GuestOnlyRoute>
+                  <SignInPage />
+                </GuestOnlyRoute>
               </Suspense>
             ),
           },
@@ -64,6 +76,24 @@ const router = createBrowserRouter([
             element: (
               <Suspense fallback={<RouteFallback />}>
                 <StatsPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: "admin/users",
+            element: (
+              <Suspense fallback={<RouteFallback />}>
+                <AdminRoute>
+                  <AdminUsersPage />
+                </AdminRoute>
+              </Suspense>
+            ),
+          },
+          {
+            path: "*",
+            element: (
+              <Suspense fallback={<RouteFallback />}>
+                <NotFoundPage />
               </Suspense>
             ),
           },

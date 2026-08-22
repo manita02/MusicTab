@@ -31,6 +31,7 @@ describe('Stats (e2e)', () => {
       expect(res.body.most[0]).toHaveProperty('title');
       expect(res.body.most[0]).not.toHaveProperty('urlPdf');
       expect(res.body.most[0]).not.toHaveProperty('urlYoutube');
+      expect(res.body.most[0]).not.toHaveProperty('urlImg');
     }
     if (res.body.least[0]) {
       expect(res.body.least[0].viewCount).toBeGreaterThan(0);
