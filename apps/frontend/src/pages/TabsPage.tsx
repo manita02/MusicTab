@@ -359,7 +359,17 @@ export const TabsPage: React.FC = () => {
             textAlign: "center",
           }}
         >
-          <Typography fontWeight={600} noWrap sx={{ maxWidth: "100%" }}>
+          <Typography
+            fontWeight={600}
+            sx={{
+              width: "100%",
+              maxWidth: "100%",
+              lineHeight: 1.25,
+              whiteSpace: "normal",
+              overflowWrap: "anywhere",
+              wordBreak: "break-word",
+            }}
+          >
             {params.row.title}
           </Typography>
           {params.row.artist ? (
@@ -667,7 +677,8 @@ export const TabsPage: React.FC = () => {
               columns={columns}
               disableRowSelectionOnClick
               pageSizeOptions={[5, 10]}
-              getRowHeight={() => 220}
+              getRowHeight={() => "auto"}
+              getEstimatedRowHeight={() => 220}
               sx={{
                 border: "none",
                 minWidth: 720,
@@ -675,6 +686,14 @@ export const TabsPage: React.FC = () => {
                   backgroundColor: theme.palette.primary.main,
                   color: theme.palette.warning.contrastText,
                   fontWeight: "bold",
+                },
+                "& .MuiDataGrid-cell": {
+                  display: "flex",
+                  alignItems: "center",
+                },
+                "& .MuiDataGrid-cell[data-field=\"title\"]": {
+                  whiteSpace: "normal",
+                  py: 1,
                 },
                 "& .MuiDataGrid-row:nth-of-type(odd)": {
                   backgroundColor: theme.palette.background.default,
