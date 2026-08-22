@@ -52,7 +52,8 @@ export class InMemoryTabRepository implements ITabRepository {
         tab.createdAt,
         tab.userName,
         tab.artist,
-        tab.viewCount
+        tab.viewCount,
+        tab.userImg
       );
       this.tabs.push(newTab);
       return newTab;
@@ -231,7 +232,8 @@ export class InMemoryTabRepository implements ITabRepository {
       tab.createdAt,
       tab.userName,
       tab.artist,
-      tab.viewCount + 1
+      tab.viewCount + 1,
+      tab.userImg
     );
     const idx = this.tabs.findIndex((t) => t.id === tabId);
     this.tabs[idx] = updated;
