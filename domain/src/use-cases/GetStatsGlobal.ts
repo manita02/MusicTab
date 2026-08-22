@@ -14,7 +14,7 @@ export class GetStatsGlobal {
   async execute(take: number = STATS_RESULT_LIMIT): Promise<StatsGlobalDTO> {
     const n = capTake(take, STATS_RESULT_LIMIT);
     const [most, leastPool] = await Promise.all([
-      this.tabRepo.findTopViewedGlobal("desc", n),
+      this.tabRepo.findTopViewedGlobal("desc", n, 1),
       this.tabRepo.findTopViewedGlobal("asc", STATS_LIST_LIMIT, 1),
     ]);
     return { most, least: pickDistinctLeast(most, leastPool, n, false) };
