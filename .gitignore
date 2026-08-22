@@ -35,7 +35,6 @@ lerna-debug.log*
 # Prisma
 apps/backend/prisma/*.db
 apps/backend/src/generated/prisma
-apps/backend/prisma/migrations/migration_lock.toml
 
 # OS files
 .DS_Store

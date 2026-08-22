@@ -10,6 +10,7 @@
     "rollup": "npm:@rollup/wasm-node@4.61.0"
   },
   "scripts": {
+    "db:up": "docker compose up db -d",
     "lint": "eslint . --ext .ts --max-warnings=0",
     "format": "prettier --write ."
   },

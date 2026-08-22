@@ -1,4 +1,20 @@
 services:
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: musictab
+      POSTGRES_PASSWORD: musictab
+      POSTGRES_DB: musictab
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U musictab -d musictab"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   backend:
     build:
       context: .
@@ -7,13 +23,15 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
-      - DATABASE_URL=file:/data/music_tab.db
+      - DATABASE_URL=postgresql://musictab:musictab@db:5432/musictab
+      - DIRECT_URL=postgresql://musictab:musictab@db:5432/musictab
       - PORT=3000
       - CORS_ORIGIN=http://localhost:5173
       - JWT_SECRET=holo
-    volumes:
-      - sqlite-data:/data
-    depends_on: []
+      - SEED_ON_BOOT=true
+    depends_on:
+      db:
+        condition: service_healthy
 
   frontend:
     build:
@@ -29,4 +47,4 @@ services:
       - backend
 
 volumes:
-  sqlite-data:
+  pg-data:
