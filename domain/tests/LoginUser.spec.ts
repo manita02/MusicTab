@@ -3,47 +3,10 @@ import { LoginUser } from "../src/use-cases/LoginUser";
 import { User, Role } from "../src/entities/User";
 import { Session } from "../src/entities/Session";
 import { DomainError } from "../src/errors/DomainError";
-import { IUserRepository } from "../src/repositories/IUserRepository";
 import { ISessionRepository } from "../src/repositories/ISessionRepository";
 import { IPasswordHasher } from "../src/services/IPasswordHasher";
 import { ITokenService } from "../src/services/ITokenService";
-
-
-/** In-memory User Repository */
-class InMemoryUserRepository implements IUserRepository {
-    private users: User[] = [];
-    async findByEmail(email: string) {
-      return this.users.find(u => u.email.toString() === email.toLowerCase()) ?? null;
-    }
-    async findById(id: number) {
-      return this.users.find(u => u.id === id) ?? null;
-    }
-    async save(user: User) {
-      const id = this.users.length + 1;
-      const rehydrated = User.rehydrate(
-        id,
-        user.username,
-        user.email.toString(),
-        user.passwordHash,
-        user.role,
-        user.createdAt,
-        user.birthDate,
-        user.urlImg.toString(),
-        user.signupIp,
-      );
-      this.users.push(rehydrated);
-      return rehydrated;
-    }
-    async deleteById(id: number) {
-      this.users = this.users.filter(u => u.id !== id);
-    }
-    async findByUsername(username: string): Promise<User | null> {
-      return this.users.find(u => u.username === username) ?? null;
-    }
-    async findBySignupIp(ip: string): Promise<User[]> {
-      return this.users.filter(u => u.signupIp === ip);
-    }
-  }
+import { InMemoryUserRepository } from "./fakes/InMemoryUserRepository";
   
   /** In-memory Session Repository */
   class InMemorySessionRepository implements ISessionRepository {

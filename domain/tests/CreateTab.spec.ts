@@ -1,52 +1,9 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { CreateTab } from "../src/use-cases/CreateTab";
 import { Role, User } from "../src/entities/User";
-import { IUserRepository } from "../src/repositories/IUserRepository";
 import { DomainError } from "../src/errors/DomainError";
 import { InMemoryTabRepository } from "./fakes/InMemoryTabRepository";
-
-class InMemoryUserRepository implements IUserRepository {
-  private users: User[] = [];
-
-  async findById(id: number) {
-    return this.users.find((u) => u.id === id) ?? null;
-  }
-
-  async save(user: User) {
-    const newId = user.id ?? this.users.length + 1;
-    const rehydrated = User.rehydrate(
-      newId,
-      user.username,
-      user.email.toString(),
-      user.passwordHash,
-      user.role,
-      user.createdAt,
-      user.birthDate,
-      user.urlImg.toString(),
-      user.signupIp,
-    );
-    const idx = this.users.findIndex((u) => u.id === newId);
-    if (idx >= 0) this.users[idx] = rehydrated;
-    else this.users.push(rehydrated);
-    return rehydrated;
-  }
-
-  async deleteById(id: number) {
-    this.users = this.users.filter((u) => u.id !== id);
-  }
-
-  async findByEmail(email: string) {
-    return this.users.find((u) => u.email.toString() === email.toLowerCase()) ?? null;
-  }
-
-  async findByUsername(username: string): Promise<User | null> {
-    return this.users.find((u) => u.username === username) ?? null;
-  }
-
-  async findBySignupIp(ip: string): Promise<User[]> {
-    return this.users.filter((u) => u.signupIp === ip);
-  }
-}
+import { InMemoryUserRepository } from "./fakes/InMemoryUserRepository";
 
 const birth = () => new Date("1995-06-01");
 const img = () => "https://example.com/avatar.png";
