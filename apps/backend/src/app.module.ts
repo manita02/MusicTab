@@ -22,6 +22,7 @@ import { CatalogController } from './controllers/catalog.controller';
 import { StatsController } from './controllers/stats.controller';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { RolesGuard } from './auth/roles.guard';
+import { TurnstileService } from './auth/turnstile.service';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { RolesGuard } from './auth/roles.guard';
     InstrumentPrismaRepository,
     PasswordHasherService,
     TokenService,
+    TurnstileService,
     JwtAuthGuard,
     RolesGuard,
     { provide: APP_GUARD, useClass: JwtAuthGuard },
