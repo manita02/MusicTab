@@ -15,7 +15,8 @@ export class Tab {
     public readonly urlImg: Url,
     public readonly createdAt: Date = new Date(),
     public readonly userName?: string,
-    public readonly viewCount: number = 0
+    public readonly viewCount: number = 0,
+    public readonly userImg?: string
   ) {}
 
   static create(
@@ -60,7 +61,8 @@ export class Tab {
     createdAt?: Date,
     userName?: string,
     artist: string = "",
-    viewCount: number = 0
+    viewCount: number = 0,
+    userImg?: string
   ): Tab {
     const pdf = Url.create(urlPdf, "PDF URL");
     const youtube = Url.create(urlYoutube, "YouTube URL");
@@ -80,7 +82,8 @@ export class Tab {
       img,
       createdAt ?? new Date(),
       userName,
-      safeViewCount
+      safeViewCount,
+      userImg
     );
   }
 
@@ -112,7 +115,8 @@ export class Tab {
       Url.create(props.urlImg ?? this.urlImg.toString(), "Image URL"),
       this.createdAt,
       this.userName,
-      this.viewCount
+      this.viewCount,
+      this.userImg
     );
   }
 }
