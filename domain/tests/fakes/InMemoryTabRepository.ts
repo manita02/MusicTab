@@ -259,12 +259,20 @@ export class InMemoryTabRepository implements ITabRepository {
 
     return ranked.slice(0, take).flatMap(([tabId, meta]) => {
       const tab = this.tabs.find((t) => t.id === tabId);
-      return tab ? [this.toHit(tab, meta.lastViewedAt)] : [];
+      if (!tab) return [];
+      return [{ ...this.toHit(tab, meta.lastViewedAt), userViewCount: meta.count }];
     });
   }
 
-  async findTopViewedGlobal(order: ViewOrder, take: number): Promise<CopilotTabHit[]> {
-    const rows = this.tabs.map((t) => this.toHit(t));
+  async findTopViewedGlobal(
+    order: ViewOrder,
+    take: number,
+    minViewCount = 0
+  ): Promise<CopilotTabHit[]> {
+    let rows = this.tabs.map((t) => this.toHit(t));
+    if (minViewCount > 0) {
+      rows = rows.filter((r) => r.viewCount >= minViewCount);
+    }
     rows.sort((a, b) =>
       order === "desc"
         ? b.viewCount - a.viewCount || b.id - a.id
@@ -276,7 +284,8 @@ export class InMemoryTabRepository implements ITabRepository {
   async findStaleViewedByUser(
     userId: number,
     staleAfterDays: number,
-    take: number
+    take: number,
+    options?: { onlyStale?: boolean }
   ): Promise<CopilotTabHit[]> {
     const lastByTab = new Map<number, Date>();
     for (const v of this.views.filter((x) => x.userId === userId)) {
@@ -288,7 +297,8 @@ export class InMemoryTabRepository implements ITabRepository {
     const cutoff = Date.now() - staleAfterDays * 24 * 60 * 60 * 1000;
     const entries = [...lastByTab.entries()];
     const stale = entries.filter(([, at]) => at.getTime() < cutoff);
-    const chosen = (stale.length > 0 ? stale : entries).sort(
+    const pool = options?.onlyStale ? stale : stale.length > 0 ? stale : entries;
+    const chosen = pool.sort(
       (a, b) => a[1].getTime() - b[1].getTime()
     );
 

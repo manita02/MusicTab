@@ -30,7 +30,7 @@ describe("Navbar component", () => {
 
     fireEvent.click(avatarButton);
     const menu = screen.getByRole("menu");
-    expect(within(menu).getByText(/Update User/i)).toBeVisible();
+    expect(within(menu).getByText(/Pepe123/i)).toBeVisible();
     expect(within(menu).getByText(/Log Out/i)).toBeVisible();
   });
 
@@ -41,7 +41,7 @@ describe("Navbar component", () => {
 
     fireEvent.click(accountButton);
     const menu = screen.getByRole("menu");
-    expect(within(menu).getByText(/Sign Up/i)).toBeVisible();
+    expect(within(menu).getByText(/Sign In/i)).toBeVisible();
     expect(within(menu).getByText(/Login/i)).toBeVisible();
   });
 
@@ -53,6 +53,7 @@ describe("Navbar component", () => {
     expect(within(mobileMenu).getByText(/HOME/i)).toBeVisible();
     // expect(within(mobileMenu).getByText(/HOW IT WORKS/i)).toBeVisible();
     expect(within(mobileMenu).getByText(/TABS/i)).toBeVisible();
+    expect(within(mobileMenu).getByText(/STATS/i)).toBeVisible();
     fireEvent.click(navButton);
   });
 });

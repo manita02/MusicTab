@@ -1,7 +1,8 @@
 import { ITabRepository } from "../repositories/ITabRepository";
 import { NotFoundError } from "../errors/DomainError";
 
-const DEDUP_WINDOW_MS = 30 * 60 * 1000;
+/** Ignore double-clicks; each intentional PDF open still counts. */
+const DEDUP_WINDOW_MS = 2 * 1000;
 
 export class RecordTabView {
   constructor(private readonly tabRepo: ITabRepository) {}

@@ -38,12 +38,12 @@ describe("RecordTabView", () => {
     expect(tab?.viewCount).toBe(1);
   });
 
-  it("does not insert nor increment within 30 minutes for the same userId+tabId", async () => {
+  it("does not insert nor increment within 2 seconds for the same userId+tabId", async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-01-01T12:00:00.000Z"));
 
     await useCase.execute(10, tabId);
-    vi.setSystemTime(new Date("2026-01-01T12:29:59.000Z"));
+    vi.setSystemTime(new Date("2026-01-01T12:00:01.999Z"));
     const second = await useCase.execute(10, tabId);
 
     expect(second.counted).toBe(false);
@@ -51,12 +51,12 @@ describe("RecordTabView", () => {
     expect(tab?.viewCount).toBe(1);
   });
 
-  it("counts again after the 30 minute window", async () => {
+  it("counts again after the 2 second window", async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-01-01T12:00:00.000Z"));
 
     await useCase.execute(10, tabId);
-    vi.setSystemTime(new Date("2026-01-01T12:30:00.000Z"));
+    vi.setSystemTime(new Date("2026-01-01T12:00:02.000Z"));
     const second = await useCase.execute(10, tabId);
 
     expect(second.counted).toBe(true);

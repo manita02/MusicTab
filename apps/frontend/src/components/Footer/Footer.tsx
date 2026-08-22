@@ -25,6 +25,9 @@ export const Footer: React.FC = () => {
         py: { xs: 0.75, md: 0.85 },
         px: { xs: 1.5, md: 2 },
         mt: "auto",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         textAlign: "center",
         backgroundColor: theme.palette.background.paper,
         color: theme.palette.text.secondary,
@@ -54,20 +57,26 @@ export const Footer: React.FC = () => {
           <Box component="img" src={forItLogo} alt="Logo For IT" sx={{ height: 28 }} />
         </Link>
 
-        <Box sx={{ textAlign: "center", flex: 1, minWidth: 0 }}>
-          <Typography variant="caption" component="p" sx={{ lineHeight: 1.3 }}>
+        <Box sx={{ textAlign: "center", flex: 1, minWidth: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Typography variant="caption" component="p" sx={{ lineHeight: 1.3, m: 0 }}>
             © {new Date().getFullYear()} <strong>MusicTab</strong>. All rights reserved.
-            {" · "}
+            {" "}
             Developed by{" "}
             <Link
               href="https://github.com/manita02"
-              underline="hover"
+              underline="none"
               target="_blank"
               rel="noopener noreferrer"
               sx={{
                 color: theme.palette.text.secondary,
-                "&:hover": { color: theme.palette.secondary.main },
-                transition: "color 0.2s ease",
+                fontWeight: 600,
+                letterSpacing: "0.01em",
+                borderBottom: `1px solid ${theme.palette.text.secondary}55`,
+                transition: "color 0.2s ease, border-color 0.2s ease",
+                "&:hover": {
+                  color: theme.palette.secondary.main,
+                  borderBottomColor: theme.palette.secondary.main,
+                },
               }}
             >
               Ana Lucia Juarez
@@ -96,6 +105,7 @@ export const Footer: React.FC = () => {
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
+          width: "100%",
           gap: 1,
         }}
       >

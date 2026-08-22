@@ -34,13 +34,16 @@ import {
   canManageTabs,
   normalizeRole,
 } from "../auth/tabPermissions";
+import { useQueryClient } from "@tanstack/react-query";
 import { api } from "../api/client";
 import { ENDPOINTS } from "../api/endpoints";
+import { STATS_GLOBAL_QUERY_KEY, STATS_ME_QUERY_KEY } from "../api/hooks/useStats";
 
 const GUEST_TABS_MESSAGE =
   "You can browse all published tabs below. Buttons for PDF download and tab editing are locked until you sign in. Sign in or create an account to unlock downloads; only admins can manage (create/edit/delete) tabs.";
 
 export const TabsPage: React.FC = () => {
+  const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const { isLoggedIn, userRole: rawRole } = useAuth();
@@ -210,6 +213,8 @@ export const TabsPage: React.FC = () => {
   const handleViewPdf = async (tabId: number, pdfUrl: string) => {
     try {
       await api.post(ENDPOINTS.tabs.view(tabId));
+      await queryClient.invalidateQueries({ queryKey: STATS_ME_QUERY_KEY });
+      await queryClient.invalidateQueries({ queryKey: STATS_GLOBAL_QUERY_KEY });
       window.open(pdfUrl, "_blank", "noopener,noreferrer");
     } catch {
       // 401 is handled by the axios interceptor (redirect to login).
@@ -337,8 +342,8 @@ export const TabsPage: React.FC = () => {
       headerName: "Title",
       flex: 1,
       minWidth: 180,
-      align: "center",
-      headerAlign: "center",
+      align: "center" as const,
+      headerAlign: "center" as const,
       renderCell: (params: any) => (
         <Box
           sx={{
@@ -354,7 +359,17 @@ export const TabsPage: React.FC = () => {
             textAlign: "center",
           }}
         >
-          <Typography fontWeight={600} noWrap sx={{ maxWidth: "100%" }}>
+          <Typography
+            fontWeight={600}
+            sx={{
+              width: "100%",
+              maxWidth: "100%",
+              lineHeight: 1.25,
+              whiteSpace: "normal",
+              overflowWrap: "anywhere",
+              wordBreak: "break-word",
+            }}
+          >
             {params.row.title}
           </Typography>
           {params.row.artist ? (
@@ -468,8 +483,8 @@ export const TabsPage: React.FC = () => {
         field: "instrument",
         headerName: "Instrument",
         width: 150,
-        align: "center",
-        headerAlign: "center",
+        align: "center" as const,
+        headerAlign: "center" as const,
         renderCell: (params: any) => (
           <Box
             sx={{
@@ -489,8 +504,8 @@ export const TabsPage: React.FC = () => {
         field: "genre",
         headerName: "Genre",
         width: 150,
-        align: "center",
-        headerAlign: "center",
+        align: "center" as const,
+        headerAlign: "center" as const,
         renderCell: (params: any) => (
           <Box
             sx={{
@@ -510,8 +525,8 @@ export const TabsPage: React.FC = () => {
         field: "user",
         headerName: "Uploaded by",
         width: 200,
-        align: "center",
-        headerAlign: "center",
+        align: "center" as const,
+        headerAlign: "center" as const,
         renderCell: (params: any) => (
           <Box
             sx={{
@@ -662,7 +677,8 @@ export const TabsPage: React.FC = () => {
               columns={columns}
               disableRowSelectionOnClick
               pageSizeOptions={[5, 10]}
-              getRowHeight={() => 220}
+              getRowHeight={() => "auto"}
+              getEstimatedRowHeight={() => 220}
               sx={{
                 border: "none",
                 minWidth: 720,
@@ -670,6 +686,14 @@ export const TabsPage: React.FC = () => {
                   backgroundColor: theme.palette.primary.main,
                   color: theme.palette.warning.contrastText,
                   fontWeight: "bold",
+                },
+                "& .MuiDataGrid-cell": {
+                  display: "flex",
+                  alignItems: "center",
+                },
+                "& .MuiDataGrid-cell[data-field=\"title\"]": {
+                  whiteSpace: "normal",
+                  py: 1,
                 },
                 "& .MuiDataGrid-row:nth-of-type(odd)": {
                   backgroundColor: theme.palette.background.default,
