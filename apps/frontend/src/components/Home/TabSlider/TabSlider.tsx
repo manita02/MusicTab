@@ -83,9 +83,13 @@ export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs, instruments }) => 
         position: "relative",
         width: "100%",
         py: { xs: 1.5, md: 2 },
-        overflow: "hidden",
+        overflow: "visible",
+        "& .slick-slider": {
+          overflow: "visible",
+        },
         "& .slick-list": {
           px: 0,
+          overflow: "hidden",
         },
         "& .slick-slide": {
           px: { xs: 0.5, sm: 0.75 },
@@ -93,7 +97,7 @@ export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs, instruments }) => 
         "& .slick-prev, & .slick-next": {
           width: { xs: 28, md: 32 },
           height: { xs: 28, md: 32 },
-          zIndex: 10,
+          zIndex: 20,
           top: "50%",
           transform: "translateY(-50%)",
           borderRadius: "50%",
@@ -103,13 +107,14 @@ export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs, instruments }) => 
           alignItems: "center",
           justifyContent: "center",
           transition: "all 0.2s ease",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
         },
         "& .slick-prev:hover, & .slick-next:hover": {
           backgroundColor: theme.palette.background.default,
           color: theme.palette.warning.main,
         },
-        "& .slick-prev": { left: { xs: 4, sm: -4 } },
-        "& .slick-next": { right: { xs: 4, sm: -4 } },
+        "& .slick-prev": { left: { xs: 8, sm: 10, md: 12 } },
+        "& .slick-next": { right: { xs: 8, sm: 10, md: 12 } },
       }}
     >
       <Slider {...settings}>
