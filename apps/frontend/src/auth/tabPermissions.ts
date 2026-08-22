@@ -13,6 +13,10 @@ export function canManageTabs(isLoggedIn: boolean, role: ViewerRole): boolean {
   return isLoggedIn && isAdmin(role);
 }
 
+export function canManageUsers(isLoggedIn: boolean, role: ViewerRole): boolean {
+  return isLoggedIn && isAdmin(role);
+}
+
 export function canViewFullTabs(isLoggedIn: boolean): boolean {
   return !!isLoggedIn;
 }
