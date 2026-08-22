@@ -57,6 +57,7 @@ import { TurnstileService } from './auth/turnstile.service';
     JwtAuthGuard,
     RolesGuard,
     { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
   ],
 })
 export class AppModule {}
