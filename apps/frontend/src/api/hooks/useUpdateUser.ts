@@ -10,6 +10,7 @@ type UpdateUserRequest = {
   password?: string;
   birthDate?: string;
   urlImg?: string;
+  role?: "ADMIN" | "USER";
 };
 
 type UpdateUserResponse = {
@@ -37,6 +38,7 @@ export const useUpdateUser = () => {
         password: data.password,
         birthDate: data.birthDate,
         urlImg: data.urlImg,
+        role: data.role,
       });
       return res.data;
     },
