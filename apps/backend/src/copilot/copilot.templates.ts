@@ -2,7 +2,7 @@ import { CopilotTabHit } from '@domain/dto/CopilotTabHit';
 import type { CopilotIntent } from './graph/copilot.schema';
 
 export const OUT_OF_SCOPE_REPLY =
-  'I can only help with the MusicTab catalog. Ask about tabs, counts, genres, instruments, artists, who uploaded them, your PDF views, or how many Copilot messages you have left. Type "what can you do" for examples.';
+  'I can only help with the MusicTab catalog. Ask about tabs, counts, genres, instruments, artists, who uploaded them, your PDF views, or how many Pua messages you have left. Type "what can you do" for examples.';
 
 export const HELP_REPLY = `I can help with the MusicTab catalog (I never invent songs). You can ask in English or Spanish; I always reply in English.
 
@@ -12,7 +12,7 @@ export const HELP_REPLY = `I can help with the MusicTab catalog (I never invent 
 • Rankings: most/least viewed, the ones you viewed most/least, most recent.
 • Your View PDF history: last one you opened, how many PDFs you opened, ones you haven't opened in a while, or never visited.
 • Tabs uploaded by a username, or the ones you uploaded.
-• How many Copilot messages you have left today.
+• How many Pua messages you have left today.
 
 I don't read the PDF, I don't give lyrics or chords, and there's no download ranking.`;
 
@@ -103,7 +103,7 @@ export function uploaderReply(username: string, total: number, hits: CopilotTabH
 
 export function quotaReply(used: number, remaining: number, limit: number): string {
   if (remaining <= 0) {
-    return `You've used all ${limit} Copilot messages for today. Your quota resets tomorrow.`;
+    return `You've used all ${limit} Pua messages for today. Your quota resets tomorrow.`;
   }
   return `Today you used ${used} of ${limit} messages. You have ${remaining} left.`;
 }

@@ -15,9 +15,9 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import SendIcon from "@mui/icons-material/Send";
-import SmartToyIcon from "@mui/icons-material/SmartToy";
 import { useNavigate } from "react-router-dom";
 import { COPILOT_UI } from "../../api/copilot.constants";
+import { PuaIcon } from "./PuaIcon";
 import { copilotErrorFromUnknown } from "../../api/copilotErrors";
 import type {
   CopilotHistoryMessage,
@@ -143,12 +143,11 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
   return (
     <>
       <Tooltip
-        title={isLoggedIn ? "Copilot" : "Sign in to use Copilot"}
+        title={isLoggedIn ? COPILOT_UI.BRAND_NAME : `Sign in to use ${COPILOT_UI.BRAND_NAME}`}
         arrow
       >
         <Fab
-          color="secondary"
-          aria-label="Open Copilot"
+          aria-label={`Open ${COPILOT_UI.BRAND_NAME}`}
           data-testid="copilot-fab"
           onClick={handleOpen}
           size={isMobile ? "medium" : "large"}
@@ -163,9 +162,21 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
             zIndex: 11,
             width: { xs: 48, md: 56 },
             height: { xs: 48, md: 56 },
+            minHeight: { xs: 48, md: 56 },
+            p: 0,
+            overflow: "visible",
+            bgcolor: "#D96B0A",
+            border: "3px solid #FF9100",
+            boxShadow: "0 0 10px 2px rgba(255,145,0,0.8)",
+            transition: "box-shadow 0.3s ease, transform 0.2s ease, background-color 0.2s ease",
+            "&:hover": {
+              bgcolor: "#E07812",
+              boxShadow: "0 0 14px 3px rgba(255,145,0,1)",
+              transform: "scale(1.06)",
+            },
           }}
         >
-          <SmartToyIcon />
+          <PuaIcon size={isMobile ? 30 : 36} />
         </Fab>
       </Tooltip>
 
@@ -200,10 +211,10 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
             flexShrink: 0,
           }}
         >
-          <SmartToyIcon color="secondary" />
+          <PuaIcon size={32} />
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Typography variant="h6" component="h2" fontWeight={700}>
-              Copilot
+              {COPILOT_UI.BRAND_NAME}
             </Typography>
             {isLoggedIn && (
               <Typography variant="caption" color="text.secondary">
@@ -211,7 +222,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
               </Typography>
             )}
           </Box>
-          <IconButton aria-label="Close Copilot" onClick={handleClose}>
+          <IconButton aria-label={`Close ${COPILOT_UI.BRAND_NAME}`} onClick={handleClose}>
             <CloseIcon />
           </IconButton>
         </Box>
@@ -241,7 +252,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
                 />
               }
             >
-              Sign in to chat with Copilot and search the catalog.
+              Sign in to chat with {COPILOT_UI.BRAND_NAME} and search the catalog.
             </Alert>
           )}
 
@@ -341,7 +352,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
             }}
             inputProps={{
               maxLength: COPILOT_UI.MAX_INPUT_CHARS,
-              "aria-label": "Message for Copilot",
+              "aria-label": `Message for ${COPILOT_UI.BRAND_NAME}`,
             }}
             placeholder={
               isLoggedIn
@@ -358,7 +369,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
               disabled={sendDisabled}
               onClick={handleSend}
               startIcon={<SendIcon />}
-              aria-label="Send message to Copilot"
+              aria-label={`Send message to ${COPILOT_UI.BRAND_NAME}`}
             />
           </Box>
         </Box>

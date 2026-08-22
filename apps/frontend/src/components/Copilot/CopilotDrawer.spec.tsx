@@ -43,9 +43,9 @@ describe("CopilotDrawer", () => {
     await user.click(screen.getByTestId("copilot-fab"));
 
     expect(
-      await screen.findByText(/Sign in to chat with Copilot/i),
+      await screen.findByText(/Sign in to chat with Pua/i),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText("Message for Copilot")).toBeDisabled();
+    expect(screen.getByLabelText("Message for Pua")).toBeDisabled();
     expect(screen.getByRole("button", { name: /Send/i })).toBeDisabled();
     expect(api.get).not.toHaveBeenCalled();
     expect(api.post).not.toHaveBeenCalled();
@@ -83,7 +83,7 @@ describe("CopilotDrawer", () => {
       expect(api.get).toHaveBeenCalledWith("/copilot/quota");
     });
 
-    await user.type(screen.getByLabelText("Message for Copilot"), "Milo J");
+    await user.type(screen.getByLabelText("Message for Pua"), "Milo J");
     await user.click(screen.getByRole("button", { name: /Send/i }));
 
     expect(await screen.findByText("I found these tabs by Milo J.")).toBeInTheDocument();
