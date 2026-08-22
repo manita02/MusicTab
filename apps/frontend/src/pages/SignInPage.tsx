@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { Box, Typography, Tooltip, useTheme, TextField } from "@mui/material";
+import { Box, Typography, Tooltip, useTheme, TextField, Grid, Avatar } from "@mui/material";
 import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
 import { InputField } from "../components/InputField/InputField";
 import { Button } from "../components/Button/Button";
@@ -93,16 +93,16 @@ export const SignInPage: React.FC = () => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          py: { xs: 4, sm: 6 },
+          py: { xs: 2, sm: 3, md: 4 },
           width: "100%",
         }}
       >
         <Box
           sx={{
-            width: { xs: "100%", sm: 360 },
+            width: { xs: "100%", sm: 400, md: 680 },
             display: "flex",
             flexDirection: "column",
-            gap: { xs: 2, sm: 3 },
+            gap: { xs: 1.5, sm: 2 },
             textAlign: "center",
             px: 2,
           }}
@@ -121,48 +121,65 @@ export const SignInPage: React.FC = () => {
           </Typography>
 
           <Box component="form" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <InputField
-              label="Username *"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Choose a username"
-            />
-            <TextField
-              label="Date of birth *"
-              type="date"
-              value={birthDate}
-              onChange={(e) => setBirthDate(e.target.value)}
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-              sx={{ borderRadius: "12px" }}
-            />
-            <InputField
-              label="Email *"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              type="email"
-              placeholder="example@gmail.com"
-            />
-            <InputField
-              label="Password *"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              type="password"
-              placeholder="********"
-            />
-            <InputField
-              label="Profile Image URL"
-              value={profileUrl}
-              onChange={(e) => setProfileUrl(e.target.value)}
-              placeholder="https://example.com/avatar.jpg"
-            />
+            {profileUrl ? (
+              <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <Avatar src={profileUrl} alt="Profile preview" sx={{ width: 72, height: 72 }} />
+              </Box>
+            ) : null}
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <InputField
+                  label="Username *"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Choose a username"
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <TextField
+                  label="Date of birth *"
+                  type="date"
+                  value={birthDate}
+                  onChange={(e) => setBirthDate(e.target.value)}
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  sx={{ borderRadius: "12px" }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <InputField
+                  label="Email *"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  type="email"
+                  placeholder="example@gmail.com"
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <InputField
+                  label="Password *"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  type="password"
+                  placeholder="********"
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <InputField
+                  label="Profile Image URL"
+                  value={profileUrl}
+                  onChange={(e) => setProfileUrl(e.target.value)}
+                  placeholder="https://example.com/avatar.jpg"
+                />
+              </Grid>
+            </Grid>
 
             <Button
               label={isPending ? "Signing in..." : "Sign In"}
               onClick={handleSignIn}
               disabled={isPending}
               variantType="primary"
-              sx={{ width: "100%", mt: 1 }}
+              sx={{ width: { xs: "100%", md: "auto" }, alignSelf: { md: "center" }, minWidth: { md: 220 }, mt: 1 }}
             />
           </Box>
         </Box>

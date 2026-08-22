@@ -10,6 +10,8 @@ import {
   TextField,
   Tooltip,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import SendIcon from "@mui/icons-material/Send";
@@ -36,6 +38,8 @@ type ChatBubble = CopilotHistoryMessage & {
 
 export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState("");
   const [messages, setMessages] = useState<ChatBubble[]>([]);
@@ -147,11 +151,18 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
           aria-label="Open Copilot"
           data-testid="copilot-fab"
           onClick={handleOpen}
+          size={isMobile ? "medium" : "large"}
           sx={{
             position: "fixed",
-            right: { xs: 16, md: 24 },
-            bottom: { xs: 148, md: 112 },
+            right: { xs: 12, md: 20 },
+            bottom: {
+              xs: "calc(64px + env(safe-area-inset-bottom, 0px))",
+              sm: 60,
+              md: 56,
+            },
             zIndex: 11,
+            width: { xs: 48, md: 56 },
+            height: { xs: 48, md: 56 },
           }}
         >
           <SmartToyIcon />
@@ -159,28 +170,34 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
       </Tooltip>
 
       <Drawer
-        anchor="right"
+        anchor={isMobile ? "bottom" : "right"}
         open={open}
         onClose={handleClose}
         data-testid="copilot-drawer"
         PaperProps={{
           sx: {
-            width: { xs: "100%", sm: 400 },
+            width: { xs: "100%", sm: 380, md: 420 },
+            height: { xs: "min(88dvh, 100%)", sm: "100dvh" },
+            maxHeight: "100dvh",
             display: "flex",
             flexDirection: "column",
             bgcolor: "background.paper",
+            overflow: "hidden",
+            borderTopLeftRadius: { xs: 16, sm: 0 },
+            borderTopRightRadius: { xs: 16, sm: 0 },
           },
         }}
       >
         <Box
           sx={{
             px: 2,
-            py: 1.5,
+            py: { xs: 1, sm: 1.5 },
             display: "flex",
             alignItems: "center",
             gap: 1,
             borderBottom: "1px solid",
             borderColor: "divider",
+            flexShrink: 0,
           }}
         >
           <SmartToyIcon color="secondary" />
@@ -203,6 +220,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
           ref={listRef}
           sx={{
             flex: 1,
+            minHeight: 0,
             overflowY: "auto",
             px: 2,
             py: 2,
@@ -293,7 +311,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
           )}
         </Box>
 
-        <Box sx={{ px: 2, pb: 2, pt: 1, borderTop: "1px solid", borderColor: "divider" }}>
+        <Box sx={{ px: { xs: 1.5, sm: 2 }, pb: { xs: 1.5, sm: 2 }, pt: 1, borderTop: "1px solid", borderColor: "divider", flexShrink: 0 }}>
           {errorMessage && (
             <Alert
               severity="error"
@@ -311,7 +329,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
           <TextField
             fullWidth
             multiline
-            maxRows={4}
+            maxRows={isMobile ? 3 : 4}
             value={draft}
             disabled={!isLoggedIn || chat.isPending || atDailyLimit}
             onChange={(e) => setDraft(e.target.value)}

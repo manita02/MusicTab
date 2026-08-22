@@ -36,8 +36,8 @@ export const LoginPage: React.FC = () => {
   const isSuccess = loginMutation.status === "success";
 
   return (
-    <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 4, width: "100%" }}>
-      <Box sx={{ width: { xs: "100%", sm: 360 }, display: "flex", flexDirection: "column", gap: 2, textAlign: "center", px: 2 }}>
+    <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: { xs: 2, md: 3 }, width: "100%" }}>
+      <Box sx={{ width: { xs: "100%", sm: 400 }, display: "flex", flexDirection: "column", gap: 2, textAlign: "center", px: { xs: 0, sm: 2 } }}>
         <Tooltip title="MusicTab" arrow>
           <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
             <LibraryMusicIcon sx={{ color: theme.palette.primary.main, fontSize: 36, mr: 1 }} />

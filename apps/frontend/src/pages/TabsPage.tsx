@@ -14,6 +14,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import { UserAvatar } from "../components/UserAvatar/UserAvatar";
 
 import { theme } from "../theme/theme";
 import { Button } from "../components/Button/Button";
@@ -239,6 +240,7 @@ export const TabsPage: React.FC = () => {
       instrument: getInstrumentName(tab.instrumentId),
       genre: getGenreName(tab.genreId),
       user: tab.userName || "-",
+      userImg: tab.userImg || "",
       userId: tab.userId,
       createdAt: tab.createdAt,
     })) || [];
@@ -335,18 +337,28 @@ export const TabsPage: React.FC = () => {
       headerName: "Title",
       flex: 1,
       minWidth: 180,
+      align: "center",
+      headerAlign: "center",
       renderCell: (params: any) => (
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
-            gap: 0.5,
             alignItems: "center",
+            justifyContent: "center",
+            gap: 0.5,
+            width: "100%",
+            minWidth: 0,
+            height: "100%",
+            py: 0.5,
+            textAlign: "center",
           }}
         >
-          <Typography fontWeight={600}>{params.row.title}</Typography>
+          <Typography fontWeight={600} noWrap sx={{ maxWidth: "100%" }}>
+            {params.row.title}
+          </Typography>
           {params.row.artist ? (
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" color="text.secondary" noWrap sx={{ maxWidth: "100%" }}>
               {params.row.artist}
             </Typography>
           ) : null}
@@ -356,11 +368,13 @@ export const TabsPage: React.FC = () => {
               src={params.row.imageUrl}
               alt="Preview"
               sx={{
-                width: 160,
-                height: 170,
+                width: 96,
+                aspectRatio: "3 / 4",
                 objectFit: "cover",
+                objectPosition: "center",
                 borderRadius: 1,
                 border: `1px solid ${theme.palette.divider}`,
+                flexShrink: 0,
               }}
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
@@ -370,15 +384,18 @@ export const TabsPage: React.FC = () => {
           ) : (
             <Box
               sx={{
-                width: 160,
-                height: 170,
+                width: 96,
+                aspectRatio: "3 / 4",
                 backgroundColor: "rgba(0,0,0,0.3)",
                 borderRadius: 1,
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                fontSize: 12,
+                fontSize: 11,
                 color: "#fff",
+                flexShrink: 0,
+                textAlign: "center",
+                px: 0.5,
               }}
             >
               No Image
@@ -391,7 +408,7 @@ export const TabsPage: React.FC = () => {
   const videoCol = {
       field: "youtubeUrl",
       headerName: "Video",
-      width: 360,
+      width: 280,
       sortable: false,
       filterable: false,
       renderCell: (params: any) => {
@@ -404,7 +421,7 @@ export const TabsPage: React.FC = () => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              p: 2,
+              p: 1,
             }}
           >
             {embedUrl ? (
@@ -415,8 +432,10 @@ export const TabsPage: React.FC = () => {
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 sx={{
-                  width: 347,
-                  height: 195,
+                  width: "100%",
+                  maxWidth: 248,
+                  aspectRatio: "16 / 9",
+                  height: "auto",
                   borderRadius: 1,
                   border: `1px solid ${theme.palette.divider}`,
                 }}
@@ -424,8 +443,9 @@ export const TabsPage: React.FC = () => {
             ) : (
               <Box
                 sx={{
-                  width: 347,
-                  height: 195,
+                  width: "100%",
+                  maxWidth: 248,
+                  aspectRatio: "16 / 9",
                   backgroundColor: "rgba(0,0,0,0.3)",
                   borderRadius: 1,
                   display: "flex",
@@ -444,32 +464,81 @@ export const TabsPage: React.FC = () => {
   };
 
   const metaCols = [
-      { field: "instrument", headerName: "Instrument", width: 150 },
-      { field: "genre", headerName: "Genre", width: 150 },
+      {
+        field: "instrument",
+        headerName: "Instrument",
+        width: 150,
+        align: "center",
+        headerAlign: "center",
+        renderCell: (params: any) => (
+          <Box
+            sx={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+            }}
+          >
+            {params.value}
+          </Box>
+        ),
+      },
+      {
+        field: "genre",
+        headerName: "Genre",
+        width: 150,
+        align: "center",
+        headerAlign: "center",
+        renderCell: (params: any) => (
+          <Box
+            sx={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+            }}
+          >
+            {params.value}
+          </Box>
+        ),
+      },
       {
         field: "user",
         headerName: "Uploaded by",
-        width: 150,
+        width: 200,
+        align: "center",
+        headerAlign: "center",
         renderCell: (params: any) => (
           <Box
             sx={{
               display: "flex",
-              flexDirection: "column",
+              flexDirection: "row",
               justifyContent: "center",
-              alignItems: "flex-start",
-              gap: 0.5,
+              alignItems: "center",
+              gap: 1,
               height: "100%",
+              width: "100%",
+              minWidth: 0,
             }}
           >
-            <Typography fontWeight={600}>{params.row.user}</Typography>
-            {params.row.createdAt && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                <CalendarTodayIcon sx={{ fontSize: 14, color: "text.secondary" }} />
-                <Typography variant="caption" color="text.secondary">
-                  {new Date(params.row.createdAt).toLocaleDateString()}
-                </Typography>
-              </Box>
-            )}
+            <UserAvatar name={params.row.user} src={params.row.userImg} size={36} />
+            <Box sx={{ minWidth: 0, textAlign: "left" }}>
+              <Typography fontWeight={600} noWrap>
+                {params.row.user}
+              </Typography>
+              {params.row.createdAt && (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                  <CalendarTodayIcon sx={{ fontSize: 14, color: "text.secondary" }} />
+                  <Typography variant="caption" color="text.secondary">
+                    {new Date(params.row.createdAt).toLocaleDateString()}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
           </Box>
         ),
       },
@@ -478,7 +547,7 @@ export const TabsPage: React.FC = () => {
   const columns = [actionsCol, titleCol, videoCol, ...metaCols];
 
   return (
-    <Box sx={{ position: "relative", backgroundColor: "transparent", py: 2 }}>
+    <Box sx={{ position: "relative", backgroundColor: "transparent", py: { xs: 1, md: 1.5 } }}>
       <IconLoader active={pageLoading || isLoading} />
       {isError && (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
@@ -498,8 +567,9 @@ export const TabsPage: React.FC = () => {
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               textShadow: "2px 2px 6px rgba(0, 0, 0, 0.15)",
+              fontSize: { xs: "1.5rem", md: "1.85rem" },
               letterSpacing: "0.5px",
-              mb: 2,
+              mb: 1.5,
             }}
           >
             Tabs
@@ -512,8 +582,8 @@ export const TabsPage: React.FC = () => {
             justifyContent={{ xs: "center", md: "space-between" }}
             textAlign={{ xs: "center", md: "left" }}
             sx={{
-              mb: 4,
-              p: 2,
+              mb: 2,
+              p: { xs: 1.5, md: 2 },
               borderRadius: 2,
               backgroundColor: "rgba(245,241,220,0.6)",
               boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
@@ -578,11 +648,13 @@ export const TabsPage: React.FC = () => {
 
           <Box
             sx={{
-              height: 500,
+              height: { xs: 420, md: "min(520px, calc(100dvh - 260px))" },
+              minHeight: 360,
               backgroundColor: "white",
               borderRadius: 2,
               boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-              overflow: "hidden",
+              overflow: "auto",
+              width: "100%",
             }}
           >
             <DataGrid
@@ -593,6 +665,7 @@ export const TabsPage: React.FC = () => {
               getRowHeight={() => 220}
               sx={{
                 border: "none",
+                minWidth: 720,
                 "& .MuiDataGrid-columnHeaders": {
                   backgroundColor: theme.palette.primary.main,
                   color: theme.palette.warning.contrastText,

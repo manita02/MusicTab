@@ -26,7 +26,7 @@ export const AboutSection: React.FC = () => {
   };
 
   return (
-    <Box textAlign="center" sx={{ mt: 2, mb: 4, px: 3 }}>
+    <Box textAlign="center" sx={{ mt: { xs: 1, md: 1.5 }, mb: { xs: 1, md: 2 }, px: { xs: 1, md: 2 } }}>
       <Typography
         variant="h5"
         fontWeight={700}
@@ -36,8 +36,9 @@ export const AboutSection: React.FC = () => {
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
           textShadow: "2px 2px 6px rgba(0, 0, 0, 0.15)",
+          fontSize: { xs: "1.15rem", md: "1.35rem" },
           letterSpacing: "0.5px",
-          mb: 2,
+          mb: 1,
         }}
       >
         About MusicTab
@@ -46,13 +47,13 @@ export const AboutSection: React.FC = () => {
       <Typography
         variant="body1"
         color="text.secondary"
-        sx={{ maxWidth: 600, mx: "auto", mb: 3, textAlign: "justify" }}
+        sx={{ maxWidth: 640, mx: "auto", mb: 2, textAlign: { xs: "left", sm: "justify" }, fontSize: { xs: "0.9rem", md: "1rem" } }}
       >
         MusicTab is a platform created for sharing and discovering song tabs.
         Explore other users' tabs or upload your own to help the community.
       </Typography>
 
-      <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", gap: 1.5, flexWrap: "wrap" }}>
         <Button label="View Tabs" variantType="primary" onClick={() => navigate("/tabs")} />
 
         <Tooltip title={canManage ? "" : "Only administrators can create tabs"} arrow>

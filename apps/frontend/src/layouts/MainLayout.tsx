@@ -19,7 +19,7 @@ export const MainLayout: React.FC = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        minHeight: "100vh",
+        minHeight: "100dvh",
         position: "relative",
       }}
     >
@@ -86,27 +86,29 @@ export const MainLayout: React.FC = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyContent: "center",
+          justifyContent: "flex-start",
           overflowY: "auto",
+          overflowX: "hidden",
           scrollbarGutter: "stable",
-          minHeight: "100vh",
-          pt: { xs: 10, md: 12 },
-          pb: { xs: 18, sm: 14, md: 12 },
+          minHeight: "100dvh",
+          pt: { xs: 8, sm: 8.5, md: 9 },
+          pb: { xs: 8, sm: 7.5, md: 7 },
         }}
       >
         <Container
           component="main"
+          maxWidth="lg"
           sx={{
-            p: { xs: 2, md: 3 },
-            mb: 4,
+            p: { xs: 1.5, sm: 2, md: 2.5 },
+            mb: { xs: 1, md: 1.5 },
             backgroundColor: "rgba(245, 241, 220, 0.75)",
-            borderRadius: 3,
+            borderRadius: { xs: 2, md: 3 },
             boxShadow: "0 8px 30px rgba(0,0,0,0.25)",
             display: "flex",
             flexDirection: "column",
-            maxWidth: "md",
             width: "100%",
             alignSelf: "center",
+            minWidth: 0,
           }}
         >
           <Outlet />

@@ -27,12 +27,13 @@ export const HomePage: React.FC = () => {
         image: tab.urlImg || "https://via.placeholder.com/400x225?text=No+Image",
         date: tab.createdAt,
         user: tab.userName || `User #${tab.userId}`,
+        userImg: tab.userImg,
         instrumentId: tab.instrumentId,
       }))
     : [];
 
   return (
-    <Box sx={{ backgroundColor: "transparent", mt: 3, position: "relative" }}>
+    <Box sx={{ backgroundColor: "transparent", mt: { xs: 0.5, md: 1 }, position: "relative" }}>
       <IconLoader active={pageLoading || isLoading} />
 
       {error ? (
@@ -42,15 +43,16 @@ export const HomePage: React.FC = () => {
       ) : (
         <>
           <Typography
-            variant="h4"
+            variant="h5"
             textAlign="center"
             fontWeight={700}
             sx={{
               position: "relative",
-              display: "inline-block",
+              display: "block",
               mx: "auto",
-              px: 3,
-              pb: 1,
+              px: { xs: 1, md: 3 },
+              pb: 0.75,
+              fontSize: { xs: "1.35rem", md: "1.6rem" },
               color: (theme) => theme.palette.text.primary,
               "&::after": {
                 content: '""',
@@ -58,7 +60,7 @@ export const HomePage: React.FC = () => {
                 bottom: 0,
                 left: "50%",
                 transform: "translateX(-50%)",
-                width: "60%",
+                width: "40%",
                 height: "3px",
                 borderRadius: "2px",
                 background: (theme) =>
