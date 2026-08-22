@@ -40,4 +40,17 @@ describe("InputField", () => {
     const buttons = screen.queryAllByRole("button");
     expect(buttons.length).toBe(0);
   });
+
+  it("forwards paste and drop handlers", () => {
+    const onPaste = vi.fn((e: { preventDefault: () => void }) => e.preventDefault());
+    const onDrop = vi.fn((e: { preventDefault: () => void }) => e.preventDefault());
+    render(
+      <InputField label="Email" value="" onChange={() => {}} onPaste={onPaste} onDrop={onDrop} />,
+    );
+    const input = screen.getByLabelText("Email");
+    fireEvent.paste(input, { clipboardData: { getData: () => "copied@gmail.com" } });
+    fireEvent.drop(input);
+    expect(onPaste).toHaveBeenCalled();
+    expect(onDrop).toHaveBeenCalled();
+  });
 });

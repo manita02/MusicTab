@@ -28,7 +28,8 @@ class InMemoryUserRepository implements IUserRepository {
         user.role,
         user.createdAt,
         user.birthDate,
-        user.urlImg.toString()
+        user.urlImg.toString(),
+        user.signupIp,
       );
       this.users.push(rehydrated);
       return rehydrated;
@@ -38,7 +39,10 @@ class InMemoryUserRepository implements IUserRepository {
     }
     async findByUsername(username: string): Promise<User | null> {
       return this.users.find(u => u.username === username) ?? null;
-    }    
+    }
+    async findBySignupIp(ip: string): Promise<User[]> {
+      return this.users.filter(u => u.signupIp === ip);
+    }
   }
   
   /** In-memory Session Repository */

@@ -118,7 +118,7 @@ The seed is **idempotent**. It creates a default **ADMIN** (registration always 
 | Field | Value |
 |--------|--------|
 | Username | `admin` |
-| Email (login) | `admin@admin.com` |
+| Email (login) | `admin@gmail.com` |
 | Password | `admin` |
 
 | Catalog | Values |

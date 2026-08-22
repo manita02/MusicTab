@@ -23,6 +23,7 @@ class InMemoryUserRepository implements IUserRepository {
       user.createdAt,
       user.birthDate,
       user.urlImg.toString(),
+      user.signupIp,
     );
     const idx = this.users.findIndex((u) => u.id === newId);
     if (idx >= 0) this.users[idx] = rehydrated;
@@ -41,6 +42,10 @@ class InMemoryUserRepository implements IUserRepository {
   async findByUsername(username: string): Promise<User | null> {
     return this.users.find((u) => u.username === username) ?? null;
   }
+
+  async findBySignupIp(ip: string): Promise<User[]> {
+    return this.users.filter((u) => u.signupIp === ip);
+  }
 }
 
 const birth = () => new Date("1995-06-01");
@@ -55,8 +60,8 @@ describe("CreateTab use case", () => {
     tabRepo = new InMemoryTabRepository();
     userRepo = new InMemoryUserRepository();
     useCase = new CreateTab(tabRepo, userRepo);
-    await userRepo.save(User.create("user", "user@u.com", "hash", Role.USER, birth(), img()));
-    await userRepo.save(User.create("admin", "admin@a.com", "hash", Role.ADMIN, birth(), img()));
+    await userRepo.save(User.create("user", "user@gmail.com", "hash", Role.USER, birth(), img()));
+    await userRepo.save(User.create("admin", "admin@gmail.com", "hash", Role.ADMIN, birth(), img()));
   });
 
   const payload = {
@@ -70,7 +75,7 @@ describe("CreateTab use case", () => {
   };
 
   it("rejects creation for normal users", async () => {
-    const user = (await userRepo.findByEmail("user@u.com"))!;
+    const user = (await userRepo.findByEmail("user@gmail.com"))!;
     await expect(
       useCase.execute({
         ...payload,
@@ -80,7 +85,7 @@ describe("CreateTab use case", () => {
   });
 
   it("allows admin to create tabs", async () => {
-    const admin = (await userRepo.findByEmail("admin@a.com"))!;
+    const admin = (await userRepo.findByEmail("admin@gmail.com"))!;
     const tab = await useCase.execute({
       ...payload,
       userId: admin.id!,
@@ -91,7 +96,7 @@ describe("CreateTab use case", () => {
   });
 
   it("rejects empty artist on new tabs", async () => {
-    const admin = (await userRepo.findByEmail("admin@a.com"))!;
+    const admin = (await userRepo.findByEmail("admin@gmail.com"))!;
     await expect(
       useCase.execute({
         ...payload,

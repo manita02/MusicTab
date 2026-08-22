@@ -16,16 +16,26 @@ export class User {
     public readonly role: Role,
     public readonly createdAt: Date,
     public readonly birthDate: Date,
-    public readonly urlImg: Url
+    public readonly urlImg: Url,
+    public readonly signupIp: string | null,
   ) {}
 
-  static create(username: string, emailStr: string, passwordHash: string, role: Role = Role.USER, birthDate: Date, urlImg: string): User {
+  static create(
+    username: string,
+    emailStr: string,
+    passwordHash: string,
+    role: Role = Role.USER,
+    birthDate: Date,
+    urlImg: string,
+    signupIp: string | null = null,
+  ): User {
     if (username.length < 3) {
       throw new DomainError("Username must have at least 3 characters");
     }
     const email = Email.create(emailStr);
     const img = Url.create(urlImg, "Profile Image URL");
-    return new User(null, username, email, passwordHash, role, new Date(), birthDate, img);
+    const ip = signupIp?.trim() ? signupIp.trim() : null;
+    return new User(null, username, email, passwordHash, role, new Date(), birthDate, img, ip);
   }
 
   static rehydrate(
@@ -36,11 +46,13 @@ export class User {
     role: Role,
     createdAt: Date,
     birthDate: Date,
-    urlImg: string
+    urlImg: string,
+    signupIp: string | null = null,
   ): User {
     const email = Email.create(emailStr);
     const img = Url.create(urlImg, "Profile Image URL");
-    return new User(id, username, email, passwordHash, role, createdAt, birthDate, img);
+    const ip = signupIp?.trim() ? signupIp.trim() : null;
+    return new User(id, username, email, passwordHash, role, createdAt, birthDate, img, ip);
   }
 
   isAdmin() {

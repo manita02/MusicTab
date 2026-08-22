@@ -16,10 +16,13 @@ model User {
   createdAt     DateTime            @default(now())
   birthDate     DateTime
   urlImg        String
+  signupIp      String?
   sessions      Session[]
   tablaturas    Tab[]
   tabViews      TabView[]
   copilotUsage  CopilotDailyUsage[]
+
+  @@index([signupIp])
 }
 
 model Genre {
