@@ -19,6 +19,7 @@ import { AppService } from './app.service';
 import { GenrePrismaRepository } from './repositories/genre-prisma.repository';
 import { InstrumentPrismaRepository } from './repositories/instrument-prisma.repository';
 import { CatalogController } from './controllers/catalog.controller';
+import { StatsController } from './controllers/stats.controller';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { RolesGuard } from './auth/roles.guard';
 
@@ -39,7 +40,8 @@ import { RolesGuard } from './auth/roles.guard';
     AppController,
     UserController,
     TabController,
-    CatalogController
+    CatalogController,
+    StatsController,
   ],
   providers: [
     AppService,
