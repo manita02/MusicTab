@@ -74,6 +74,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     <AppBar position="static" color="primary" sx={{ backgroundColor: theme.palette.primary.main, boxShadow: "none", px: { xs: 1, md: 2 } }}>
       <Toolbar
         sx={{
+          position: "relative",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
@@ -106,8 +107,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             disableScrollLock
           >
             {pages.map(({ label, path }) => (
-              <MenuItem key={label} onClick={() => handleNavClick(path)}>
-                <Typography textAlign="center">{label}</Typography>
+              <MenuItem key={label} onClick={() => handleNavClick(path)} sx={{ justifyContent: "center" }}>
+                <Typography sx={{ width: "100%", textAlign: "center" }}>{label}</Typography>
               </MenuItem>
             ))}
           </Menu>
@@ -143,7 +144,15 @@ export const Navbar: React.FC<NavbarProps> = ({
         </Tooltip>
 
         {/* Desktop Menu */}
-        <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" }, justifyContent: "center" }}>
+        <Box
+          sx={{
+            display: { xs: "none", md: "flex" },
+            justifyContent: "center",
+            position: "absolute",
+            left: "50%",
+            transform: "translateX(-50%)",
+          }}
+        >
           {pages.map(({ label, path }) => (
             <Button
               key={label}
@@ -289,8 +298,12 @@ export const Navbar: React.FC<NavbarProps> = ({
               </Tooltip>
             )}
             {menuItems.map(({ label, action }) => (
-              <MenuItem key={label} onClick={() => { handleCloseUserMenu(); action?.(); }}>
-                <Typography textAlign="center">{label}</Typography>
+              <MenuItem
+                key={label}
+                onClick={() => { handleCloseUserMenu(); action?.(); }}
+                sx={{ justifyContent: "center" }}
+              >
+                <Typography sx={{ width: "100%", textAlign: "center" }}>{label}</Typography>
               </MenuItem>
             ))}
           </Menu>
