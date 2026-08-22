@@ -2206,6 +2206,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@marsidev/react-turnstile@npm:^1.6.0":
+  version: 1.6.0
+  resolution: "@marsidev/react-turnstile@npm:1.6.0"
+  peerDependencies:
+    react: ^17.0.2 || ^18.0.0 || ^19.0
+    react-dom: ^17.0.2 || ^18.0.0 || ^19.0
+  checksum: 10c0/2d9c9f337d723ae13feff7d5e6c707ef03ab83a600853305c5ea4bc175ec1fd441f2a61342285b54014ed4afc6a16a06b2e109095d0369f2160653599c644363
+  languageName: node
+  linkType: hard
+
 "@mui/core-downloads-tracker@npm:^7.3.11":
   version: 7.3.11
   resolution: "@mui/core-downloads-tracker@npm:7.3.11"
@@ -7358,6 +7368,7 @@ __metadata:
     "@emotion/styled": "npm:^11.14.1"
     "@eslint/js": "npm:^9.36.0"
     "@fortawesome/fontawesome-free": "npm:^7.1.0"
+    "@marsidev/react-turnstile": "npm:^1.6.0"
     "@mui/icons-material": "npm:^7.3.4"
     "@mui/material": "npm:^7.3.4"
     "@mui/x-data-grid": "npm:^8.16.0"
