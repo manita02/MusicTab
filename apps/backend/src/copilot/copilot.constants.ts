@@ -4,10 +4,10 @@ export const COPILOT = {
   HISTORY_MESSAGES: 4,
   RESULT_LIMIT: 3, // top N de TODAS las consultas del bot
   MAX_INPUT_CHARS: 100,
-  DAILY_MESSAGE_LIMIT: 5, // por usuario, calendario AR
+  DAILY_MESSAGE_LIMIT: 10, // 10 msgs/usuario/día AR + 60s entre mensajes exitosos
   MAX_TOOL_ROUNDS: 1,
   GEMINI_TIMEOUT_MS: 25_000,
-  SEND_COOLDOWN_MS: 2_500, // UI: pausa entre envíos (RPM de Google ~10–15/min)
+  SEND_COOLDOWN_MS: 60_000, // server-enforced pause between successful sends
   STALE_AFTER_DAYS: 7, // “hace rato no visito”
 } as const;
 

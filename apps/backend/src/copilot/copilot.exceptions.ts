@@ -4,8 +4,13 @@ import { COPILOT } from './copilot.constants';
 export class CopilotHttpException extends HttpException {
   readonly copilotCode: string;
 
-  constructor(status: number, code: string, message: string) {
-    super({ statusCode: status, code, message }, status);
+  constructor(
+    status: number,
+    code: string,
+    message: string,
+    extra: Record<string, unknown> = {},
+  ) {
+    super({ statusCode: status, code, message, ...extra }, status);
     this.copilotCode = code;
   }
 }
@@ -22,7 +27,17 @@ export function copilotDailyLimit(): CopilotHttpException {
   return new CopilotHttpException(
     HttpStatus.TOO_MANY_REQUESTS,
     'COPILOT_DAILY_LIMIT',
-    "You've reached the 5-message limit for today",
+    `You've reached the ${COPILOT.DAILY_MESSAGE_LIMIT}-message limit for today`,
+  );
+}
+
+export function copilotCooldown(remainingMs: number): CopilotHttpException {
+  const seconds = Math.max(1, Math.ceil(remainingMs / 1000));
+  return new CopilotHttpException(
+    HttpStatus.TOO_MANY_REQUESTS,
+    'COPILOT_COOLDOWN',
+    `Please wait ${seconds} seconds before sending another message to Pua`,
+    { retryAfterMs: remainingMs },
   );
 }
 
