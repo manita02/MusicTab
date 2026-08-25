@@ -7,7 +7,7 @@ import { useLatestTabs, type TabPreview } from "../api/hooks/useLatestTabs";
 import { useInstruments } from "../api/hooks/useCatalog";
 
 export const HomePage: React.FC = () => {
-  const { data: tabsData, isLoading, error } = useLatestTabs(8);
+  const { data: tabsData, isLoading, isFetching, error } = useLatestTabs(8);
   const [pageLoading, setPageLoading] = useState(true);
   const { data: instruments = [] } = useInstruments();
 
@@ -34,7 +34,7 @@ export const HomePage: React.FC = () => {
 
   return (
     <Box sx={{ backgroundColor: "transparent", mt: { xs: 0.5, md: 1 }, position: "relative" }}>
-      <IconLoader active={pageLoading || isLoading} />
+      <IconLoader active={pageLoading || isLoading || isFetching} />
 
       {error ? (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
