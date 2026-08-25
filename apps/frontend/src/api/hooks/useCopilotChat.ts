@@ -7,6 +7,7 @@ import {
   type CopilotChatRequest,
   type CopilotChatResponse,
   type CopilotHistoryMessage,
+  type CopilotQuota,
 } from "../copilot.types";
 import { COPILOT_QUOTA_QUERY_KEY } from "./useCopilotQuota";
 
@@ -37,7 +38,15 @@ export function useCopilotChat() {
         quota: data.quota,
       } satisfies CopilotChatResponse;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      queryClient.setQueryData<CopilotQuota>(COPILOT_QUOTA_QUERY_KEY, (prev) => ({
+        used: data.quota.used,
+        remaining: data.quota.remaining,
+        limit: data.quota.limit,
+        resetAt: prev?.resetAt,
+        cooldownUntil: data.quota.cooldownUntil ?? null,
+        cooldownRemainingMs: data.quota.cooldownRemainingMs ?? 0,
+      }));
       void queryClient.invalidateQueries({ queryKey: COPILOT_QUOTA_QUERY_KEY });
     },
   });
