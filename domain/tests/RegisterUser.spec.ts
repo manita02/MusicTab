@@ -20,7 +20,7 @@ class FakeHasher implements IPasswordHasher {
 const payload = (overrides: Partial<{ username: string; email: string; password: string; signupIp: string }> = {}) => ({
   username: "pepe",
   email: "pepe@gmail.com",
-  password: "secret",
+  password: "Secret1!",
   birthDate: birth(),
   urlImg: img(),
   signupIp: "203.0.113.10",
@@ -43,7 +43,7 @@ describe("RegisterUser use case (domain TDD)", () => {
 
     expect(user.id).toBe(1);
     expect(user.email.toString()).toBe("pepe@gmail.com");
-    expect(user.passwordHash).toBe("hashed-secret");
+    expect(user.passwordHash).toBe("hashed-Secret1!");
     expect(user.isAdmin()).toBe(false);
     expect(user.signupIp).toBe("203.0.113.10");
   });
@@ -98,5 +98,12 @@ describe("RegisterUser use case (domain TDD)", () => {
 
   it("rejects missing signup IP", async () => {
     await expect(useCase.execute(payload({ signupIp: "unknown" }))).rejects.toThrow(DomainError);
+  });
+
+  it("rejects a weak password and does not persist the user", async () => {
+    await expect(useCase.execute(payload({ password: "secret" }))).rejects.toMatchObject({
+      code: "WeakPassword",
+    });
+    expect(await repo.findByEmail("pepe@gmail.com")).toBeNull();
   });
 });

@@ -94,11 +94,24 @@ describe("UpdateUser use case", () => {
       actorId: adminId,
       actorRole: Role.ADMIN,
       targetId: userId,
-      password: "n3w-pass",
+      password: "N3w-pass!",
     });
 
     const stored = await repo.findById(userId);
-    expect(stored?.passwordHash).toBe("hashed-n3w-pass");
+    expect(stored?.passwordHash).toBe("hashed-N3w-pass!");
+  });
+
+  it("rejects a weak password when updating", async () => {
+    await expect(
+      useCase.execute({
+        actorId: adminId,
+        actorRole: Role.ADMIN,
+        targetId: userId,
+        password: "weak",
+      }),
+    ).rejects.toMatchObject({ code: "WeakPassword" });
+    const stored = await repo.findById(userId);
+    expect(stored?.passwordHash).toBe("hashed-secret");
   });
 
   it("rejects a missing target", async () => {
