@@ -56,6 +56,7 @@ export const ManageProfileDialog: React.FC<{
   const isAdminTarget = user != null;
   const targetId = user?.id ?? authUserId ?? Number(localStorage.getItem("userId"));
   const isAdminRole = role === "ADMIN";
+  const isSelfTarget = Number(targetId) === Number(authUserId ?? localStorage.getItem("userId"));
 
   const formatDate = (isoString: string | null) => {
     if (!isoString) return "";
@@ -148,7 +149,7 @@ export const ManageProfileDialog: React.FC<{
         showModal(
           "success",
           "Account Deleted",
-          "Your account and all your published tabs have been deleted successfully."
+          "Your account and its associated data (published tabs, PDF view history, login sessions, and Copilot usage) were deleted successfully.",
         );
         localStorage.clear();
         setTimeout(() => {
@@ -159,7 +160,11 @@ export const ManageProfileDialog: React.FC<{
         return;
       }
 
-      showModal("success", "Account Deleted", "The user was deleted successfully.");
+      showModal(
+        "success",
+        "Account Deleted",
+        "The account and its associated data (published tabs, PDF view history, login sessions, and Copilot usage) were deleted.",
+      );
       onSaved?.();
       setTimeout(() => {
         setModalOpen(false);
@@ -226,7 +231,11 @@ export const ManageProfileDialog: React.FC<{
         open={confirmDeleteOpen}
         type="warning"
         title="Delete Account?"
-        message="This action will permanently delete this account and all published tabs. Are you sure you want to continue?"
+        message={
+          isSelfTarget
+            ? "This will permanently delete your account, all tabs you published, your PDF view history, login sessions, and Copilot usage. This cannot be undone."
+            : "This will permanently delete this account, all tabs they published, their PDF view history, login sessions, and Copilot usage. This cannot be undone."
+        }
         confirmText="Yes, delete"
         cancelText="Cancel"
         onConfirm={() => {
