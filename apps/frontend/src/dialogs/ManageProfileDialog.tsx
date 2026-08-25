@@ -21,6 +21,7 @@ import { RoleBadge } from "../components/RoleBadge/RoleBadge";
 import { useAuth } from "../api/hooks/useAuth";
 import { useUpdateUser } from "../api/hooks/useUpdateUser";
 import { useDeleteUser } from "../api/hooks/useDeleteUser";
+import { isStrongPassword, PASSWORD_POLICY_HINT, PASSWORD_POLICY_MESSAGE } from "../auth/passwordPolicy";
 
 export type ManageProfileUser = {
   id: number;
@@ -180,6 +181,10 @@ export const ManageProfileDialog: React.FC<{
   };
 
   const handleSave = async () => {
+    if (password && !isStrongPassword(password)) {
+      showModal("warning", "Choose a stronger password", PASSWORD_POLICY_MESSAGE);
+      return;
+    }
     try {
       await updateUserMutation.mutateAsync({
         id: Number(targetId),
@@ -344,6 +349,16 @@ export const ManageProfileDialog: React.FC<{
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="********"
+                helperText={
+                  password
+                    ? isStrongPassword(password)
+                      ? PASSWORD_POLICY_HINT
+                      : PASSWORD_POLICY_MESSAGE
+                    : isEditing
+                      ? PASSWORD_POLICY_HINT
+                      : undefined
+                }
+                error={!!password && !isStrongPassword(password)}
                 fullWidth
                 disabled={!isEditing}
               />

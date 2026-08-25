@@ -8,6 +8,7 @@ import { Button } from "../components/Button/Button";
 import { MessageModal } from "../components/MessageModal/MessageModal";
 import { IconLoader } from "../components/IconLoader/IconLoader";
 import { useRegister } from "../api/hooks/useRegister";
+import { isStrongPassword, PASSWORD_POLICY_HINT, PASSWORD_POLICY_MESSAGE } from "../auth/passwordPolicy";
 
 const TURNSTILE_SITE_KEY =
   import.meta.env.VITE_TURNSTILE_SITE_KEY || "1x00000000000000000000AA";
@@ -91,6 +92,10 @@ export const SignInPage: React.FC = () => {
     }
     if (!turnstileToken) {
       showModal("warning", "Verification required", "Please complete the verification challenge");
+      return;
+    }
+    if (!isStrongPassword(password)) {
+      showModal("warning", "Choose a stronger password", PASSWORD_POLICY_MESSAGE);
       return;
     }
     registerUser(
@@ -250,6 +255,12 @@ export const SignInPage: React.FC = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   type="password"
                   placeholder="********"
+                  error={!!password && !isStrongPassword(password)}
+                  helperText={
+                    password && !isStrongPassword(password)
+                      ? PASSWORD_POLICY_MESSAGE
+                      : PASSWORD_POLICY_HINT
+                  }
                 />
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
