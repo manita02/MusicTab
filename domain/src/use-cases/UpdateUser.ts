@@ -3,6 +3,7 @@ import { Role, User } from "../entities/User";
 import { ConflictError, DomainError, NotFoundError } from "../errors/DomainError";
 import { IUserRepository } from "../repositories/IUserRepository";
 import { IPasswordHasher } from "../services/IPasswordHasher";
+import { Password } from "../value-objects/Password";
 
 export type UpdateUserInput = {
   actorId: number;
@@ -77,6 +78,9 @@ export class UpdateUser {
     }
 
     const password = dto.password?.trim();
+    if (password) {
+      Password.assert(password);
+    }
     const nextHash = password
       ? await this.passwordHasher.hash(password)
       : target.passwordHash;

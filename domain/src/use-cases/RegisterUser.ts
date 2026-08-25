@@ -3,6 +3,7 @@ import { IPasswordHasher } from "../services/IPasswordHasher";
 import { Role, User } from "../entities/User";
 import { ConflictError } from "../errors/DomainError";
 import { normalizeSignupIp } from "../value-objects/SignupIp";
+import { Password } from "../value-objects/Password";
 
 type DTO = {
   username: string;
@@ -28,7 +29,8 @@ export class RegisterUser {
     if (existingUsername) {
       throw new ConflictError("Username already taken");
     }
-    const hash = await this.passwordHasher.hash(dto.password);
+    const password = Password.assert(dto.password);
+    const hash = await this.passwordHasher.hash(password);
     User.create(dto.username, dto.email, hash, Role.USER, dto.birthDate, dto.urlImg);
 
     const signupIp = normalizeSignupIp(dto.signupIp);
