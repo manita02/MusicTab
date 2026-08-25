@@ -14,6 +14,7 @@ export function useCopilotQuota(enabled: boolean) {
     },
     enabled,
     retry: false,
-    staleTime: 15_000,
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 }

@@ -14,11 +14,13 @@ import {
   useTheme,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import SendIcon from "@mui/icons-material/Send";
 import { useNavigate } from "react-router-dom";
 import { COPILOT_UI } from "../../api/copilot.constants";
 import { PuaIcon } from "./PuaIcon";
 import { copilotErrorFromUnknown } from "../../api/copilotErrors";
+import { formatCooldownMmSs, remainingMsFromQuota } from "../../api/copilotQuota";
 import type {
   CopilotHistoryMessage,
   CopilotTabHit,
@@ -44,8 +46,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
   const [draft, setDraft] = useState("");
   const [messages, setMessages] = useState<ChatBubble[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [coolingDown, setCoolingDown] = useState(false);
-  const cooldownTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [nowMs, setNowMs] = useState(() => Date.now());
   const nextId = useRef(1);
   const listRef = useRef<HTMLDivElement | null>(null);
 
@@ -56,6 +57,8 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
   const limit = quotaQuery.data?.limit ?? COPILOT_UI.DAILY_MESSAGE_LIMIT;
   const remaining = quotaQuery.data?.remaining ?? limit - used;
   const atDailyLimit = remaining <= 0;
+  const cooldownRemainingMs = remainingMsFromQuota(quotaQuery.data, nowMs);
+  const coolingDown = cooldownRemainingMs > 0;
 
   const trimmed = draft.trim();
   const overLimit = draft.length > COPILOT_UI.MAX_INPUT_CHARS;
@@ -68,24 +71,21 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
     overLimit;
 
   useEffect(() => {
-    return () => {
-      if (cooldownTimer.current) clearTimeout(cooldownTimer.current);
-    };
-  }, []);
+    if (!open) return;
+    setNowMs(Date.now());
+  }, [open, quotaQuery.dataUpdatedAt]);
+
+  useEffect(() => {
+    if (!coolingDown) return;
+    const id = window.setInterval(() => setNowMs(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, [coolingDown, quotaQuery.data?.cooldownUntil]);
 
   useEffect(() => {
     const el = listRef.current;
     if (!el) return;
     el.scrollTop = el.scrollHeight;
   }, [messages, chat.isPending, open]);
-
-  const startCooldown = () => {
-    setCoolingDown(true);
-    if (cooldownTimer.current) clearTimeout(cooldownTimer.current);
-    cooldownTimer.current = setTimeout(() => {
-      setCoolingDown(false);
-    }, COPILOT_UI.SEND_COOLDOWN_MS);
-  };
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -105,7 +105,6 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
     }));
 
     setErrorMessage(null);
-    startCooldown();
     chat.mutate(
       { message, history },
       {
@@ -123,10 +122,15 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
             },
           ]);
           setDraft("");
+          setNowMs(Date.now());
         },
         onError: (error) => {
           const mapped = copilotErrorFromUnknown(error);
           setErrorMessage(mapped.message);
+          if (mapped.code === "COPILOT_COOLDOWN") {
+            void quotaQuery.refetch();
+            setNowMs(Date.now());
+          }
           if (mapped.redirectToLogin) {
             navigate("/login");
           }
@@ -334,7 +338,7 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
           )}
           {isLoggedIn && atDailyLimit && (
             <Alert severity="warning" sx={{ mb: 1 }}>
-              You've reached the 5-message limit for today
+              You've reached the {COPILOT_UI.DAILY_MESSAGE_LIMIT}-message limit for today
             </Alert>
           )}
           <TextField
@@ -362,7 +366,25 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
             helperText={`${draft.length}/${COPILOT_UI.MAX_INPUT_CHARS}`}
             FormHelperTextProps={{ sx: { textAlign: "right", m: 0, mt: 0.5 } }}
           />
-          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: 1 }}>
+            {isLoggedIn && coolingDown ? (
+              <Box
+                data-testid="copilot-cooldown"
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.75,
+                  color: "error.main",
+                }}
+              >
+                <HourglassEmptyIcon fontSize="small" aria-hidden />
+                <Typography variant="body2" fontWeight={700} component="span">
+                  Wait {formatCooldownMmSs(cooldownRemainingMs)}
+                </Typography>
+              </Box>
+            ) : (
+              <span />
+            )}
             <Button
               label="Send"
               variantType="primary"

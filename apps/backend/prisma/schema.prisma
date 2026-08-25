@@ -9,19 +9,20 @@ datasource db {
 }
 
 model User {
-  id            Int                 @id @default(autoincrement())
-  username      String              @unique
-  email         String              @unique
-  passwordHash  String
-  role          String
-  createdAt     DateTime            @default(now())
-  birthDate     DateTime
-  urlImg        String
-  signupIp      String?
-  sessions      Session[]
-  tablaturas    Tab[]
-  tabViews      TabView[]
-  copilotUsage  CopilotDailyUsage[]
+  id                   Int                 @id @default(autoincrement())
+  username             String              @unique
+  email                String              @unique
+  passwordHash         String
+  role                 String
+  createdAt            DateTime            @default(now())
+  birthDate            DateTime
+  urlImg               String
+  signupIp             String?
+  lastCopilotMessageAt DateTime?
+  sessions             Session[]
+  tablaturas           Tab[]
+  tabViews             TabView[]
+  copilotUsage         CopilotDailyUsage[]
 
   @@index([signupIp])
 }

@@ -54,7 +54,14 @@ describe("CopilotDrawer", () => {
   it("logueado carga quota y un mensaje corto obtiene reply + chips", async () => {
     const user = userEvent.setup();
     vi.mocked(api.get).mockResolvedValue({
-      data: { used: 1, limit: 5, remaining: 4, resetAt: "2026-08-22T03:00:00.000Z" },
+      data: {
+        used: 1,
+        limit: 10,
+        remaining: 9,
+        resetAt: "2026-08-22T03:00:00.000Z",
+        cooldownUntil: null,
+        cooldownRemainingMs: 0,
+      },
     });
     vi.mocked(api.post).mockResolvedValue({
       data: {
@@ -71,14 +78,20 @@ describe("CopilotDrawer", () => {
             urlPdf: "https://hidden.example/file.pdf",
           },
         ],
-        quota: { used: 2, remaining: 3, limit: 5 },
+        quota: {
+          used: 2,
+          remaining: 8,
+          limit: 10,
+          cooldownUntil: new Date(Date.now() + 60_000).toISOString(),
+          cooldownRemainingMs: 60_000,
+        },
       },
     });
 
     renderDrawer(true);
     await user.click(screen.getByTestId("copilot-fab"));
 
-    expect(await screen.findByText("messages today 1/5")).toBeInTheDocument();
+    expect(await screen.findByText("messages today 1/10")).toBeInTheDocument();
     await waitFor(() => {
       expect(api.get).toHaveBeenCalledWith("/copilot/quota");
     });
@@ -93,5 +106,27 @@ describe("CopilotDrawer", () => {
       message: "Milo J",
       history: [],
     });
+  });
+
+  it("logueado con cooldownUntil futuro deshabilita Send y muestra la espera", async () => {
+    const user = userEvent.setup();
+    vi.mocked(api.get).mockResolvedValue({
+      data: {
+        used: 1,
+        limit: 10,
+        remaining: 9,
+        resetAt: "2026-08-22T03:00:00.000Z",
+        cooldownUntil: new Date(Date.now() + 47_000).toISOString(),
+        cooldownRemainingMs: 47_000,
+      },
+    });
+
+    renderDrawer(true);
+    await user.click(screen.getByTestId("copilot-fab"));
+
+    expect(await screen.findByTestId("copilot-cooldown")).toHaveTextContent(/Wait 0:4\d/);
+    await user.type(screen.getByLabelText("Message for Pua"), "Milo J");
+    expect(screen.getByRole("button", { name: /Send/i })).toBeDisabled();
+    expect(api.post).not.toHaveBeenCalled();
   });
 });

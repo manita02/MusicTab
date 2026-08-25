@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { countByArtistReply, quotaReply } from './copilot.templates';
 
 describe('countByArtistReply', () => {
@@ -20,6 +21,6 @@ describe('countByArtistReply', () => {
 
 describe('quotaReply', () => {
   it('informa usados y restantes', () => {
-    expect(quotaReply(2, 3, 5)).toContain('2 of 5');
+    expect(quotaReply(2, 8, 10)).toContain('2 of 10');
   });
 });
