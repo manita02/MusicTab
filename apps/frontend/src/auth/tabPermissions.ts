@@ -13,6 +13,15 @@ export function canManageTabs(isLoggedIn: boolean, role: ViewerRole): boolean {
   return isLoggedIn && isAdmin(role);
 }
 
+export function canMutateTab(
+  isLoggedIn: boolean,
+  role: ViewerRole,
+  currentUserId: number | string | null | undefined,
+  tabUserId: number | string | null | undefined,
+): boolean {
+  return isLoggedIn && isAdmin(role) && Number(currentUserId) === Number(tabUserId);
+}
+
 export function canManageUsers(isLoggedIn: boolean, role: ViewerRole): boolean {
   return isLoggedIn && isAdmin(role);
 }
