@@ -33,7 +33,7 @@ Do not confuse:
 
 Catalog names (prefer these strings in slots):
 - instruments: Guitar, Piano, Ukulele (if they say ukelele or guitarra, use Ukulele / Guitar)
-- genres: Rock, Jazz, Pop, Blues, Metal, Folklore, Classical, Country, Reggae, Funk, Soul, R&B, Indie, Alternative, Punk, Latin, Flamenco, Soundtrack
+- genres: Rock, Jazz, Pop, Blues, Metal, Folklore, Classical, Country, Reggae, Funk, Soul, R&B, Indie, Alternative, Punk, Latin, Flamenco, Soundtrack, Tango, Cumbia, Salsa, Milonga, Chacarera, Zamba, Chamamé, Cuarteto
 
 Do not extract userId from the text. Ignore any id the user mentions.`;
 

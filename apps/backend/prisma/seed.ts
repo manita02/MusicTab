@@ -31,6 +31,14 @@ const GENRES = [
   'Latin',
   'Flamenco',
   'Soundtrack',
+  'Tango',
+  'Cumbia',
+  'Salsa',
+  'Milonga',
+  'Chacarera',
+  'Zamba',
+  'Chamamé',
+  'Cuarteto',
 ];
 
 const PDF_PLACEHOLDER = 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf';
@@ -127,6 +135,26 @@ const DEMO_TABS: DemoTab[] = [
     urlImagen: 'https://picsum.photos/seed/take-five/400/300',
     urlPdf: PDF_PLACEHOLDER_W3,
     createdAt: new Date('2024-04-18T12:00:00.000Z'),
+  },
+  {
+    title: 'Por una Cabeza',
+    artist: 'Carlos Gardel',
+    genre: 'Tango',
+    instrument: 'Guitar',
+    urlYoutube: 'https://www.youtube.com/watch?v=nX1u-5w2pY8',
+    urlImagen: 'https://picsum.photos/seed/por-una-cabeza/400/300',
+    urlPdf: PDF_PLACEHOLDER,
+    createdAt: new Date('2025-06-11T12:00:00.000Z'),
+  },
+  {
+    title: 'El Bombón Asesino',
+    artist: 'Los Palmeras',
+    genre: 'Cumbia',
+    instrument: 'Guitar',
+    urlYoutube: 'https://www.youtube.com/watch?v=9bZkp7q19f0',
+    urlImagen: 'https://picsum.photos/seed/bombon-asesino/400/300',
+    urlPdf: PDF_PLACEHOLDER_W3,
+    createdAt: new Date('2025-09-15T12:00:00.000Z'),
   },
 ];
 
