@@ -13,7 +13,7 @@ const TURNSTILE_SITE_KEY =
   import.meta.env.VITE_TURNSTILE_SITE_KEY || "1x00000000000000000000AA";
 
 const DEFAULT_PROFILE_IMG =
-  "https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg";
+  "https://imgs.search.brave.com/cKpndh_PLl3bVHQqLUPiuQ3ERWbja_MIKeFqA52qCqs/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvMTUvVXNl/ci1CYWNrZ3JvdW5k/LVBORy5wbmc";
 
 const blockTypedEmail = (
   onBlocked: () => void,
