@@ -58,8 +58,9 @@ describe("Tab entity (domain TDD)", () => {
     ).toThrow(DomainError);
   });
 
-  it("canEdit returns true only for admin", () => {
-    const tab = Tab.create(
+  it("canEdit returns true only for the admin who owns the tab", () => {
+    const tab = Tab.rehydrate(
+      10,
       "Song",
       2,
       1,
@@ -69,28 +70,62 @@ describe("Tab entity (domain TDD)", () => {
       "http://example.com/img.jpg",
     );
 
-    const admin = User.create("admin", "admin@gmail.com", "pass", Role.ADMIN, new Date("1990-01-01"), "https://x.com/a.png");
-    const owner = User.create(
+    const ownerAdmin = User.rehydrate(
+      2,
+      "admin",
+      "admin@gmail.com",
+      "pass",
+      Role.ADMIN,
+      new Date("2024-01-01"),
+      new Date("1990-01-01"),
+      "https://x.com/a.png",
+    );
+    const otherAdmin = User.rehydrate(
+      3,
+      "other-admin",
+      "other-admin@gmail.com",
+      "pass",
+      Role.ADMIN,
+      new Date("2024-01-01"),
+      new Date("1990-01-01"),
+      "https://x.com/oa.png",
+    );
+    const ownerUser = User.rehydrate(
+      2,
       "owner",
       "owner@gmail.com",
       "pass",
       Role.USER,
+      new Date("2024-01-01"),
       new Date("1990-01-01"),
       "https://x.com/o.png",
     );
-
-    const other = User.create(
+    const otherUser = User.rehydrate(
+      4,
       "other",
       "other@outlook.com",
       "pass",
       Role.USER,
+      new Date("2024-01-01"),
       new Date("1991-01-01"),
       "https://x.com/x.png",
     );
+    const unsavedAdmin = User.create(
+      "admin",
+      "unsaved-admin@gmail.com",
+      "pass",
+      Role.ADMIN,
+      new Date("1990-01-01"),
+      "https://x.com/a.png",
+    );
 
-    expect(tab.canEdit(admin)).toBe(true);
-    expect(tab.canEdit(owner)).toBe(false);
-    expect(tab.canEdit(other)).toBe(false);
+    expect(tab.canEdit(ownerAdmin)).toBe(true);
+    expect(tab.canDelete(ownerAdmin)).toBe(true);
+    expect(tab.canEdit(otherAdmin)).toBe(false);
+    expect(tab.canDelete(otherAdmin)).toBe(false);
+    expect(tab.canEdit(ownerUser)).toBe(false);
+    expect(tab.canEdit(otherUser)).toBe(false);
+    expect(tab.canEdit(unsavedAdmin)).toBe(false);
   });
 
   it("rehydrates a tab from DB", () => {
