@@ -35,11 +35,13 @@ function toTabPreview(v: ViewerTabRow): TabPreview {
   };
 }
 
+export const LATEST_TABS_QUERY_KEY = ["latestTabs"] as const;
+
 export const useLatestTabs = (limit: number = 8) => {
   const { isLoggedIn } = useAuth();
 
   return useQuery<TabPreview[], Error>({
-    queryKey: ["latestTabs", limit, isLoggedIn ? "authenticated" : "public"],
+    queryKey: [...LATEST_TABS_QUERY_KEY, limit, isLoggedIn ? "authenticated" : "public"],
     queryFn: async () => {
       const path = isLoggedIn ? ENDPOINTS.tabs.latest : ENDPOINTS.tabs.latestPublic;
       const { data } = await api.get(path, { params: { limit } });
