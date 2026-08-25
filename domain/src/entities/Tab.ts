@@ -88,7 +88,11 @@ export class Tab {
   }
 
   canEdit(user: User): boolean {
-    return user.isAdmin();
+    return user.isAdmin() && user.id != null && user.id === this.userId;
+  }
+
+  canDelete(user: User): boolean {
+    return this.canEdit(user);
   }
 
   update(props: {

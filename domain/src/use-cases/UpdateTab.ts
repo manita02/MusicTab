@@ -37,16 +37,20 @@ export class UpdateTab {
       throw new DomainError("AuthError", "Only administrators can edit tabs");
     }
 
-    const updatedTab = tab.update({
-        title: dto.title,
-        artist: dto.artist,
-        genreId: dto.genreId,
-        instrumentId: dto.instrumentId,
-        urlPdf: dto.urlPdf,
-        urlYoutube: dto.urlYoutube,
-        urlImg: dto.urlImg,
-        });
-
-      return await this.tabRepo.update(updatedTab);
+    if (!tab.canEdit(user)) {
+      throw new DomainError("AuthError", "You can only edit tabs you created");
     }
+
+    const updatedTab = tab.update({
+      title: dto.title,
+      artist: dto.artist,
+      genreId: dto.genreId,
+      instrumentId: dto.instrumentId,
+      urlPdf: dto.urlPdf,
+      urlYoutube: dto.urlYoutube,
+      urlImg: dto.urlImg,
+    });
+
+    return await this.tabRepo.update(updatedTab);
+  }
 }
