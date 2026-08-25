@@ -9,6 +9,7 @@ type CopilotApiErrorBody = {
 export type CopilotClientError = {
   message: string;
   redirectToLogin: boolean;
+  code?: string;
 };
 
 const FALLBACK =
@@ -43,10 +44,23 @@ export function copilotErrorFromUnknown(error: unknown): CopilotClientError {
     };
   }
 
+  if (status === 429 && code === "COPILOT_COOLDOWN") {
+    const raw = bodyOf(error)?.message;
+    return {
+      message:
+        typeof raw === "string" && raw.trim()
+          ? raw
+          : "Please wait before sending another message to Pua",
+      redirectToLogin: false,
+      code: "COPILOT_COOLDOWN",
+    };
+  }
+
   if (status === 429 || code === "COPILOT_DAILY_LIMIT") {
     return {
-      message: "You've reached the 5-message limit for today",
+      message: `You've reached the ${COPILOT_UI.DAILY_MESSAGE_LIMIT}-message limit for today`,
       redirectToLogin: false,
+      code: "COPILOT_DAILY_LIMIT",
     };
   }
 

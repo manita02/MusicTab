@@ -35,7 +35,20 @@ describe("copilotErrorFromUnknown", () => {
     const mapped = copilotErrorFromUnknown(
       axiosError(429, { code: "COPILOT_DAILY_LIMIT" }),
     );
-    expect(mapped.message).toBe("You've reached the 5-message limit for today");
+    expect(mapped.code).toBe("COPILOT_DAILY_LIMIT");
+    expect(mapped.message).toBe("You've reached the 10-message limit for today");
+  });
+
+  it("429 COPILOT_COOLDOWN usa el mensaje del server y no el tope diario", () => {
+    const mapped = copilotErrorFromUnknown(
+      axiosError(429, {
+        code: "COPILOT_COOLDOWN",
+        message: "Please wait 40 seconds before sending another message to Pua",
+      }),
+    );
+    expect(mapped.code).toBe("COPILOT_COOLDOWN");
+    expect(mapped.message).toContain("Please wait 40 seconds");
+    expect(mapped.message).not.toMatch(/10-message limit/i);
   });
 
   it("503 avisa que la IA no está disponible", () => {

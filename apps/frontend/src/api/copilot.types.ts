@@ -22,6 +22,8 @@ export type CopilotQuota = {
   limit: number;
   remaining: number;
   resetAt?: string;
+  cooldownUntil?: string | null;
+  cooldownRemainingMs?: number;
 };
 
 export type CopilotChatRequest = {
@@ -32,7 +34,10 @@ export type CopilotChatRequest = {
 export type CopilotChatResponse = {
   reply: string;
   hits: CopilotTabHit[];
-  quota: Pick<CopilotQuota, "used" | "remaining" | "limit">;
+  quota: Pick<
+    CopilotQuota,
+    "used" | "remaining" | "limit" | "cooldownUntil" | "cooldownRemainingMs"
+  >;
 };
 
 export function sanitizeCopilotHits(hits: unknown): CopilotTabHit[] {
