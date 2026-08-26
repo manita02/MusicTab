@@ -58,7 +58,7 @@ export const AdminUsersPage: React.FC = () => {
       open: true,
       type: "warning",
       title: "Delete this user?",
-      message: `Are you sure you want to delete "${user.username}"? This action cannot be undone.`,
+      message: `Are you sure you want to delete "${user.username}"? This will permanently delete this account, all tabs they published, their PDF view history, login sessions, and Copilot usage. This cannot be undone.`,
     });
   };
 
@@ -73,7 +73,7 @@ export const AdminUsersPage: React.FC = () => {
           open: true,
           type: "success",
           title: "Deleted successfully",
-          message: `The user "${selectedUser.username}" was deleted successfully.`,
+          message: `The account "${selectedUser.username}" and its associated data (published tabs, PDF view history, login sessions, and Copilot usage) were deleted.`,
         });
         setSelectedUser(null);
       },

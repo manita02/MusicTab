@@ -32,6 +32,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   canDownloadTabPdf,
   canManageTabs,
+  canMutateTab,
   normalizeRole,
 } from "../auth/tabPermissions";
 import { useQueryClient } from "@tanstack/react-query";
@@ -40,13 +41,13 @@ import { ENDPOINTS } from "../api/endpoints";
 import { STATS_GLOBAL_QUERY_KEY, STATS_ME_QUERY_KEY } from "../api/hooks/useStats";
 
 const GUEST_TABS_MESSAGE =
-  "You can browse all published tabs below. Buttons for PDF download and tab editing are locked until you sign in. Sign in or create an account to unlock downloads; only admins can manage (create/edit/delete) tabs.";
+  "You can browse all published tabs below. Buttons for PDF download and tab editing are locked until you sign in. Sign in or create an account to unlock downloads. Only admins can create tabs, and an admin can edit or delete only the tabs they created.";
 
 export const TabsPage: React.FC = () => {
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("search") || "");
-  const { isLoggedIn, userRole: rawRole } = useAuth();
+  const { isLoggedIn, userRole: rawRole, userId } = useAuth();
   const viewerRole = normalizeRole(rawRole);
   const canManage = canManageTabs(isLoggedIn, viewerRole);
   const canDownload = canDownloadTabPdf(isLoggedIn);
@@ -65,7 +66,7 @@ export const TabsPage: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<any>(null);
 
   const { mutate: deleteTab, isPending: isDeleting } = useDeleteTab();
-  const localUserId = Number(localStorage.getItem("userId"));
+  const localUserId = userId ?? Number(localStorage.getItem("userId"));
 
   useEffect(() => {
     if (!canManage && view === "mine") {
@@ -250,7 +251,7 @@ export const TabsPage: React.FC = () => {
       createdAt: tab.createdAt,
     })) || [];
 
-  const manageDisabledTooltip = isGuest
+  const guestOrUserManageTooltip = isGuest
     ? "Sign in to manage tabs (admins only)"
     : "Only administrators can manage tabs";
 
@@ -260,7 +261,20 @@ export const TabsPage: React.FC = () => {
       width: 140,
       sortable: false,
       filterable: false,
-      renderCell: (params: any) => (
+      renderCell: (params: any) => {
+        const canMutate = canMutateTab(isLoggedIn, viewerRole, localUserId, params.row.userId);
+        const editTooltip = canMutate
+          ? "Update"
+          : canManage
+            ? "You can only edit tabs you created"
+            : guestOrUserManageTooltip;
+        const deleteTooltip = canMutate
+          ? "Delete"
+          : canManage
+            ? "You can only delete tabs you created"
+            : guestOrUserManageTooltip;
+
+        return (
         <Box
           sx={{
             display: "flex",
@@ -272,15 +286,15 @@ export const TabsPage: React.FC = () => {
             width: "100%",
           }}
         >
-          <Tooltip title={canManage ? "Update" : manageDisabledTooltip} arrow>
+          <Tooltip title={editTooltip} arrow>
             <span>
               <IconButton
                 size="small"
-                onClick={() => canManage && handleEdit(params.row.id)}
-                disabled={!canManage}
+                onClick={() => canMutate && handleEdit(params.row.id)}
+                disabled={!canMutate}
                 sx={{
-                  color: canManage ? theme.palette.warning.main : theme.palette.action.disabled,
-                  "&:hover": canManage
+                  color: canMutate ? theme.palette.warning.main : theme.palette.action.disabled,
+                  "&:hover": canMutate
                     ? { backgroundColor: "rgba(255,144,19,0.1)" }
                     : undefined,
                 }}
@@ -289,15 +303,15 @@ export const TabsPage: React.FC = () => {
               </IconButton>
             </span>
           </Tooltip>
-          <Tooltip title={canManage ? "Delete" : manageDisabledTooltip} arrow>
+          <Tooltip title={deleteTooltip} arrow>
             <span>
               <IconButton
                 size="small"
-                onClick={() => canManage && handleDeleteClick(params.row)}
-                disabled={!canManage || isDeleting}
+                onClick={() => canMutate && handleDeleteClick(params.row)}
+                disabled={!canMutate || isDeleting}
                 sx={{
-                  color: canManage ? theme.palette.error.main : theme.palette.action.disabled,
-                  "&:hover": canManage
+                  color: canMutate ? theme.palette.error.main : theme.palette.action.disabled,
+                  "&:hover": canMutate
                     ? { backgroundColor: "rgba(255,0,0,0.08)" }
                     : undefined,
                 }}
@@ -334,7 +348,8 @@ export const TabsPage: React.FC = () => {
               </Tooltip>
             ))}
         </Box>
-      ),
+        );
+      },
   };
 
   const titleCol = {

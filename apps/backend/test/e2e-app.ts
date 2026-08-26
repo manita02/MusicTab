@@ -13,6 +13,9 @@ const E2E_USER_PASSWORD = 'e2e-user-pass';
 const E2E_ADMIN_EMAIL = 'e2e.admin@gmail.com';
 const E2E_ADMIN_NAME = 'e2eadmin';
 const E2E_ADMIN_PASSWORD = 'e2e-admin-pass';
+export const E2E_ADMIN2_EMAIL = 'e2e.admin2@gmail.com';
+export const E2E_ADMIN2_NAME = 'e2eadmin2';
+export const E2E_ADMIN2_PASSWORD = 'e2e-admin2-pass';
 
 export async function createE2eApp(): Promise<INestApplication<App>> {
   const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -25,7 +28,7 @@ export async function createE2eApp(): Promise<INestApplication<App>> {
   return app;
 }
 
-async function upsertE2eUser(
+export async function upsertE2eUser(
   prisma: PrismaService,
   data: { email: string; username: string; password: string; role: 'USER' | 'ADMIN' },
 ) {
@@ -86,6 +89,18 @@ export async function seedE2eActors(app: INestApplication<App>) {
     user: { ...userSession, id: user.id },
     admin: { ...adminSession, id: admin.id },
   };
+}
+
+export async function seedE2eSecondAdmin(app: INestApplication<App>) {
+  const prisma = app.get(PrismaService);
+  const admin = await upsertE2eUser(prisma, {
+    email: E2E_ADMIN2_EMAIL,
+    username: E2E_ADMIN2_NAME,
+    password: E2E_ADMIN2_PASSWORD,
+    role: 'ADMIN',
+  });
+  const session = await loginAs(app, E2E_ADMIN2_EMAIL, E2E_ADMIN2_PASSWORD);
+  return { ...session, id: admin.id };
 }
 
 export function authHeader(token: string) {

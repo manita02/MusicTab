@@ -18,6 +18,9 @@ import { CurrentUser, RequestUser } from '../auth/decorators/current-user.decora
 import { TurnstileService } from '../auth/turnstile.service';
 import { extractClientIp } from '../auth/extract-client-ip';
 
+const DEFAULT_PROFILE_IMG =
+  'https://imgs.search.brave.com/cKpndh_PLl3bVHQqLUPiuQ3ERWbja_MIKeFqA52qCqs/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvMTUvVXNl/ci1CYWNrZ3JvdW5k/LVBORy5wbmc';
+
 type RegisterDTO = {
   username: string;
   email: string;
@@ -90,12 +93,16 @@ export class UserController {
     const ip = extractClientIp(req);
     await this.turnstile.verify(dto.turnstileToken, ip);
 
+    const urlImg = (dto.urlImg ?? '').trim().startsWith('http')
+      ? dto.urlImg.trim()
+      : DEFAULT_PROFILE_IMG;
+
     const user = await this.registerUser.execute({
       username: dto.username,
       email,
       password: dto.password,
       birthDate: new Date(dto.birthDate),
-      urlImg: dto.urlImg,
+      urlImg,
       signupIp: ip,
     });
     return {

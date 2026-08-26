@@ -23,6 +23,10 @@ export class DeleteTab {
       throw new DomainError("AuthError", "Only administrators can delete tabs");
     }
 
+    if (!tab.canDelete(user)) {
+      throw new DomainError("AuthError", "You can only delete tabs you created");
+    }
+
     await this.tabRepo.delete(id);
   }
 }

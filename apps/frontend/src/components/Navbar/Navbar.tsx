@@ -19,7 +19,9 @@ import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium"; // 👑
 import PersonIcon from "@mui/icons-material/Person"; // 👤 user icon
 import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { canManageUsers, normalizeRole } from "../../auth/tabPermissions";
+import { LATEST_TABS_QUERY_KEY } from "../../api/hooks/useLatestTabs";
 
 interface NavbarProps {
   isLoggedIn: boolean;
@@ -51,6 +53,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const theme = useTheme();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const canSeeManageUsers = canManageUsers(isLoggedIn, normalizeRole(userRole));
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => setAnchorElNav(event.currentTarget);
@@ -58,8 +61,17 @@ export const Navbar: React.FC<NavbarProps> = ({
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => setAnchorElUser(event.currentTarget);
   const handleCloseUserMenu = () => setAnchorElUser(null);
 
+  const goHome = () => {
+    void queryClient.invalidateQueries({ queryKey: [...LATEST_TABS_QUERY_KEY] });
+    navigate("/");
+  };
+
   const handleNavClick = (path: string) => {
     handleCloseNavMenu();
+    if (path === "/") {
+      goHome();
+      return;
+    }
     navigate(path);
   };
 
@@ -134,7 +146,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               "&:hover .logo-text": { color: theme.palette.secondary.main },
               [theme.breakpoints.up("md")]: { position: "relative", left: "unset", transform: "none" },
             }}
-            onClick={() => navigate("/")}
+            onClick={goHome}
           >
             <LibraryMusicIcon className="logo-icon" sx={{ mr: 1, color: theme.palette.primary.contrastText, fontSize: { xs: 26, md: 28 }, transition: "color 0.3s ease" }} />
             <Typography className="logo-text" variant="h6" component="div"

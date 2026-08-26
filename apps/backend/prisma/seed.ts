@@ -9,7 +9,7 @@ const LEGACY_ADMIN_EMAIL = 'admin@admin.com';
 const ADMIN_PASSWORD = 'admin';
 const ADMIN_SIGNUP_IP = '127.0.0.1';
 const ADMIN_IMG =
-  'https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg';
+  'https://imgs.search.brave.com/cKpndh_PLl3bVHQqLUPiuQ3ERWbja_MIKeFqA52qCqs/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvMTUvVXNl/ci1CYWNrZ3JvdW5k/LVBORy5wbmc';
 
 const INSTRUMENTS = ['Guitar', 'Piano', 'Ukulele'];
 const GENRES = [
@@ -31,6 +31,14 @@ const GENRES = [
   'Latin',
   'Flamenco',
   'Soundtrack',
+  'Tango',
+  'Cumbia',
+  'Salsa',
+  'Milonga',
+  'Chacarera',
+  'Zamba',
+  'Chamamé',
+  'Cuarteto',
 ];
 
 const PDF_PLACEHOLDER = 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf';
@@ -128,6 +136,26 @@ const DEMO_TABS: DemoTab[] = [
     urlPdf: PDF_PLACEHOLDER_W3,
     createdAt: new Date('2024-04-18T12:00:00.000Z'),
   },
+  {
+    title: 'Por una Cabeza',
+    artist: 'Carlos Gardel',
+    genre: 'Tango',
+    instrument: 'Guitar',
+    urlYoutube: 'https://www.youtube.com/watch?v=nX1u-5w2pY8',
+    urlImagen: 'https://picsum.photos/seed/por-una-cabeza/400/300',
+    urlPdf: PDF_PLACEHOLDER,
+    createdAt: new Date('2025-06-11T12:00:00.000Z'),
+  },
+  {
+    title: 'El Bombón Asesino',
+    artist: 'Los Palmeras',
+    genre: 'Cumbia',
+    instrument: 'Guitar',
+    urlYoutube: 'https://www.youtube.com/watch?v=9bZkp7q19f0',
+    urlImagen: 'https://picsum.photos/seed/bombon-asesino/400/300',
+    urlPdf: PDF_PLACEHOLDER_W3,
+    createdAt: new Date('2025-09-15T12:00:00.000Z'),
+  },
 ];
 
 async function seedAdmin() {
@@ -138,7 +166,7 @@ async function seedAdmin() {
   });
 
   if (existing) {
-    const data: { role?: string; email?: string; signupIp?: string } = {};
+    const data: { role?: string; email?: string; signupIp?: string; urlImg?: string } = {};
     if (existing.role !== 'ADMIN') {
       data.role = 'ADMIN';
     }
@@ -147,6 +175,12 @@ async function seedAdmin() {
     }
     if (!existing.signupIp) {
       data.signupIp = ADMIN_SIGNUP_IP;
+    }
+    if (
+      !existing.urlImg ||
+      existing.urlImg.includes('img.freepik.com/premium-vector/avatar-profile-icon')
+    ) {
+      data.urlImg = ADMIN_IMG;
     }
 
     if (Object.keys(data).length > 0) {

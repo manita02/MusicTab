@@ -3,16 +3,19 @@ import { Navbar } from "./Navbar";
 import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "../../theme/theme";
 import { MemoryRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 describe("Navbar component", () => {
   const renderNavbar = (props = {}) => {
     const defaultProps = { isLoggedIn: false, userName: "" };
     render(
-      <ThemeProvider theme={theme}>
-        <MemoryRouter>
-          <Navbar {...defaultProps} {...props} />
-        </MemoryRouter>
-      </ThemeProvider>
+      <QueryClientProvider client={new QueryClient()}>
+        <ThemeProvider theme={theme}>
+          <MemoryRouter>
+            <Navbar {...defaultProps} {...props} />
+          </MemoryRouter>
+        </ThemeProvider>
+      </QueryClientProvider>
     );
   };
 

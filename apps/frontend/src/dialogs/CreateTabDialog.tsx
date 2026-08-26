@@ -145,7 +145,7 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
 
   const previewBoxStyles = {
     width: "100%",
-    maxWidth: 220,
+    maxWidth: 190,
     aspectRatio: "3 / 4",
     mx: "auto",
     borderRadius: 2,
@@ -160,7 +160,7 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
 
   const coverPreviewSx = {
     width: "100%",
-    maxWidth: 220,
+    maxWidth: 190,
     aspectRatio: "3 / 4",
     mx: "auto",
     borderRadius: 2,
@@ -169,6 +169,26 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
     objectPosition: "center",
     border: `1px solid ${theme.palette.divider}`,
     display: "block",
+  };
+
+  const videoPreviewSx = {
+    width: "100%",
+    maxWidth: { xs: "100%", sm: 400 },
+    aspectRatio: "16 / 9",
+    mx: "auto",
+    borderRadius: 2,
+    boxShadow: 3,
+    border: `1px solid ${theme.palette.divider}`,
+    display: "block",
+  };
+
+  const videoPlaceholderSx = {
+    ...videoPreviewSx,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.7)",
+    color: "#fff",
   };
 
   useEffect(() => {
@@ -196,15 +216,16 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
         open={open}
         onClose={onClose}
         fullWidth
-        maxWidth="lg"
+        maxWidth="md"
         fullScreen={fullScreen}
         PaperProps={{
           sx: {
             borderRadius: { xs: 0, md: 3 },
-            p: { xs: 0.5, sm: 1.5, md: 2 },
+            p: { xs: 0, sm: 1, md: 1.25 },
             backgroundColor: theme.palette.background.paper,
             m: { xs: 0, sm: 2 },
             maxHeight: { xs: "100dvh", md: "90dvh" },
+            overflowX: "hidden",
           },
         }}
       >
@@ -213,14 +234,16 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
             fontWeight: 700,
             textAlign: "center",
             color: theme.palette.primary.main,
-            pb: 1,
+            pt: { xs: 1.25, sm: 1.5 },
+            pb: { xs: 0.75, sm: 1 },
+            px: { xs: 1.5, sm: 2 },
           }}
         >
           Create New Tab
         </DialogTitle>
 
-        <DialogContent dividers sx={{ px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 } }}>
-          <Grid container spacing={2}>
+        <DialogContent dividers sx={{ px: { xs: 1.5, sm: 2 }, py: { xs: 1.5, sm: 2 }, overflowX: "hidden" }}>
+          <Grid container spacing={{ xs: 1, sm: 1.5 }}>
             <Grid size={{ xs: 12, md: 6 }}>
               <InputField label="Title *" value={title} onChange={(e) => setTitle(e.target.value)} fullWidth />
             </Grid>
@@ -251,7 +274,7 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
             <Grid size={{ xs: 12, md: 6, lg: 4 }}>
               <InputField label="Image URL" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} fullWidth />
             </Grid>
-            <Grid size={{ xs: 12, lg: 4 }}>
+            <Grid size={{ xs: 12, md: 6, lg: 4 }}>
               <InputField label="YouTube URL" value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} fullWidth />
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
@@ -276,30 +299,10 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
                   src={embedUrl}
                   title="YouTube preview"
                   allowFullScreen
-                  sx={{
-                    width: "100%",
-                    aspectRatio: "16 / 9",
-                    borderRadius: 2,
-                    boxShadow: 3,
-                    border: `1px solid ${theme.palette.divider}`,
-                    display: "block",
-                  }}
+                  sx={videoPreviewSx}
                 />
               ) : (
-                <Box
-                  sx={{
-                    width: "100%",
-                    aspectRatio: "16 / 9",
-                    borderRadius: 2,
-                    boxShadow: 3,
-                    border: `1px solid ${theme.palette.divider}`,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: "rgba(0,0,0,0.7)",
-                    color: "#fff",
-                  }}
-                >
+                <Box sx={videoPlaceholderSx}>
                   <Typography>No video</Typography>
                 </Box>
               )}
@@ -307,19 +310,32 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
           </Grid>
         </DialogContent>
 
-        <DialogActions sx={{ justifyContent: "center", py: 2, gap: 2, flexWrap: "wrap" }}>
+        <DialogActions
+          disableSpacing
+          sx={{
+            justifyContent: "center",
+            py: { xs: 1, sm: 1.5 },
+            px: { xs: 1.5, sm: 2 },
+            gap: { xs: 1, sm: 1.5 },
+            flexWrap: "wrap",
+            "& .MuiButton-root": {
+              fontSize: "0.875rem",
+              padding: "6px 16px",
+              minHeight: 40,
+              width: { xs: "100%", sm: "auto" },
+            },
+          }}
+        >
           <Button
             label={isPending ? "Saving..." : "Save Tab"}
             variantType="secondary"
             disabled={isPending}
             onClick={handleSave}
-            sx={{ width: { xs: "100%", sm: "auto" } }}
           />
           <Button
             label="Cancel"
             variantType="danger"
             onClick={onClose}
-            sx={{ width: { xs: "100%", sm: "auto" } }}
           />
         </DialogActions>
       </Dialog>
