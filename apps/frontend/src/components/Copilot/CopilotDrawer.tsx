@@ -247,6 +247,26 @@ export const CopilotDrawer: React.FC<CopilotDrawerProps> = ({ isLoggedIn }) => {
           {!isLoggedIn && (
             <Alert
               severity="info"
+              sx={{
+                alignItems: "center",
+                "& .MuiAlert-message": {
+                  minWidth: 0,
+                },
+                "& .MuiAlert-action": {
+                  pt: 0,
+                  pl: 1,
+                  mr: 0,
+                  flexShrink: 0,
+                  alignItems: "center",
+                },
+                "& .MuiAlert-action .MuiButton-root": {
+                  whiteSpace: "nowrap",
+                  minWidth: "max-content",
+                  fontSize: "0.8125rem",
+                  px: 1.75,
+                  py: 0.75,
+                },
+              }}
               action={
                 <Button
                   label="Go to login"

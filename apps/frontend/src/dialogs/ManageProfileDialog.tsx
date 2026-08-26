@@ -259,10 +259,11 @@ export const ManageProfileDialog: React.FC<{
         PaperProps={{
           sx: {
             borderRadius: { xs: 0, md: 3 },
-            p: { xs: 0.5, sm: 1.5, md: 2 },
+            p: { xs: 0, sm: 1, md: 1.25 },
             backgroundColor: theme.palette.background.paper,
             m: { xs: 0, sm: 2 },
             maxHeight: { xs: "100dvh", md: "90dvh" },
+            overflowX: "hidden",
           },
         }}
       >
@@ -271,7 +272,9 @@ export const ManageProfileDialog: React.FC<{
             fontWeight: 700,
             textAlign: "center",
             color: theme.palette.primary.main,
-            pb: 1,
+            pt: { xs: 1.25, sm: 1.5 },
+            pb: { xs: 0.75, sm: 1 },
+            px: { xs: 1.5, sm: 2 },
             position: "relative",
           }}
         >
@@ -295,15 +298,15 @@ export const ManageProfileDialog: React.FC<{
           </IconButton>
         </DialogTitle>
 
-        <DialogContent dividers sx={{ px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 } }}>
-          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 2 }}>
+        <DialogContent dividers sx={{ px: { xs: 1.5, sm: 2 }, py: { xs: 1.5, sm: 2 }, overflowX: "hidden" }}>
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 1.5 }}>
             <Avatar
               src={previewImg}
               alt={username}
               sx={{
-                width: { xs: 88, md: 112 },
-                height: { xs: 88, md: 112 },
-                mb: 1,
+                width: { xs: 72, md: 96 },
+                height: { xs: 72, md: 96 },
+                mb: 0.75,
                 border: `3px solid ${isAdminRole ? "#FF9100" : "#2979FF"}`,
                 boxShadow: isAdminRole
                   ? "0 0 10px 2px rgba(255,145,0,0.8)"
@@ -318,12 +321,12 @@ export const ManageProfileDialog: React.FC<{
               }}
             />
 
-            <Box sx={{ mt: 1 }}>
+            <Box sx={{ mt: 0.5 }}>
               <RoleBadge role={role} />
             </Box>
           </Box>
 
-          <Grid container spacing={2}>
+          <Grid container spacing={{ xs: 1, sm: 1.5 }}>
             <Grid size={{ xs: 12, md: 6 }}>
               <InputField
                 label="Username"
@@ -413,11 +416,19 @@ export const ManageProfileDialog: React.FC<{
         </DialogContent>
 
         <DialogActions
+          disableSpacing
           sx={{
             justifyContent: "center",
-            py: 2,
-            gap: 2,
+            py: { xs: 1, sm: 1.5 },
+            px: { xs: 1.5, sm: 2 },
+            gap: { xs: 1, sm: 1.5 },
             flexWrap: "wrap",
+            "& .MuiButton-root": {
+              fontSize: "0.875rem",
+              padding: "6px 16px",
+              minHeight: 40,
+              width: { xs: "100%", sm: "auto" },
+            },
           }}
         >
           {isEditing ? (
@@ -426,13 +437,11 @@ export const ManageProfileDialog: React.FC<{
                 label="Save Changes"
                 variantType="secondary"
                 onClick={handleSave}
-                sx={{ width: { xs: "100%", sm: "auto" } }}
               />
               <Button
                 label="Cancel"
                 variantType="danger"
                 onClick={handleEditToggle}
-                sx={{ width: { xs: "100%", sm: "auto" } }}
               />
             </>
           ) : (
@@ -441,13 +450,11 @@ export const ManageProfileDialog: React.FC<{
                 label="Edit Profile"
                 variantType="secondary"
                 onClick={handleEditToggle}
-                sx={{ width: { xs: "100%", sm: "auto" } }}
               />
               <Button
                 label="Delete Account"
                 variantType="danger"
                 onClick={() => setConfirmDeleteOpen(true)}
-                sx={{ width: { xs: "100%", sm: "auto" } }}
               />
             </>
           )}

@@ -149,42 +149,43 @@ export const SignInPage: React.FC = () => {
         sx={{
           display: "flex",
           justifyContent: "center",
-          alignItems: "center",
-          py: { xs: 2, sm: 3, md: 4 },
+          alignItems: "flex-start",
+          py: { xs: 1, sm: 1.25, md: 1 },
           width: "100%",
         }}
       >
         <Box
           sx={{
-            width: { xs: "100%", sm: 400, md: 680 },
+            width: "100%",
+            maxWidth: { xs: "100%", sm: 420, md: 920 },
             display: "flex",
             flexDirection: "column",
-            gap: { xs: 1.5, sm: 2 },
+            gap: { xs: 1, sm: 1.25, md: 1.25 },
             textAlign: "center",
-            px: 2,
+            px: { xs: 0, sm: 1, md: 0.5 },
           }}
         >
           <Tooltip title="MusicTab" arrow>
-            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", mb: 1 }}>
-              <LibraryMusicIcon sx={{ color: theme.palette.primary.main, fontSize: 36, mr: 1 }} />
+            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <LibraryMusicIcon sx={{ color: theme.palette.primary.main, fontSize: { xs: 32, md: 34 }, mr: 1 }} />
             </Box>
           </Tooltip>
 
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+          <Typography variant="h6" sx={{ fontWeight: 600, lineHeight: 1.3 }}>
             Sign In to MusicTab
           </Typography>
-          <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 2 }}>
+          <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
             Enter your details to create your account
           </Typography>
 
-          <Box component="form" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <Box component="form" sx={{ display: "flex", flexDirection: "column", gap: { xs: 1.25, md: 1.5 } }}>
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
               <Avatar
                 src={previewImg}
                 alt="Profile preview"
                 sx={{
-                  width: { xs: 88, md: 112 },
-                  height: { xs: 88, md: 112 },
+                  width: { xs: 72, md: 88 },
+                  height: { xs: 72, md: 88 },
                   border: "3px solid #2979FF",
                   boxShadow: "0 0 10px 2px rgba(41,121,255,0.8)",
                   transition: "box-shadow 0.3s ease, transform 0.2s ease",
@@ -195,8 +196,8 @@ export const SignInPage: React.FC = () => {
                 }}
               />
             </Box>
-            <Grid container spacing={2}>
-              <Grid size={{ xs: 12, md: 6 }}>
+            <Grid container spacing={{ xs: 1.25, sm: 1.5 }}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <InputField
                   label="Username *"
                   value={username}
@@ -204,18 +205,7 @@ export const SignInPage: React.FC = () => {
                   placeholder="Choose a username"
                 />
               </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <TextField
-                  label="Date of birth *"
-                  type="date"
-                  value={birthDate}
-                  onChange={(e) => setBirthDate(e.target.value)}
-                  fullWidth
-                  InputLabelProps={{ shrink: true }}
-                  sx={{ borderRadius: "12px" }}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <InputField
                   label="Email *"
                   value={email}
@@ -231,7 +221,7 @@ export const SignInPage: React.FC = () => {
                   helperText={emailPasteHint}
                 />
               </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <InputField
                   label="Confirm email *"
                   value={emailConfirm}
@@ -248,7 +238,7 @@ export const SignInPage: React.FC = () => {
                   onBlur={() => setConfirmTouched(true)}
                 />
               </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <InputField
                   label="Password *"
                   value={password}
@@ -263,7 +253,20 @@ export const SignInPage: React.FC = () => {
                   }
                 />
               </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
+              <Grid size={{ xs: 12, md: 4 }}>
+                <TextField
+                  label="Date of birth *"
+                  type="date"
+                  value={birthDate}
+                  onChange={(e) => setBirthDate(e.target.value)}
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  sx={{
+                    "& .MuiInputBase-root": { borderRadius: "12px" },
+                  }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <InputField
                   label="Profile Image URL"
                   value={profileUrl}
@@ -292,13 +295,14 @@ export const SignInPage: React.FC = () => {
               />
             </Box>
 
-            <Button
-              label={isPending ? "Signing in..." : "Sign In"}
-              onClick={handleSignIn}
-              disabled={isPending}
-              variantType="primary"
-              sx={{ width: { xs: "100%", md: "auto" }, alignSelf: { md: "center" }, minWidth: { md: 220 }, mt: 1 }}
-            />
+            <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
+              <Button
+                label={isPending ? "Signing in..." : "Sign In"}
+                onClick={handleSignIn}
+                disabled={isPending}
+                variantType="primary"
+              />
+            </Box>
           </Box>
         </Box>
       </Box>
