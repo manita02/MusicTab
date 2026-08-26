@@ -16,6 +16,7 @@
 
 ## Index
 
+* [Live demo (ver online)](#live-demo)
 * [Overview](#overview)
 * [Technologies](#technologies)
 * [Pua (AI copilot)](#pua-ai-copilot)
@@ -33,6 +34,12 @@
 * [Author](#author)
 * [Production deployment](./docs/README_DEPLOY.md)
 
+## Live demo
+
+**[Ver online](https://musictab-4e9.pages.dev/)**
+
+Deploy: **Cloudflare Pages** (frontend), **Render** (API), **Neon** (PostgreSQL).
+
 ## Overview
 MusicTab is a **Yarn workspaces** monorepo for browsing, managing, and discovering **instrument tablature**.
 
@@ -47,14 +54,14 @@ It includes:
 ## Backend
 | Node.js | NestJS | TypeScript | Prisma ORM | PostgreSQL | ts-node | Jest / Vitest |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" width="50"/> | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/NestJS.svg/1200px-NestJS.svg.png" width="60"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" width="50"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/prisma/prisma-original.svg" width="60"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" width="60"/> | <img src="https://typestrong.org/ts-node/img/logo-icon.svg" width="70"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitest/vitest-original.svg" width="60"/> |
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" width="50"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nestjs/nestjs-original.svg" width="60"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" width="50"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/prisma/prisma-original.svg" width="60"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" width="60"/> | <img src="https://typestrong.org/ts-node/img/logo-icon.svg" width="70"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitest/vitest-original.svg" width="60"/> |
 
 Also: **Zod** (structured LLM output), **JWT** sessions, **Cloudflare Turnstile** (server-side verify on register).
 
 ## Frontend
 | React 19 | TypeScript | Vite 7 | Material UI | TanStack Query | Storybook | Vitest |
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="60"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" width="50"/> | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Vitejs-logo.svg/2078px-Vitejs-logo.svg.png" width="60"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/materialui/materialui-original.svg" width="50"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="50"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/storybook/storybook-original.svg" width="50"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitest/vitest-original.svg" width="60"/> |
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="60"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" width="50"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" width="60"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/materialui/materialui-original.svg" width="50"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="50"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/storybook/storybook-original.svg" width="50"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitest/vitest-original.svg" width="60"/> |
 
 Also: **Axios**, **React Router 7**, **Cloudflare Turnstile** (Sign In)
 
