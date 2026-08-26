@@ -44,11 +44,13 @@ describe("DeleteUser use case", () => {
     expect(await repo.findById(userId)).toBeNull();
   });
 
-  it("forbids an ADMIN from deleting themselves", async () => {
-    await expect(
-      useCase.execute({ actorId: adminId, actorRole: Role.ADMIN, targetId: adminId }),
-    ).rejects.toMatchObject({ code: "AuthError" });
-    expect(await repo.findById(adminId)).not.toBeNull();
+  it("lets an ADMIN delete themselves when another admin remains", async () => {
+    await repo.save(
+      User.create("second", "second@gmail.com", "hashed-2", Role.ADMIN, birth(), img(), "10.0.0.2"),
+    );
+
+    await useCase.execute({ actorId: adminId, actorRole: Role.ADMIN, targetId: adminId });
+    expect(await repo.findById(adminId)).toBeNull();
   });
 
   it("rejects deleting the last remaining administrator", async () => {
@@ -60,6 +62,13 @@ describe("DeleteUser use case", () => {
 
     await expect(
       useCase.execute({ actorId: 99, actorRole: Role.ADMIN, targetId: adminId }),
+    ).rejects.toBeInstanceOf(ConflictError);
+    expect(await repo.findById(adminId)).not.toBeNull();
+  });
+
+  it("rejects an ADMIN deleting themselves when they are the last administrator", async () => {
+    await expect(
+      useCase.execute({ actorId: adminId, actorRole: Role.ADMIN, targetId: adminId }),
     ).rejects.toBeInstanceOf(ConflictError);
     expect(await repo.findById(adminId)).not.toBeNull();
   });
