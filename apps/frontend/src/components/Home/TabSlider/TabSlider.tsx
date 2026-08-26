@@ -68,19 +68,28 @@ export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs, instruments }) => 
     if (iconUrl) {
       return (
         <Tooltip title={name} arrow>
-          <Box component="span" sx={{ display: "inline-flex", flexShrink: 0 }}>
+          <Box
+            component="span"
+            sx={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              width: 36,
+              height: 36,
+              borderRadius: "50%",
+              backgroundColor: theme.palette.warning.main,
+            }}
+          >
             <Box
               component="img"
               src={iconUrl}
               alt={name}
               sx={{
-                width: 32,
-                height: 32,
-                p: "2px",
-                borderRadius: "50%",
-                backgroundColor: theme.palette.warning.main,
+                width: 24,
+                height: 24,
                 objectFit: "contain",
-                boxSizing: "border-box",
+                display: "block",
               }}
             />
           </Box>
