@@ -59,6 +59,27 @@ describe('Users authorization (e2e)', () => {
       expect(res.body.some((row: { id: number }) => row.id === userId)).toBe(true);
     });
 
+    it('ADMIN can delete their own account when another admin remains', async () => {
+      const prisma = app.get(PrismaService);
+      const stamp = Date.now();
+      const password = 'e2e-self-del-pass';
+      const extraAdmin = await upsertE2eUser(prisma, {
+        email: `e2eselfadmin${stamp}@gmail.com`,
+        username: `e2eselfadmin${stamp}`,
+        password,
+        role: 'ADMIN',
+      });
+      const extraSession = await loginAs(app, extraAdmin.email, password);
+
+      await request(app.getHttpServer())
+        .delete(`/users/${extraAdmin.id}`)
+        .set(authHeader(extraSession.token))
+        .expect(200);
+
+      expect(await prisma.user.findUnique({ where: { id: extraAdmin.id } })).toBeNull();
+      expect(await prisma.user.findUnique({ where: { id: adminId } })).not.toBeNull();
+    });
+
     describe('delete cascade', () => {
       async function catalogIds() {
         const catalogs = await request(app.getHttpServer()).get('/catalogs/genres').expect(200);

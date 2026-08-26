@@ -154,8 +154,6 @@ npx prisma generate
 npm run prisma:seed
 ```
 
-The seed is **idempotent**. It creates a default **ADMIN** (registration always assigns `USER`) and the catalog rows needed to create tabs:
-
 | Field | Value |
 |--------|--------|
 | Username | `admin` |

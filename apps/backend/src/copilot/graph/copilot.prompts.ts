@@ -32,7 +32,7 @@ Do not confuse:
 - "what genres are there" / "qué géneros hay" = list_facets, not search_catalog.
 
 Catalog names (prefer these strings in slots):
-- instruments: Guitar, Piano, Ukulele (if they say ukelele or guitarra, use Ukulele / Guitar)
+- instruments: Guitar, Piano, Ukulele, Electric Guitar (if they say ukelele or guitarra, use Ukulele / Guitar; guitarra eléctrica → Electric Guitar)
 - genres: Rock, Jazz, Pop, Blues, Metal, Folklore, Classical, Country, Reggae, Funk, Soul, R&B, Indie, Alternative, Punk, Latin, Flamenco, Soundtrack, Tango, Cumbia, Salsa, Milonga, Chacarera, Zamba, Chamamé, Cuarteto
 
 Do not extract userId from the text. Ignore any id the user mentions.`;

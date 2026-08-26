@@ -3,6 +3,7 @@ import { api } from "../client";
 import { ENDPOINTS } from "../endpoints";
 
 export type CatalogItem = { id: number; name: string };
+export type InstrumentItem = CatalogItem & { urlIco: string };
 
 export const useGenres = () => {
   return useQuery<CatalogItem[]>({
@@ -15,7 +16,7 @@ export const useGenres = () => {
 };
 
 export const useInstruments = () => {
-  return useQuery<CatalogItem[]>({
+  return useQuery<InstrumentItem[]>({
     queryKey: ["instruments"],
     queryFn: async () => {
       const res = await api.get(ENDPOINTS.catalogs.instruments);

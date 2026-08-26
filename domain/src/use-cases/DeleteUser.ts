@@ -17,10 +17,6 @@ export class DeleteUser {
       throw new DomainError("AuthError", "You can only delete your own account");
     }
 
-    if (actorIsAdmin && dto.targetId === dto.actorId) {
-      throw new DomainError("AuthError", "Administrators cannot delete their own account");
-    }
-
     const target = await this.userRepo.findById(dto.targetId);
     if (!target || target.id == null) {
       throw new NotFoundError("User not found");

@@ -9,14 +9,14 @@ export class InstrumentPrismaRepository implements IInstrumentRepository {
 
   async findAll(): Promise<Instrument[]> {
     const records = await this.prisma.instrument.findMany();
-    return records.map((r: { id: number; name: string }) =>
-      Instrument.rehydrate(r.id, r.name),
+    return records.map((r: { id: number; name: string; urlIco: string }) =>
+      Instrument.rehydrate(r.id, r.name, r.urlIco),
     );
   }
 
   async findById(id: number): Promise<Instrument | null> {
     const record = await this.prisma.instrument.findUnique({ where: { id } });
     if (!record) return null;
-    return Instrument.rehydrate(record.id, record.name);
+    return Instrument.rehydrate(record.id, record.name, record.urlIco);
   }
 }
