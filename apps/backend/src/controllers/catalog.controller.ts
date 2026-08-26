@@ -4,7 +4,7 @@ import { InstrumentPrismaRepository } from '../repositories/instrument-prisma.re
 import { Public } from '../auth/decorators/public.decorator';
 
 type GenreDTO = { id: number; name: string };
-type InstrumentDTO = { id: number; name: string };
+type InstrumentDTO = { id: number; name: string; urlIco: string };
 
 @Public()
 @Controller('catalogs')
@@ -23,6 +23,6 @@ export class CatalogController {
   @Get('instruments')
   async getInstruments(): Promise<InstrumentDTO[]> {
     const instruments = await this.instrumentRepo.findAll();
-    return instruments.map(i => ({ id: i.id, name: i.name }));
+    return instruments.map(i => ({ id: i.id, name: i.name, urlIco: i.urlIco }));
   }
 }

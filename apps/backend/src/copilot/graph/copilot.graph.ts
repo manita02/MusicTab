@@ -87,6 +87,9 @@ const INSTRUMENT_ALIASES: Record<string, string> = {
   guitarra: 'Guitar',
   guitar: 'Guitar',
   piano: 'Piano',
+  'electric guitar': 'Electric Guitar',
+  'guitarra electrica': 'Electric Guitar',
+  'guitarra eléctrica': 'Electric Guitar',
 };
 
 const SELF_UPLOADER = /^(yo|mí|mi|me|mias|míos|mios|mis|mía|mine)$/i;
