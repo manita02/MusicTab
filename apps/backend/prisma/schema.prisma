@@ -36,6 +36,7 @@ model Genre {
 model Instrument {
   id         Int    @id @default(autoincrement())
   name       String @unique
+  urlIco     String @default("")
   tablaturas Tab[]
 }
 

@@ -11,7 +11,12 @@ const ADMIN_SIGNUP_IP = '127.0.0.1';
 const ADMIN_IMG =
   'https://imgs.search.brave.com/cKpndh_PLl3bVHQqLUPiuQ3ERWbja_MIKeFqA52qCqs/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/cG5nYWxsLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvMTUvVXNl/ci1CYWNrZ3JvdW5k/LVBORy5wbmc';
 
-const INSTRUMENTS = ['Guitar', 'Piano', 'Ukulele'];
+const INSTRUMENTS = [
+  { name: 'Guitar', urlIco: '/src/assets/guitarra.png' },
+  { name: 'Piano', urlIco: '/src/assets/piano.png' },
+  { name: 'Ukulele', urlIco: '/src/assets/ukelele.png' },
+  { name: 'Electric Guitar', urlIco: '/src/assets/guitarra-electrica.png' },
+];
 const GENRES = [
   'Rock',
   'Jazz',
@@ -39,123 +44,6 @@ const GENRES = [
   'Zamba',
   'Chamamé',
   'Cuarteto',
-];
-
-const PDF_PLACEHOLDER = 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf';
-const PDF_PLACEHOLDER_W3 = 'https://www.w3.org/WAI/WCAG21/working-examples/pdf-table/table.pdf';
-
-type DemoTab = {
-  title: string;
-  artist: string;
-  genre: string;
-  instrument: string;
-  urlYoutube: string;
-  urlImagen: string;
-  urlPdf: string;
-  createdAt: Date;
-};
-
-const DEMO_TABS: DemoTab[] = [
-  {
-    title: 'Milo J — Rara Vez',
-    artist: 'Milo J',
-    genre: 'Latin',
-    instrument: 'Guitar',
-    urlYoutube: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    urlImagen: 'https://picsum.photos/seed/miloj-rara/400/300',
-    urlPdf: PDF_PLACEHOLDER,
-    createdAt: new Date('2024-03-10T12:00:00.000Z'),
-  },
-  {
-    title: 'Milo J — M.A.I',
-    artist: 'Milo J',
-    genre: 'Pop',
-    instrument: 'Piano',
-    urlYoutube: 'https://www.youtube.com/watch?v=jNQXAC9IVRw',
-    urlImagen: 'https://picsum.photos/seed/miloj-mai/400/300',
-    urlPdf: PDF_PLACEHOLDER_W3,
-    createdAt: new Date('2024-08-22T12:00:00.000Z'),
-  },
-  {
-    title: "Sweet Child O' Mine",
-    artist: "Guns N' Roses",
-    genre: 'Rock',
-    instrument: 'Guitar',
-    urlYoutube: 'https://www.youtube.com/watch?v=1w7OgIMMRc4',
-    urlImagen: 'https://picsum.photos/seed/scom/400/300',
-    urlPdf: PDF_PLACEHOLDER,
-    createdAt: new Date('2024-01-15T12:00:00.000Z'),
-  },
-  {
-    title: 'Bohemian Rhapsody',
-    artist: 'Queen',
-    genre: 'Rock',
-    instrument: 'Piano',
-    urlYoutube: 'https://www.youtube.com/watch?v=fJ9rUzIMcZQ',
-    urlImagen: 'https://picsum.photos/seed/bohemian/400/300',
-    urlPdf: PDF_PLACEHOLDER_W3,
-    createdAt: new Date('2024-06-20T12:00:00.000Z'),
-  },
-  {
-    title: 'Seven Nation Army',
-    artist: 'The White Stripes',
-    genre: 'Rock',
-    instrument: 'Guitar',
-    urlYoutube: 'https://www.youtube.com/watch?v=0J2QdDbelmY',
-    urlImagen: 'https://picsum.photos/seed/seven-nation/400/300',
-    urlPdf: PDF_PLACEHOLDER,
-    createdAt: new Date('2026-08-01T12:00:00.000Z'),
-  },
-  {
-    title: 'Somewhere Over the Rainbow',
-    artist: "Israel Kamakawiwo'ole",
-    genre: 'Pop',
-    instrument: 'Ukulele',
-    urlYoutube: 'https://www.youtube.com/watch?v=V1bFr2SWP1I',
-    urlImagen: 'https://picsum.photos/seed/rainbow-uke/400/300',
-    urlPdf: PDF_PLACEHOLDER_W3,
-    createdAt: new Date('2024-11-05T12:00:00.000Z'),
-  },
-  {
-    title: 'River Flows in You',
-    artist: 'Yiruma',
-    genre: 'Classical',
-    instrument: 'Piano',
-    urlYoutube: 'https://www.youtube.com/watch?v=7maJOI3QMu0',
-    urlImagen: 'https://picsum.photos/seed/yiruma/400/300',
-    urlPdf: PDF_PLACEHOLDER,
-    createdAt: new Date('2025-02-14T12:00:00.000Z'),
-  },
-  {
-    title: 'Take Five',
-    artist: 'Dave Brubeck',
-    genre: 'Jazz',
-    instrument: 'Piano',
-    urlYoutube: 'https://www.youtube.com/watch?v=vmDDOFXSgAs',
-    urlImagen: 'https://picsum.photos/seed/take-five/400/300',
-    urlPdf: PDF_PLACEHOLDER_W3,
-    createdAt: new Date('2024-04-18T12:00:00.000Z'),
-  },
-  {
-    title: 'Por una Cabeza',
-    artist: 'Carlos Gardel',
-    genre: 'Tango',
-    instrument: 'Guitar',
-    urlYoutube: 'https://www.youtube.com/watch?v=nX1u-5w2pY8',
-    urlImagen: 'https://picsum.photos/seed/por-una-cabeza/400/300',
-    urlPdf: PDF_PLACEHOLDER,
-    createdAt: new Date('2025-06-11T12:00:00.000Z'),
-  },
-  {
-    title: 'El Bombón Asesino',
-    artist: 'Los Palmeras',
-    genre: 'Cumbia',
-    instrument: 'Guitar',
-    urlYoutube: 'https://www.youtube.com/watch?v=9bZkp7q19f0',
-    urlImagen: 'https://picsum.photos/seed/bombon-asesino/400/300',
-    urlPdf: PDF_PLACEHOLDER_W3,
-    createdAt: new Date('2025-09-15T12:00:00.000Z'),
-  },
 ];
 
 async function seedAdmin() {
@@ -241,13 +129,14 @@ async function renameGenre(from: string, to: string) {
 async function seedCatalogs() {
   await renameGenre('Folk', 'Folklore');
 
-  await seedNamedRecords('instruments', INSTRUMENTS, (name) =>
-    prisma.instrument.upsert({
+  for (const { name, urlIco } of INSTRUMENTS) {
+    await prisma.instrument.upsert({
       where: { name },
-      update: {},
-      create: { name },
-    }),
-  );
+      update: { urlIco },
+      create: { name, urlIco },
+    });
+  }
+  console.log(`Seeded instruments: ${INSTRUMENTS.map((i) => i.name).join(', ')}`);
 
   await seedNamedRecords('genres', GENRES, (name) =>
     prisma.genre.upsert({
@@ -258,52 +147,15 @@ async function seedCatalogs() {
   );
 }
 
-async function seedDemoTabs(adminId: number) {
-  const genres = await prisma.genre.findMany();
-  const instruments = await prisma.instrument.findMany();
-  const genreByName = new Map(genres.map((g) => [g.name, g.id]));
-  const instrumentByName = new Map(instruments.map((i) => [i.name, i.id]));
-
-  let created = 0;
-  let skipped = 0;
-
-  for (const demo of DEMO_TABS) {
-    const existing = await prisma.tab.findUnique({ where: { title: demo.title } });
-    if (existing) {
-      skipped += 1;
-      continue;
-    }
-
-    const genreId = genreByName.get(demo.genre);
-    const instrumentId = instrumentByName.get(demo.instrument);
-    if (!genreId || !instrumentId) {
-      throw new Error(`Missing catalog entry for "${demo.title}" (${demo.genre} / ${demo.instrument})`);
-    }
-
-    await prisma.tab.create({
-      data: {
-        title: demo.title,
-        artist: demo.artist,
-        urlYoutube: demo.urlYoutube,
-        urlImagen: demo.urlImagen,
-        urlPdf: demo.urlPdf,
-        createdAt: demo.createdAt,
-        userId: adminId,
-        genreId,
-        instrumentId,
-        viewCount: 0,
-      },
-    });
-    created += 1;
-  }
-
-  console.log(`Seeded demo tabs: ${created} created, ${skipped} already existed`);
+async function deleteAdminTabs(adminId: number) {
+  const result = await prisma.tab.deleteMany({ where: { userId: adminId } });
+  console.log(`Removed ${result.count} tab(s) owned by admin`);
 }
 
 async function main() {
   const admin = await seedAdmin();
+  await deleteAdminTabs(admin.id);
   await seedCatalogs();
-  await seedDemoTabs(admin.id);
 }
 
 main()
