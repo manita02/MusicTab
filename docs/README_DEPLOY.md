@@ -36,7 +36,7 @@ Environment variables:
 | `CORS_ORIGIN` | Frontend origin(s), comma-separated, e.g. `https://your-app.pages.dev` |
 | `GEMINI_API_KEY` | Google AI Studio key (required for **Pua**) |
 | `COPILOT_MODEL` | Optional. Default in `render.yaml`: `gemini-3.6-flash` |
-| `SEED_ON_BOOT` | `true` on first deploy (idempotent admin + catalogs + demo tabs), then set `false` |
+| `SEED_ON_BOOT` | `true` on first deploy (idempotent admin + catalogs; removes tabs owned by the seed admin), then set `false` |
 | `TURNSTILE_SECRET_KEY` | Production secret (not the `1x000000...` test key) |
 | `TURNSTILE_VERIFY_URL` | Optional. Default: `https://challenges.cloudflare.com/turnstile/v0/siteverify` |
 
