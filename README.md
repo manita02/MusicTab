@@ -56,7 +56,7 @@ Also: **Zod** (structured LLM output), **JWT** sessions, **Cloudflare Turnstile*
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="60"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" width="50"/> | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Vitejs-logo.svg/2078px-Vitejs-logo.svg.png" width="60"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/materialui/materialui-original.svg" width="50"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="50"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/storybook/storybook-original.svg" width="50"/> | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitest/vitest-original.svg" width="60"/> |
 
-Also: **Axios**, **React Router 7**, **Cloudflare Turnstile** (Sign In).
+Also: **Axios**, **React Router 7**, **Cloudflare Turnstile** (Sign In)
 
 ## DevOps
 | Docker | Docker Compose |
