@@ -54,16 +54,20 @@ export const AdminUsersPage: React.FC = () => {
 
   const handleDeleteClick = (user: AdminUser) => {
     setSelectedUser(user);
+    const isSelf = userId != null && user.id === userId;
     setModal({
       open: true,
       type: "warning",
-      title: "Delete this user?",
-      message: `Are you sure you want to delete "${user.username}"? This will permanently delete this account, all tabs they published, their PDF view history, login sessions, and Copilot usage. This cannot be undone.`,
+      title: isSelf ? "Delete your account?" : "Delete this user?",
+      message: isSelf
+        ? `Are you sure you want to delete your account "${user.username}"? This will permanently delete this account, all tabs you published, your PDF view history, login sessions, and Copilot usage. This cannot be undone.`
+        : `Are you sure you want to delete "${user.username}"? This will permanently delete this account, all tabs they published, their PDF view history, login sessions, and Copilot usage. This cannot be undone.`,
     });
   };
 
   const handleConfirmDelete = () => {
     if (!selectedUser) return;
+    const deletedSelf = userId != null && selectedUser.id === userId;
     deleteUser(selectedUser.id, {
       onSuccess: () => {
         queryClient.setQueryData<AdminUser[]>(ADMIN_USERS_QUERY_KEY, (prev) =>
@@ -73,9 +77,17 @@ export const AdminUsersPage: React.FC = () => {
           open: true,
           type: "success",
           title: "Deleted successfully",
-          message: `The account "${selectedUser.username}" and its associated data (published tabs, PDF view history, login sessions, and Copilot usage) were deleted.`,
+          message: deletedSelf
+            ? "Your account and its associated data (published tabs, PDF view history, login sessions, and Copilot usage) were deleted."
+            : `The account "${selectedUser.username}" and its associated data (published tabs, PDF view history, login sessions, and Copilot usage) were deleted.`,
         });
         setSelectedUser(null);
+        if (deletedSelf) {
+          localStorage.clear();
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 1500);
+        }
       },
       onError: (err) => {
         const errorMessage =
@@ -167,14 +179,9 @@ export const AdminUsersPage: React.FC = () => {
       align: "center",
       headerAlign: "center",
       renderCell: (params) => {
-        const isSelf = userId != null && params.row.id === userId;
         const isLastAdmin = params.row.role === "ADMIN" && adminCount <= 1;
-        const deleteDisabled = isSelf || isLastAdmin || isDeleting;
-        const deleteTooltip = isSelf
-          ? "You cannot delete your own account"
-          : isLastAdmin
-            ? "Cannot delete the last administrator"
-            : "Delete";
+        const deleteDisabled = isLastAdmin || isDeleting;
+        const deleteTooltip = isLastAdmin ? "Cannot delete the last administrator" : "Delete";
 
         return (
           <Box

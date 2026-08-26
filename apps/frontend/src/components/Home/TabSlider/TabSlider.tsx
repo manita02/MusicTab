@@ -6,8 +6,10 @@ import {
   CardMedia,
   CardContent,
   Typography,
+  useMediaQuery,
   useTheme,
   Chip,
+  Tooltip,
 } from "@mui/material";
 
 import "slick-carousel/slick/slick.css";
@@ -15,6 +17,7 @@ import "slick-carousel/slick/slick-theme.css";
 import { useNavigate } from "react-router-dom";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { UserAvatar } from "../../UserAvatar/UserAvatar";
+import { resolveInstrumentIco } from "../../../assets/instrumentIcons";
 
 interface TabItem {
   id: number;
@@ -29,6 +32,7 @@ interface TabItem {
 interface Instrument {
   id: number;
   name: string;
+  urlIco?: string;
 }
 
 interface TabsSliderProps {
@@ -46,35 +50,84 @@ const COVER_SX = {
 export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs, instruments }) => {
   const theme = useTheme();
   const navigate = useNavigate();
+  const isXs = useMediaQuery(theme.breakpoints.down("sm"), { noSsr: true });
+  const isSm = useMediaQuery(theme.breakpoints.down("md"), { noSsr: true });
+  const isMd = useMediaQuery(theme.breakpoints.down("lg"), { noSsr: true });
 
   const handleCardClick = (tab: TabItem) => {
     navigate(`/tabs?search=${encodeURIComponent(tab.title)}`);
   };
 
-  const getInstrumentName = (id: number) =>
-    instruments.find((i: { id: number }) => i.id === id)?.name || "-";
+  const getInstrument = (id: number) => instruments.find((i) => i.id === id);
+
+  const renderInstrumentBadge = (instrumentId: number) => {
+    const instrument = getInstrument(instrumentId);
+    const name = instrument?.name || "-";
+    const iconUrl = resolveInstrumentIco(instrument?.urlIco);
+
+    if (iconUrl) {
+      return (
+        <Tooltip title={name} arrow>
+          <Box component="span" sx={{ display: "inline-flex", flexShrink: 0 }}>
+            <Box
+              component="img"
+              src={iconUrl}
+              alt={name}
+              sx={{
+                width: 32,
+                height: 32,
+                p: "2px",
+                borderRadius: "50%",
+                backgroundColor: theme.palette.warning.main,
+                objectFit: "contain",
+                boxSizing: "border-box",
+              }}
+            />
+          </Box>
+        </Tooltip>
+      );
+    }
+
+    return (
+      <Chip
+        label={name}
+        size="small"
+        sx={{
+          fontWeight: 600,
+          backgroundColor: theme.palette.warning.main,
+          color: theme.palette.warning.contrastText,
+          flexShrink: 0,
+          height: 22,
+          "&:hover": {
+            backgroundColor: theme.palette.warning.dark,
+          },
+        }}
+      />
+    );
+  };
+
+  let slidesToShow = 4;
+  let slidesToScroll = 4;
+  if (isXs) {
+    slidesToShow = 2;
+    slidesToScroll = 1;
+  } else if (isSm) {
+    slidesToShow = 2;
+    slidesToScroll = 2;
+  } else if (isMd) {
+    slidesToShow = 3;
+    slidesToScroll = 3;
+  }
 
   const settings = {
     dots: false,
-    infinite: tabs.length > 4,
+    infinite: tabs.length > slidesToShow,
     speed: 600,
-    slidesToShow: 4,
-    slidesToScroll: 4,
-    responsive: [
-      { breakpoint: 1200, settings: { slidesToShow: 3, slidesToScroll: 3, infinite: tabs.length > 3 } },
-      { breakpoint: 900, settings: { slidesToShow: 2, slidesToScroll: 2, infinite: tabs.length > 2 } },
-      {
-        breakpoint: 600,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-          centerMode: false,
-          variableWidth: false,
-          arrows: true,
-          infinite: tabs.length > 1,
-        },
-      },
-    ],
+    slidesToShow,
+    slidesToScroll,
+    arrows: true,
+    centerMode: false,
+    variableWidth: false,
   };
 
   return (
@@ -117,7 +170,7 @@ export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs, instruments }) => 
         "& .slick-next": { right: { xs: 8, sm: 10, md: 12 } },
       }}
     >
-      <Slider {...settings}>
+      <Slider key={`${slidesToShow}-${slidesToScroll}`} {...settings}>
         {tabs.map((tab) => (
           <Box key={tab.id}>
             <Card
@@ -192,20 +245,7 @@ export const TabsSlider: React.FC<TabsSliderProps> = ({ tabs, instruments }) => 
                     {tab.title}
                   </Typography>
 
-                  <Chip
-                    label={getInstrumentName(tab.instrumentId)}
-                    size="small"
-                    sx={{
-                      fontWeight: 600,
-                      backgroundColor: theme.palette.warning.main,
-                      color: theme.palette.warning.contrastText,
-                      flexShrink: 0,
-                      height: 22,
-                      "&:hover": {
-                        backgroundColor: theme.palette.warning.dark,
-                      },
-                    }}
-                  />
+                  {renderInstrumentBadge(tab.instrumentId)}
                 </Box>
 
                 <Box
