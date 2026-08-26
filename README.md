@@ -58,34 +58,24 @@ Also: **Zod** (structured LLM output), **JWT** sessions, **Cloudflare Turnstile*
 
 Also: **Axios**, **React Router 7**, **Cloudflare Turnstile** (Sign In).
 
-## AI (Pua)
-
-LangChain and LangGraph are **not** the same library. Both are used, from the same ecosystem:
-
-| LangChain | LangGraph | Gemini | Zod |
-|:--:|:--:|:--:|:--:|
-| SDK: messages + Gemini client (`@langchain/core`, `@langchain/google-genai`) | Orchestration: `StateGraph` (`@langchain/langgraph`) | LLM `gemini-3.6-flash` | Structured intent/slots |
-
 ## DevOps
 | Docker | Docker Compose |
 |:--:|:--:|
 | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" width="60"/> | <img src="https://d2zv2ciw0ln4h1.cloudfront.net/uploads/docker_compose_button_39e60f2557.jpeg" width="150"/> |
 
-Local Compose runs API + Vite + Postgres. Hosting steps are **not** documented here.
+Local Compose runs API + Vite + Postgres.
 
 ## Pua (AI copilot)
 
-**Pua** is MusicTab’s generative-AI catalog assistant (drawer chatbot). Guests are invited to log in; authenticated users can ask about artists, genres, instruments, views, and uploads in **English or Spanish**. Replies are written in **English**.
+**Pua** is MusicTab’s generative-AI catalog assistant (drawer chatbot). Guests are invited to log in; authenticated users can ask about artists, genres, instruments, views, and uploads in **English or Spanish**. 
+The LLM classifies the question; **TypeScript domain use-cases** load rows from **PostgreSQL**; then the model (or a fixed template) phrases the answer.
 
-Pua does **not** hallucinate tabs, IDs, or URLs. The LLM classifies the question; **TypeScript domain use-cases** load rows from **PostgreSQL**; then the model (or a fixed template) phrases the answer.
-
-| Layer | Language / library | Role |
-|--------|---------------------|------|
-| API | **TypeScript**, **NestJS 11** (`CopilotModule`) | JWT, quota, `POST /copilot/chat`, `GET /copilot/quota` |
-| Orchestration | **LangGraph** (`@langchain/langgraph`) | `StateGraph`: `understand` → `act` → `reply` |
-| LLM | **Google Gemini** via **LangChain** (`ChatGoogleGenerativeAI`) | Default model **`gemini-3.6-flash`** (`COPILOT_MODEL`) |
-| Structured output | **Zod** | Intent + slots (`artist`, `genre`, `instrument`, …) |
-| Tools | TypeScript domain (`SearchTabs`, counts, views, …) | Catalog reads only |
+| Layer | Language / library |
+|--------|---------------------|
+| API | **TypeScript**, **NestJS 11** (`CopilotModule`) |
+| Orchestration | **LangGraph** (`@langchain/langgraph`) |
+| LLM | **Google Gemini** via **LangChain** (`ChatGoogleGenerativeAI`) |
+| Structured output | **Zod** |
 
 Graph (all in TypeScript):
 
