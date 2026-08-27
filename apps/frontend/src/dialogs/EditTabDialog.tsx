@@ -205,7 +205,7 @@ export const EditTabDialog: React.FC<EditTabDialogProps> = ({
         PaperProps={{
           sx: {
             borderRadius: { xs: 0, md: 3 },
-            p: { xs: 0, sm: 1, md: 1.25 },
+            p: 0,
             backgroundColor: theme.palette.background.paper,
             m: { xs: 0, sm: 2 },
             maxHeight: { xs: "100dvh", md: "90dvh" },
@@ -218,8 +218,8 @@ export const EditTabDialog: React.FC<EditTabDialogProps> = ({
             fontWeight: 700,
             textAlign: "center",
             color: theme.palette.primary.main,
-            pt: { xs: 1.25, sm: 1.5 },
-            pb: { xs: 0.75, sm: 1 },
+            pt: 1,
+            pb: 0.5,
             px: { xs: 1.5, sm: 2 },
           }}
         >

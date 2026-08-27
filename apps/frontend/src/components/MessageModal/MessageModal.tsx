@@ -97,13 +97,15 @@ export const MessageModal: React.FC<MessageModalProps> = ({
         sx={{
           fontWeight: 600,
           textAlign: "center",
-          pb: 1,
+          pt: 1,
+          pb: 0.5,
+          px: 2,
         }}
       >
         {title}
         <Divider
           sx={{
-            mt: 1,
+            mt: 0.5,
             width: "60%",
             mx: "auto",
             borderWidth: 2,
@@ -113,8 +115,8 @@ export const MessageModal: React.FC<MessageModalProps> = ({
         />
       </DialogTitle>
 
-      <DialogContent>
-        <Box display="flex" justifyContent="center" mt={1}>
+      <DialogContent sx={{ px: 2, pt: 0.5, pb: 1 }}>
+        <Box display="flex" justifyContent="center">
           <Alert
             severity={type}
             variant="filled"
@@ -132,7 +134,7 @@ export const MessageModal: React.FC<MessageModalProps> = ({
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ justifyContent: "center", pb: 2, px: 2, gap: 1, flexWrap: "wrap" }}>
+      <DialogActions sx={{ justifyContent: "center", pb: 1.5, pt: 0.5, px: 2, gap: 1, flexWrap: "wrap" }}>
         {type === "warning" ? (
           <>
             <Button
