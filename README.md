@@ -301,14 +301,20 @@ docker compose down
   - Upload and update profile image
 
 - **Roles & tab permissions (source of truth: backend)**
-  - **Admin (`ADMIN`)** — Full tablature **CRUD**: create, edit, delete; browse all tabs; download PDFs; admin-only UI controls.
-  - **Registered user (`USER`)** — Browse tabs with full details (including PDF links from authenticated APIs), **download** PDFs; **cannot** create, edit, or delete tabs or call admin mutation endpoints.
-  - **Guest (not signed in)** — Can browse the **public** tab catalogue and see previews (YouTube embed via `youtubeVideoId`, cover image via a **same-origin proxy** so stored image URLs are not exposed in public JSON). **Download**, **create**, **edit**, and **delete** are disabled in the UI and blocked by the API for mutations; PDF is not returned on public list endpoints.
+  - **Admin (`ADMIN`)** — Full tablature **CRUD**: create, edit, delete; browse all tabs; download PDFs; admin-only UI controls; **Capture tab PDF** studio (desktop).
+  - **Registered user (`USER`)** — Browse tabs with full details (including PDF links from authenticated APIs), **download** PDFs; **cannot** create, edit, or delete tabs or call admin mutation endpoints. The Capture tab PDF button is visible but disabled.
+  - **Guest (not signed in)** — Can browse the **public** tab catalogue and see previews (YouTube embed via `youtubeVideoId`, cover image via a **same-origin proxy** so stored image URLs are not exposed in public JSON). **Download**, **create**, **edit**, and **delete** are disabled in the UI and blocked by the API for mutations; PDF is not returned on public list endpoints. The Capture tab PDF button is visible but disabled.
 
 - **Tabs Management**
   - Tabs include YouTube link, preview image, PDF file, genre, and instrument
   - **Only admins** perform create / update / delete (domain rules + NestJS `RolesGuard`)
   - Public read endpoints: `GET /tabs/public`, `GET /tabs/latest/public`; authenticated listing: `GET /tabs`, `GET /tabs/latest`
+
+- **Capture tab PDF (admin, desktop)**
+  - Entry points: Home (next to View Tabs / Create New Tab) and the Tabs page
+  - Admin pastes a YouTube URL, shares **this browser tab**, crops the tablature region, stacks up to **30** captures, then downloads a PDF locally
+  - Does **not** persist to the catalog (`urlPdf`); nothing is uploaded to the API
+  - Guests and `USER` see the button disabled, with a tooltip explaining admin-only access
 
 - **Pua (AI copilot)**
   - Drawer chatbot for **logged-in** users; guests get **Go to login**
