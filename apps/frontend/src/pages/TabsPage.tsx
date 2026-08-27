@@ -21,6 +21,7 @@ import { Button } from "../components/Button/Button";
 import { InputField } from "../components/InputField/InputField";
 import { SelectField } from "../components/SelectField/SelectField";
 import { CreateTabDialog } from "../dialogs/CreateTabDialog";
+import { CaptureTabPdfButton } from "../components/CaptureTabPdfButton/CaptureTabPdfButton";
 import { useAuth } from "../api/hooks/useAuth";
 import { useAllTabs } from "../api/hooks/useTabs";
 import { useGenres, useInstruments } from "../api/hooks/useCatalog";
@@ -667,6 +668,9 @@ export const TabsPage: React.FC = () => {
                   />
                 </span>
               </Tooltip>
+            </Grid>
+            <Grid size={{ xs: 12, sm: "auto" }}>
+              <CaptureTabPdfButton sx={{ height: 56 }} />
             </Grid>
           </Grid>
 
