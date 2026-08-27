@@ -1,0 +1,316 @@
+# Golden questions — classify Pua (as-is)
+# Cada caso: utterance → intent + slots esperados.
+# Idioma de la pregunta: en | es. Reply del producto sigue siendo inglés.
+# Usar en evals con Gemini mockeado o revisión manual. No son tests ejecutables todavía (ver tasks T-010).
+
+version: 1
+notes: >
+  Slots omitidos se esperan ausentes. artist/genre/instrument/title son aproximados
+  (el modelo puede devolver mayúsculas canónicas). Desambiguación: spec.md §10.
+
+cases:
+  # --- search_catalog ---
+  - id: SC-EN-01
+    intent: search_catalog
+    lang: en
+    utterance: Are there tabs by Milo J?
+    slots: { artist: "Milo J" }
+  - id: SC-ES-01
+    intent: search_catalog
+    lang: es
+    utterance: "¿hay tabs de Milo J?"
+    slots: { artist: "Milo J" }
+  - id: SC-EN-02
+    intent: search_catalog
+    lang: en
+    utterance: Do you have Bohemian Rhapsody?
+    slots: { title: "Bohemian Rhapsody" }
+  - id: SC-ES-02
+    intent: search_catalog
+    lang: es
+    utterance: buscá Rara Vez
+    slots: { title: "Rara Vez" }
+  - id: SC-EN-03
+    intent: search_catalog
+    lang: en
+    utterance: Rock by Milo J
+    slots: { artist: "Milo J", genre: "Rock" }
+
+  # --- count_by_artist ---
+  - id: CBA-EN-01
+    intent: count_by_artist
+    lang: en
+    utterance: how many tabs by Milo J
+    slots: { artist: "Milo J" }
+  - id: CBA-ES-01
+    intent: count_by_artist
+    lang: es
+    utterance: cuántas tabs de Milo J
+    slots: { artist: "Milo J" }
+
+  # --- count_catalog ---
+  - id: CC-EN-01
+    intent: count_catalog
+    lang: en
+    utterance: how many rock tabs
+    slots: { genre: "Rock" }
+  - id: CC-ES-01
+    intent: count_catalog
+    lang: es
+    utterance: cuántas tabs de rock
+    slots: { genre: "Rock" }
+  - id: CC-EN-02
+    intent: count_catalog
+    lang: en
+    utterance: how many ukulele tabs
+    slots: { instrument: "Ukulele" }
+  - id: CC-ES-02
+    intent: count_catalog
+    lang: es
+    utterance: cuántas de ukelele
+    slots: { instrument: "Ukulele" }
+  - id: CC-EN-03
+    intent: count_catalog
+    lang: en
+    utterance: how many tabs are there
+    slots: {}
+  - id: CC-ES-03
+    intent: count_catalog
+    lang: es
+    utterance: cuántas tabs hay
+    slots: {}
+
+  # --- list_facets ---
+  - id: LF-EN-01
+    intent: list_facets
+    lang: en
+    utterance: what genres are there
+    slots: { facet: genre }
+  - id: LF-ES-01
+    intent: list_facets
+    lang: es
+    utterance: qué géneros hay
+    slots: { facet: genre }
+  - id: LF-EN-02
+    intent: list_facets
+    lang: en
+    utterance: what instruments
+    slots: { facet: instrument }
+  - id: LF-ES-02
+    intent: list_facets
+    lang: es
+    utterance: qué instrumentos
+    slots: { facet: instrument }
+  - id: LF-EN-03
+    intent: list_facets
+    lang: en
+    utterance: what artists are there
+    slots: { facet: artist }
+  - id: LF-ES-03
+    intent: list_facets
+    lang: es
+    utterance: qué artistas hay
+    slots: { facet: artist }
+
+  # --- last_viewed_me ---
+  - id: LV-EN-01
+    intent: last_viewed_me
+    lang: en
+    utterance: what was the last one I opened
+    slots: {}
+  - id: LV-ES-01
+    intent: last_viewed_me
+    lang: es
+    utterance: cuál fue la última que abrí
+    slots: {}
+
+  # --- count_my_views ---
+  - id: CMV-EN-01
+    intent: count_my_views
+    lang: en
+    utterance: how many PDFs did I open
+    slots: {}
+  - id: CMV-ES-01
+    intent: count_my_views
+    lang: es
+    utterance: cuántos PDFs abrí
+    slots: {}
+
+  # --- search_by_uploader ---
+  - id: SBU-EN-01
+    intent: search_by_uploader
+    lang: en
+    utterance: tabs uploaded by pepe
+    slots: { uploader: "pepe" }
+  - id: SBU-ES-01
+    intent: search_by_uploader
+    lang: es
+    utterance: tabs que subió pepe
+    slots: { uploader: "pepe" }
+  - id: SBU-EN-02
+    intent: search_by_uploader
+    lang: en
+    utterance: what did I upload
+    slots: { uploader: "me" }
+  - id: SBU-ES-02
+    intent: search_by_uploader
+    lang: es
+    utterance: las que subí yo
+    slots: { uploader: "me" }
+
+  # --- help ---
+  - id: HP-EN-01
+    intent: help
+    lang: en
+    utterance: what can you do
+    slots: {}
+  - id: HP-ES-01
+    intent: help
+    lang: es
+    utterance: qué podés hacer
+    slots: {}
+  - id: HP-ES-02
+    intent: help
+    lang: es
+    utterance: ayúdame
+    slots: {}
+
+  # --- my_quota ---
+  - id: MQ-EN-01
+    intent: my_quota
+    lang: en
+    utterance: how many messages do I have left
+    slots: {}
+  - id: MQ-ES-01
+    intent: my_quota
+    lang: es
+    utterance: cuántos mensajes me quedan
+    slots: {}
+
+  # --- latest ---
+  - id: LT-EN-01
+    intent: latest
+    lang: en
+    utterance: most recent tabs
+    slots: {}
+  - id: LT-ES-01
+    intent: latest
+    lang: es
+    utterance: las más recientes
+    slots: {}
+
+  # --- top_viewed_me ---
+  - id: TVM-EN-01
+    intent: top_viewed_me
+    lang: en
+    utterance: the ones I visited the most
+    slots: { order: desc }
+  - id: TVM-ES-01
+    intent: top_viewed_me
+    lang: es
+    utterance: las que más visité
+    slots: { order: desc }
+  - id: TVM-EN-02
+    intent: top_viewed_me
+    lang: en
+    utterance: the ones I visited the least
+    slots: { order: asc }
+  - id: TVM-ES-02
+    intent: top_viewed_me
+    lang: es
+    utterance: las que menos visité
+    slots: { order: asc }
+
+  # --- top_viewed_global ---
+  - id: TVG-EN-01
+    intent: top_viewed_global
+    lang: en
+    utterance: most viewed
+    slots: { order: desc }
+  - id: TVG-ES-01
+    intent: top_viewed_global
+    lang: es
+    utterance: las más visitadas
+    slots: { order: desc }
+  - id: TVG-EN-02
+    intent: top_viewed_global
+    lang: en
+    utterance: least viewed
+    slots: { order: asc }
+  - id: TVG-ES-02
+    intent: top_viewed_global
+    lang: es
+    utterance: las menos visitadas
+    slots: { order: asc }
+
+  # --- stale_for_me ---
+  - id: ST-EN-01
+    intent: stale_for_me
+    lang: en
+    utterance: ones I haven't opened in a while
+    slots: {}
+  - id: ST-ES-01
+    intent: stale_for_me
+    lang: es
+    utterance: hace rato no visito
+    slots: {}
+
+  # --- never_viewed_me ---
+  - id: NV-EN-01
+    intent: never_viewed_me
+    lang: en
+    utterance: ones I never visited
+    slots: {}
+  - id: NV-ES-01
+    intent: never_viewed_me
+    lang: es
+    utterance: nunca visité
+    slots: {}
+
+  # --- out_of_scope ---
+  - id: OOS-EN-01
+    intent: out_of_scope
+    lang: en
+    utterance: what's the weather in Buenos Aires
+    slots: {}
+  - id: OOS-ES-01
+    intent: out_of_scope
+    lang: es
+    utterance: pasame la letra de Bohemian Rhapsody
+    slots: {}
+  - id: OOS-EN-02
+    intent: out_of_scope
+    lang: en
+    utterance: give me the guitar chords for Wonderwall
+    slots: {}
+  - id: OOS-ES-02
+    intent: out_of_scope
+    lang: es
+    utterance: qué hora es
+    slots: {}
+
+  # --- desambiguación explícita ---
+  - id: DIS-01
+    intent: top_viewed_global
+    lang: es
+    utterance: las menos visitadas
+    slots: { order: asc }
+    notes: No es stale_for_me ni top_viewed_me.
+  - id: DIS-02
+    intent: last_viewed_me
+    lang: es
+    utterance: la última que abrí
+    slots: {}
+    notes: No es stale_for_me.
+  - id: DIS-03
+    intent: count_catalog
+    lang: es
+    utterance: cuántas tabs hay en total
+    slots: {}
+    notes: No es count_by_artist.
+  - id: DIS-04
+    intent: list_facets
+    lang: es
+    utterance: qué géneros hay
+    slots: { facet: genre }
+    notes: No es search_catalog.

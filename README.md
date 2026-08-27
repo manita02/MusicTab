@@ -20,6 +20,7 @@
 * [Overview](#overview)
 * [Technologies](#technologies)
 * [Pua (AI copilot)](#pua-ai-copilot)
+* [Spec Driven Development (Pua)](./docs/sdd/README.md)
 * [Prerequisites](#prerequisites)
 * [Project Installation](#project-installation)
     * [Running the Backend Locally](#running-the-backend-locally)
@@ -91,6 +92,8 @@ Graph (all in TypeScript):
 3. **`reply`** — Gemini writes 4–6 lines, or a template for some intents (`COPILOT_TEMPLATE_REPLY=true`).
 
 Limits: **10 messages / user / day** (`America/Argentina/Buenos_Aires`) and **60 s** between successful sends; input max **100** characters. Set `GEMINI_API_KEY` in `apps/backend/.env` (see `.env.example`).
+
+Product spec (as-is + backlog): [`docs/sdd/README.md`](./docs/sdd/README.md) and [`specs/001-pua-copilot/spec.md`](./specs/001-pua-copilot/spec.md).
 
 ## Prerequisites
 

@@ -1,0 +1,230 @@
+openapi: 3.0.3
+info:
+  title: MusicTab Pua (copilot)
+  description: >
+    Contrato as-is extraído de CopilotController, CopilotChatDto,
+    CopilotQuotaService y copilot.exceptions. JWT global (JwtAuthGuard).
+    POST exitoso usa el status default de Nest (201 Created) porque el
+    controller no declara @HttpCode.
+  version: "1.0.0"
+
+servers:
+  - url: http://localhost:3000
+    description: API local
+
+paths:
+  /copilot/quota:
+    get:
+      operationId: getCopilotQuota
+      summary: Cupo diario y cooldown del usuario autenticado
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Snapshot de cuota (día calendario America/Argentina/Buenos_Aires)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CopilotQuotaResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /copilot/chat:
+    post:
+      operationId: postCopilotChat
+      summary: Un turno de Pua (clasifica, consulta catálogo, responde)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CopilotChatRequest"
+      responses:
+        "201":
+          description: Turno exitoso; la cuota ya fue incrementada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CopilotChatResponse"
+        "400":
+          description: Validación (mensaje vacío/>100 u history inválido)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CopilotError"
+              examples:
+                inputTooLong:
+                  value:
+                    statusCode: 400
+                    code: INPUT_TOO_LONG
+                    message: Message must be between 1 and 100 characters
+                badRequest:
+                  value:
+                    statusCode: 400
+                    code: BAD_REQUEST
+                    message: []
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          description: Cuota diaria o cooldown de 60s
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CopilotError"
+              examples:
+                dailyLimit:
+                  value:
+                    statusCode: 429
+                    code: COPILOT_DAILY_LIMIT
+                    message: You've reached the 10-message limit for today
+                cooldown:
+                  value:
+                    statusCode: 429
+                    code: COPILOT_COOLDOWN
+                    message: Please wait 40 seconds before sending another message to Pua
+                    retryAfterMs: 40000
+        "503":
+          description: Gemini ausente, timeout o outage; no incrementa cuota
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CopilotError"
+              example:
+                statusCode: 503
+                code: GEMINI_UNAVAILABLE
+                message: The AI service is unavailable, try again in a bit
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    Unauthorized:
+      description: Falta o es inválido el JWT
+      content:
+        application/json:
+          schema:
+            type: object
+
+  schemas:
+    CopilotHistoryMessage:
+      type: object
+      required: [role, content]
+      properties:
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+          maxLength: 2000
+
+    CopilotChatRequest:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Trimmed en el pipe. Vacío o >100 → INPUT_TOO_LONG.
+        history:
+          type: array
+          maxItems: 20
+          description: El servicio recorta a los últimos 4 para el grafo.
+          items:
+            $ref: "#/components/schemas/CopilotHistoryMessage"
+
+    CopilotTabHit:
+      type: object
+      required: [id, title, artist, genre, instrument, viewCount, createdAt]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        artist:
+          type: string
+        genre:
+          type: string
+        instrument:
+          type: string
+        viewCount:
+          type: integer
+        createdAt:
+          type: string
+        lastViewedAt:
+          type: string
+      description: Nunca incluye urlPdf. Máximo 3 ítems en la respuesta.
+
+    CopilotQuotaSnapshot:
+      type: object
+      required: [used, remaining, limit]
+      properties:
+        used:
+          type: integer
+        remaining:
+          type: integer
+        limit:
+          type: integer
+          enum: [10]
+        cooldownUntil:
+          type: string
+          format: date-time
+          nullable: true
+        cooldownRemainingMs:
+          type: integer
+
+    CopilotQuotaResponse:
+      allOf:
+        - $ref: "#/components/schemas/CopilotQuotaSnapshot"
+        - type: object
+          required: [resetAt]
+          properties:
+            resetAt:
+              type: string
+              format: date-time
+              description: Próxima medianoche calendario AR (UTC 03:00).
+
+    CopilotChatResponse:
+      type: object
+      required: [reply, hits, quota]
+      properties:
+        reply:
+          type: string
+          description: Siempre inglés. Intent no se expone.
+        hits:
+          type: array
+          maxItems: 3
+          items:
+            $ref: "#/components/schemas/CopilotTabHit"
+        quota:
+          $ref: "#/components/schemas/CopilotQuotaSnapshot"
+
+    CopilotError:
+      type: object
+      required: [statusCode, code, message]
+      properties:
+        statusCode:
+          type: integer
+        code:
+          type: string
+          enum:
+            - INPUT_TOO_LONG
+            - BAD_REQUEST
+            - COPILOT_DAILY_LIMIT
+            - COPILOT_COOLDOWN
+            - GEMINI_UNAVAILABLE
+        message:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+        retryAfterMs:
+          type: number
+          description: Solo COPILOT_COOLDOWN.
