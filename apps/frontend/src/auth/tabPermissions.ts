@@ -18,6 +18,12 @@ export function canUseTabCaptureStudio(isLoggedIn: boolean, role: ViewerRole): b
   return canManageTabs(isLoggedIn, role);
 }
 
+export function tabCaptureStudioTooltip(isLoggedIn: boolean, role: ViewerRole): string {
+  if (canUseTabCaptureStudio(isLoggedIn, role)) return "";
+  if (!isLoggedIn) return "Sign in as an administrator to capture tab PDFs";
+  return "Only administrators can capture tab PDFs";
+}
+
 export function canMutateTab(
   isLoggedIn: boolean,
   role: ViewerRole,

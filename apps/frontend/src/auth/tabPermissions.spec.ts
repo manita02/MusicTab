@@ -6,6 +6,7 @@ import {
   canMutateTab,
   canUseTabCaptureStudio,
   normalizeRole,
+  tabCaptureStudioTooltip,
 } from "./tabPermissions";
 
 describe("tabPermissions", () => {
@@ -19,6 +20,16 @@ describe("tabPermissions", () => {
     expect(canUseTabCaptureStudio(true, normalizeRole("ADMIN"))).toBe(true);
     expect(canUseTabCaptureStudio(true, normalizeRole("USER"))).toBe(false);
     expect(canUseTabCaptureStudio(false, normalizeRole(null))).toBe(false);
+  });
+
+  it("tooltip del studio distingue guest, user y admin", () => {
+    expect(tabCaptureStudioTooltip(true, "ADMIN")).toBe("");
+    expect(tabCaptureStudioTooltip(false, null)).toBe(
+      "Sign in as an administrator to capture tab PDFs",
+    );
+    expect(tabCaptureStudioTooltip(true, "USER")).toBe(
+      "Only administrators can capture tab PDFs",
+    );
   });
 
   it("solo admin puede gestionar usuarios", () => {
