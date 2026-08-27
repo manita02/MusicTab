@@ -283,7 +283,7 @@ export const TabCaptureStudioDialog: React.FC<TabCaptureStudioDialogProps> = ({
         sx={{
           display: "flex",
           alignItems: "center",
-          gap: 1.5,
+          gap: 1,
           py: 1,
           px: 2,
           pr: 1,
@@ -303,30 +303,38 @@ export const TabCaptureStudioDialog: React.FC<TabCaptureStudioDialogProps> = ({
         >
           Capture tab PDF
         </Typography>
+        <Box sx={{ flex: 1 }} />
         {isDesktop ? (
           <Box
             sx={{
-              flex: 1,
+              display: "flex",
+              gap: 1.25,
+              flex: "0 1 980px",
+              maxWidth: 980,
               minWidth: 0,
-              display: "grid",
-              gridTemplateColumns: "minmax(140px, 0.7fr) minmax(220px, 1.3fr)",
-              gap: 1,
+              mr: 0.5,
             }}
           >
-            <InputField
-              label="PDF title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Song name"
-              size="small"
-            />
-            <InputField
-              label="YouTube URL"
-              value={youtubeUrl}
-              onChange={(e) => setYoutubeUrl(e.target.value)}
-              placeholder="https://www.youtube.com/watch?v=…"
-              size="small"
-            />
+            <Box sx={{ width: 460, flexShrink: 0 }}>
+              <InputField
+                label="Title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Title"
+                size="small"
+                hideLabel
+              />
+            </Box>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <InputField
+                label="Video URL"
+                value={youtubeUrl}
+                onChange={(e) => setYoutubeUrl(e.target.value)}
+                placeholder="Video URL"
+                size="small"
+                hideLabel
+              />
+            </Box>
           </Box>
         ) : null}
         <IconButton aria-label="Close capture studio" onClick={handleClose} size="small">
@@ -412,76 +420,6 @@ export const TabCaptureStudioDialog: React.FC<TabCaptureStudioDialogProps> = ({
                     Paste a YouTube URL to load the video.
                   </Box>
                 )}
-              </Box>
-
-              <video
-                ref={videoRef}
-                autoPlay
-                muted
-                playsInline
-                aria-hidden
-                data-testid="tab-capture-hidden-video"
-                style={{
-                  position: "fixed",
-                  left: "-10000px",
-                  top: 0,
-                  width: 1280,
-                  height: 720,
-                  opacity: 0.01,
-                  pointerEvents: "none",
-                }}
-              />
-
-              <Box
-                sx={{
-                  flexShrink: 0,
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: 0.75,
-                  "& .MuiButton-root": {
-                    fontSize: "0.75rem",
-                    padding: "4px 12px",
-                    minHeight: 32,
-                    "& .MuiButton-startIcon": {
-                      marginRight: 0.5,
-                      "& > *:nth-of-type(1)": { fontSize: "1rem" },
-                    },
-                  },
-                }}
-              >
-                <Button
-                  size="small"
-                  label={sharing ? "Share tab again" : "Share this tab"}
-                  variantType="secondary"
-                  startIcon={<ScreenshotMonitorIcon />}
-                  onClick={() => void handleShareTab()}
-                  disabled={busy || !embedUrl}
-                />
-                <Button
-                  size="small"
-                  label={drawing ? "Drawing crop…" : "Draw crop"}
-                  variantType={drawing ? "secondary" : "primary"}
-                  startIcon={<CropFreeIcon />}
-                  onClick={() => setDrawing((v) => !v)}
-                  disabled={busy || !embedUrl}
-                />
-                <Button
-                  size="small"
-                  label="Capture frame"
-                  startIcon={<CameraAltIcon />}
-                  onClick={() => void handleCapture()}
-                  disabled={busy || !sharing || !isCropLargeEnough(crop) || atCap || !embedUrl}
-                />
-                <Button
-                  size="small"
-                  label="Clear crop"
-                  variantType="danger"
-                  onClick={() => {
-                    setCrop(null);
-                    setDrawing(false);
-                  }}
-                  disabled={busy || !crop}
-                />
               </Box>
             </Box>
 
@@ -604,29 +542,95 @@ export const TabCaptureStudioDialog: React.FC<TabCaptureStudioDialogProps> = ({
         )}
       </DialogContent>
 
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
+        playsInline
+        aria-hidden
+        data-testid="tab-capture-hidden-video"
+        style={{
+          position: "fixed",
+          left: "-10000px",
+          top: 0,
+          width: 1280,
+          height: 720,
+          opacity: 0.01,
+          pointerEvents: "none",
+        }}
+      />
+
       <DialogActions
+        disableSpacing
         sx={{
-          justifyContent: "center",
+          justifyContent: "space-between",
+          alignItems: "center",
           gap: 1,
           flexWrap: "wrap",
+          px: 2,
           py: 1,
           "& .MuiButton-root": {
-            fontSize: "0.8rem",
-            padding: "4px 14px",
-            minHeight: 34,
+            fontSize: "0.75rem",
+            padding: "4px 12px",
+            minHeight: 32,
+            "& .MuiButton-startIcon": {
+              marginRight: 0.5,
+              "& > *:nth-of-type(1)": { fontSize: "1rem" },
+            },
           },
         }}
       >
-        {isDesktop ? (
-          <Button
-            size="small"
-            label={busy ? "Working…" : "Download PDF"}
-            variantType="secondary"
-            onClick={() => void handleDownload()}
-            disabled={busy || slices.length === 0 || !title.trim()}
-          />
-        ) : null}
-        <Button size="small" label="Close" variantType="danger" onClick={handleClose} disabled={busy} />
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75, justifyContent: "flex-start" }}>
+          {isDesktop ? (
+            <>
+              <Button
+                size="small"
+                label={sharing ? "Share tab again" : "Share this tab"}
+                variantType="secondary"
+                startIcon={<ScreenshotMonitorIcon />}
+                onClick={() => void handleShareTab()}
+                disabled={busy || !embedUrl}
+              />
+              <Button
+                size="small"
+                label={drawing ? "Drawing crop…" : "Draw crop"}
+                variantType={drawing ? "secondary" : "primary"}
+                startIcon={<CropFreeIcon />}
+                onClick={() => setDrawing((v) => !v)}
+                disabled={busy || !embedUrl}
+              />
+              <Button
+                size="small"
+                label="Capture frame"
+                startIcon={<CameraAltIcon />}
+                onClick={() => void handleCapture()}
+                disabled={busy || !sharing || !isCropLargeEnough(crop) || atCap || !embedUrl}
+              />
+              <Button
+                size="small"
+                label="Clear crop"
+                variantType="danger"
+                onClick={() => {
+                  setCrop(null);
+                  setDrawing(false);
+                }}
+                disabled={busy || !crop}
+              />
+            </>
+          ) : null}
+        </Box>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75, justifyContent: "flex-end", ml: "auto" }}>
+          {isDesktop ? (
+            <Button
+              size="small"
+              label={busy ? "Working…" : "Download PDF"}
+              variantType="secondary"
+              onClick={() => void handleDownload()}
+              disabled={busy || slices.length === 0 || !title.trim()}
+            />
+          ) : null}
+          <Button size="small" label="Cancel" variantType="danger" onClick={handleClose} disabled={busy} />
+        </Box>
       </DialogActions>
     </Dialog>
   );

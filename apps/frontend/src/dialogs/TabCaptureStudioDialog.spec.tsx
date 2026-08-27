@@ -31,8 +31,8 @@ describe("TabCaptureStudioDialog", () => {
 
     expect(screen.queryByTitle("YouTube tablature video")).not.toBeInTheDocument();
 
-    fireEvent.change(screen.getByLabelText(/PDF title/i), { target: { value: "Wonderwall" } });
-    fireEvent.change(screen.getByLabelText(/YouTube URL/i), {
+    fireEvent.change(screen.getByPlaceholderText(/^Title$/i), { target: { value: "Wonderwall" } });
+    fireEvent.change(screen.getByPlaceholderText(/^Video URL$/i), {
       target: { value: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" },
     });
 
