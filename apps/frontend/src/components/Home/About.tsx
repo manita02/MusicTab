@@ -5,6 +5,7 @@ import { theme } from "../../theme/theme";
 import { Button } from "../Button/Button";
 import { useAuth } from "../../api/hooks/useAuth";
 import { CreateTabDialog } from "../../dialogs/CreateTabDialog";
+import { CaptureTabPdfButton } from "../CaptureTabPdfButton/CaptureTabPdfButton";
 import { canManageTabs, normalizeRole } from "../../auth/tabPermissions";
 
 export const AboutSection: React.FC = () => {
@@ -66,6 +67,8 @@ export const AboutSection: React.FC = () => {
             />
           </span>
         </Tooltip>
+
+        <CaptureTabPdfButton />
       </Box>
 
       <CreateTabDialog
