@@ -26,9 +26,10 @@ import {
   loadImageFromUrl,
   startTabDisplayStream,
   stopMediaStream,
+  waitForCleanCaptureFrame,
 } from "../tab-capture/tabCapture.capture";
 import { MAX_TAB_CAPTURES, TAB_CAPTURE_MIN_WIDTH_PCT } from "../tab-capture/tabCapture.constants";
-import { CropOverlay } from "../tab-capture/CropOverlay";
+import { CropOverlay, type CropOverlayHandle } from "../tab-capture/CropOverlay";
 import {
   clampWidthPct,
   isCropLargeEnough,
@@ -62,6 +63,7 @@ export const TabCaptureStudioDialog: React.FC<TabCaptureStudioDialogProps> = ({
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const cropOverlayRef = useRef<CropOverlayHandle>(null);
 
   const [title, setTitle] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
@@ -187,7 +189,9 @@ export const TabCaptureStudioDialog: React.FC<TabCaptureStudioDialogProps> = ({
     }
 
     setBusy(true);
+    cropOverlayRef.current?.setCapturing(true);
     try {
+      await waitForCleanCaptureFrame(video);
       const blob = await cropVideoFrameToBlob(video, mapped);
       const objectUrl = URL.createObjectURL(blob);
       const img = await loadImageFromUrl(objectUrl);
@@ -208,6 +212,7 @@ export const TabCaptureStudioDialog: React.FC<TabCaptureStudioDialogProps> = ({
       const message = err instanceof Error ? err.message : "Could not capture this frame.";
       setError(message);
     } finally {
+      cropOverlayRef.current?.setCapturing(false);
       setBusy(false);
     }
   };
@@ -244,7 +249,7 @@ export const TabCaptureStudioDialog: React.FC<TabCaptureStudioDialogProps> = ({
     }
     setBusy(true);
     try {
-      await exportTabCapturePdf(title, slices);
+      await exportTabCapturePdf(title, slices, youtubeUrl.trim() || embedUrl || "");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Could not generate the PDF.";
       setError(message);
@@ -374,7 +379,12 @@ export const TabCaptureStudioDialog: React.FC<TabCaptureStudioDialogProps> = ({
                       flexShrink: 0,
                     }}
                   >
-                    <CropOverlay drawing={drawing} crop={crop} onCropChange={setCrop}>
+                    <CropOverlay
+                      ref={cropOverlayRef}
+                      drawing={drawing}
+                      crop={crop}
+                      onCropChange={setCrop}
+                    >
                       <iframe
                         ref={iframeRef}
                         src={embedUrl}
