@@ -52,6 +52,13 @@ export const theme = createTheme({
         disableScrollLock: true,
       },
     },
+    MuiDialogTitle: {
+      styleOverrides: {
+        root: {
+          padding: "8px 16px",
+        },
+      },
+    },
     MuiButton: {
       styleOverrides: {
         root: {
