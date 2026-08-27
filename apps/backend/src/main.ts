@@ -17,6 +17,7 @@ async function bootstrap() {
   app.enableCors({
     origin: corsOrigins.length === 1 ? corsOrigins[0] : corsOrigins,
     credentials: true,
+    exposedHeaders: ['Content-Disposition'],
   });
 
   app.useGlobalFilters(new DomainErrorFilter());
