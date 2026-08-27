@@ -18,6 +18,7 @@ export interface InputFieldProps {
   onDrop?: (e: React.DragEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   size?: "small" | "medium";
+  hideLabel?: boolean;
 }
 
 export const InputField: React.FC<InputFieldProps> = ({
@@ -36,6 +37,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   onDrop,
   onBlur,
   size = "medium",
+  hideLabel = false,
 }) => {
   const preventDropOver = onDrop
     ? (e: React.DragEvent<HTMLInputElement>) => {
@@ -45,7 +47,7 @@ export const InputField: React.FC<InputFieldProps> = ({
 
   return (
     <TextField
-      label={label}
+      label={hideLabel ? undefined : label}
       value={value}
       onChange={onChange}
       placeholder={placeholder}
@@ -62,6 +64,8 @@ export const InputField: React.FC<InputFieldProps> = ({
       size={size}
       slotProps={{
         htmlInput: {
+          "aria-label": label,
+          placeholder,
           onPaste,
           onDrop,
           onDragOver: preventDropOver,

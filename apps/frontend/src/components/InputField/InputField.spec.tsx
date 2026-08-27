@@ -35,6 +35,14 @@ describe("InputField", () => {
     expect(handleSearch).toHaveBeenCalled();
   });
 
+  it("hides the visible label when hideLabel is set", () => {
+    render(
+      <InputField label="titulo" value="" onChange={() => {}} placeholder="titulo" hideLabel />,
+    );
+    expect(screen.queryByText("titulo")).not.toBeInTheDocument();
+    expect(screen.getByPlaceholderText("titulo")).toHaveAttribute("aria-label", "titulo");
+  });
+
   it("does not render search icon if isSearch=false", () => {
     render(<InputField label="NoSearch" value="" onChange={() => {}} />);
     const buttons = screen.queryAllByRole("button");
