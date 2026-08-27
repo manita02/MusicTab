@@ -38,29 +38,10 @@ describe("Navbar component", () => {
     expect(within(menu).queryByText(/Manage users/i)).not.toBeInTheDocument();
   });
 
-  test("shows Capture tab PDF only for ADMIN", () => {
+  test("does not show Capture tab PDF in the user menu", () => {
     renderNavbar({ isLoggedIn: true, userName: "root", userRole: "ADMIN" });
     fireEvent.click(screen.getByLabelText(/root menu/i));
-    expect(within(screen.getByRole("menu")).getByText(/Capture tab PDF/i)).toBeVisible();
-  });
-
-  test("hides Capture tab PDF for USER", () => {
-    renderNavbar({ isLoggedIn: true, userName: "Pepe123", userRole: "USER" });
-    fireEvent.click(screen.getByLabelText(/Pepe123 menu/i));
     expect(within(screen.getByRole("menu")).queryByText(/Capture tab PDF/i)).not.toBeInTheDocument();
-  });
-
-  test("hides Capture tab PDF for guest account menu", () => {
-    renderNavbar({ isLoggedIn: false });
-    fireEvent.click(screen.getByLabelText(/Account menu/i));
-    expect(within(screen.getByRole("menu")).queryByText(/Capture tab PDF/i)).not.toBeInTheDocument();
-  });
-
-  test("does not show Capture tab PDF in the mobile navigation menu", () => {
-    renderNavbar({ isLoggedIn: true, userName: "root", userRole: "ADMIN" });
-    fireEvent.click(screen.getByLabelText(/Navigation menu/i));
-    const mobileMenu = screen.getByTestId("mobile-menu");
-    expect(within(mobileMenu).queryByText(/Capture tab PDF/i)).not.toBeInTheDocument();
   });
 
   test("hides Manage users for USER", () => {

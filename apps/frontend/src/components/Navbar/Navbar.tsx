@@ -20,11 +20,10 @@ import PersonIcon from "@mui/icons-material/Person"; // 👤 user icon
 import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { canManageUsers, canUseTabCaptureStudio, normalizeRole } from "../../auth/tabPermissions";
+import { canManageUsers, normalizeRole } from "../../auth/tabPermissions";
 import { LATEST_TABS_QUERY_KEY } from "../../api/hooks/useLatestTabs";
 import { backupErrorMessage, useDownloadBackup } from "../../api/hooks/useDownloadBackup";
 import { MessageModal } from "../MessageModal/MessageModal";
-import { TabCaptureStudioDialog } from "../../dialogs/TabCaptureStudioDialog";
 
 interface NavbarProps {
   isLoggedIn: boolean;
@@ -64,8 +63,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const canSeeManageUsers = canManageUsers(isLoggedIn, normalizeRole(userRole));
-  const canSeeTabCapture = canUseTabCaptureStudio(isLoggedIn, normalizeRole(userRole));
-  const [tabCaptureOpen, setTabCaptureOpen] = React.useState(false);
   const { download: downloadBackup, isDownloading: isDownloadingBackup } = useDownloadBackup();
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => setAnchorElNav(event.currentTarget);
@@ -342,23 +339,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </MenuItem>
               </Tooltip>
             )}
-            {canSeeTabCapture && (
-              <Tooltip
-                title="Build a PDF from YouTube tablature screenshots. Desktop Chrome or Edge."
-                arrow
-                placement="left"
-              >
-                <MenuItem
-                  onClick={() => {
-                    handleCloseUserMenu();
-                    setTabCaptureOpen(true);
-                  }}
-                  sx={{ justifyContent: "center" }}
-                >
-                  <Typography sx={{ width: "100%", textAlign: "center" }}>Capture tab PDF</Typography>
-                </MenuItem>
-              </Tooltip>
-            )}
             {canSeeManageUsers && (
               <MenuItem
                 onClick={() => {
@@ -411,7 +391,6 @@ export const Navbar: React.FC<NavbarProps> = ({
         onConfirm={() => setBackupModal((prev) => ({ ...prev, open: false }))}
         onCancel={() => setBackupModal((prev) => ({ ...prev, open: false }))}
       />
-      <TabCaptureStudioDialog open={tabCaptureOpen} onClose={() => setTabCaptureOpen(false)} />
     </AppBar>
   );
 };
