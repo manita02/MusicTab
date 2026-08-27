@@ -44,6 +44,8 @@ apps/backend/src/generated/prisma
 *.sln
 *.sw?
 
+**/musictab-backup-*.sql
+
 # Temp / coverage files
 /temp
 .tmp

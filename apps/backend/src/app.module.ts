@@ -5,6 +5,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { UserController } from './controllers/user.controller';
 import { TabController } from './controllers/tab.controller';
+import { BackupController } from './backup/backup.controller';
+import { BackupSqlService } from './backup/backup-sql.service';
 
 import { PrismaModule } from './prisma/prisma.module';
 import { CopilotModule } from './copilot/copilot.module';
@@ -43,9 +45,11 @@ import { TurnstileService } from './auth/turnstile.service';
     TabController,
     CatalogController,
     StatsController,
+    BackupController,
   ],
   providers: [
     AppService,
+    BackupSqlService,
     UserPrismaRepository,
     TabPrismaRepository,
     SessionPrismaRepository,

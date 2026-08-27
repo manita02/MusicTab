@@ -18,6 +18,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node scripts/start-prod.cjs",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "backup:sql": "npx ts-node --compiler-options {\"module\":\"CommonJS\",\"moduleResolution\":\"node\"} src/backup/backup-sql.cli.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",

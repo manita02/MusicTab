@@ -5,7 +5,7 @@ export default defineConfig({
   root: path.resolve(__dirname),
   test: {
     environment: 'node',
-    include: ['src/copilot/**/*.spec.ts'],
+    include: ['src/copilot/**/*.spec.ts', 'src/backup/**/*.spec.ts'],
     exclude: [
       'src/copilot/copilot.controller.spec.ts',
       'src/copilot/quota/argentina-calendar.spec.ts',

@@ -31,4 +31,7 @@ export const ENDPOINTS = {
     global: "/stats/global",
     me: "/stats/me",
   },
+  backup: {
+    download: "/admin/backup.sql",
+  },
 };

@@ -73,3 +73,7 @@ Register the production frontend hostname in Cloudflare Turnstile.
 5. Confirm `GEMINI_API_KEY` so Pua can call Gemini
 
 The first request after idle time on Render Free may take ~1 minute (cold start). Neon data is **not** deleted after 30 days.
+
+## 5. Data backup (ADMIN, manual restore)
+
+Logged-in **ADMIN**s can download a `.sql` dump from the avatar menu (**Download SQL backup**). Restore by hand after `prisma migrate deploy` (`SEED_ON_BOOT=false`): run the file against Neon with **DIRECT_URL** (not the pooler) — SQL Editor if small, otherwise `psql "$DIRECT_URL" -f musictab-backup.sql`. Check `SELECT COUNT(*) FROM "User";` / `"Tab";` / `"Genre";` and log in with a dumped user. Do **not** run `prisma:seed` afterwards. Treat the file as a secret (hashes + PII).

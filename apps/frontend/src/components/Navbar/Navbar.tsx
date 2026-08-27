@@ -22,6 +22,8 @@ import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { canManageUsers, normalizeRole } from "../../auth/tabPermissions";
 import { LATEST_TABS_QUERY_KEY } from "../../api/hooks/useLatestTabs";
+import { backupErrorMessage, useDownloadBackup } from "../../api/hooks/useDownloadBackup";
+import { MessageModal } from "../MessageModal/MessageModal";
 
 interface NavbarProps {
   isLoggedIn: boolean;
@@ -51,10 +53,17 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+  const [backupModal, setBackupModal] = React.useState<{
+    open: boolean;
+    type: "success" | "error";
+    title: string;
+    message: string;
+  }>({ open: false, type: "error", title: "", message: "" });
   const theme = useTheme();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const canSeeManageUsers = canManageUsers(isLoggedIn, normalizeRole(userRole));
+  const { download: downloadBackup, isDownloading: isDownloadingBackup } = useDownloadBackup();
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => setAnchorElNav(event.currentTarget);
   const handleCloseNavMenu = () => setAnchorElNav(null);
@@ -73,6 +82,25 @@ export const Navbar: React.FC<NavbarProps> = ({
       return;
     }
     navigate(path);
+  };
+
+  const handleDownloadBackup = async () => {
+    try {
+      await downloadBackup();
+      setBackupModal({
+        open: true,
+        type: "success",
+        title: "Backup downloaded",
+        message: "Restore the file manually in Neon.",
+      });
+    } catch (err) {
+      setBackupModal({
+        open: true,
+        type: "error",
+        title: "Backup failed",
+        message: backupErrorMessage(err),
+      });
+    }
   };
 
   const menuItems = isLoggedIn
@@ -322,6 +350,26 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <Typography sx={{ width: "100%", textAlign: "center" }}>Manage users</Typography>
               </MenuItem>
             )}
+            {canSeeManageUsers && (
+              <Tooltip
+                title="Manual restore in Neon. The file contains password hashes and personal data."
+                arrow
+                placement="left"
+              >
+                <MenuItem
+                  disabled={isDownloadingBackup}
+                  onClick={() => {
+                    handleCloseUserMenu();
+                    void handleDownloadBackup();
+                  }}
+                  sx={{ justifyContent: "center" }}
+                >
+                  <Typography sx={{ width: "100%", textAlign: "center" }}>
+                    {isDownloadingBackup ? "Downloading…" : "Download SQL backup"}
+                  </Typography>
+                </MenuItem>
+              </Tooltip>
+            )}
             {menuItems.map(({ label, action }) => (
               <MenuItem
                 key={label}
@@ -334,6 +382,15 @@ export const Navbar: React.FC<NavbarProps> = ({
           </Menu>
         </Box>
       </Toolbar>
+      <MessageModal
+        open={backupModal.open}
+        type={backupModal.type}
+        title={backupModal.title}
+        message={backupModal.message}
+        confirmText="Accept"
+        onConfirm={() => setBackupModal((prev) => ({ ...prev, open: false }))}
+        onCancel={() => setBackupModal((prev) => ({ ...prev, open: false }))}
+      />
     </AppBar>
   );
 };
