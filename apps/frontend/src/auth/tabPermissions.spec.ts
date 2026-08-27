@@ -4,6 +4,7 @@ import {
   canManageTabs,
   canManageUsers,
   canMutateTab,
+  canUseTabCaptureStudio,
   normalizeRole,
 } from "./tabPermissions";
 
@@ -12,6 +13,12 @@ describe("tabPermissions", () => {
     expect(canManageTabs(true, normalizeRole("ADMIN"))).toBe(true);
     expect(canManageTabs(true, normalizeRole("USER"))).toBe(false);
     expect(canManageTabs(false, normalizeRole(null))).toBe(false);
+  });
+
+  it("solo admin puede usar el studio de captura PDF", () => {
+    expect(canUseTabCaptureStudio(true, normalizeRole("ADMIN"))).toBe(true);
+    expect(canUseTabCaptureStudio(true, normalizeRole("USER"))).toBe(false);
+    expect(canUseTabCaptureStudio(false, normalizeRole(null))).toBe(false);
   });
 
   it("solo admin puede gestionar usuarios", () => {
