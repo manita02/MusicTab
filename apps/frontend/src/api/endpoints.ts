@@ -8,6 +8,7 @@ export const ENDPOINTS = {
   },
   catalogs: {
     genres: "/catalogs/genres",
+    genre: (id: number | string) => `/catalogs/genres/${id}`,
     instruments: "/catalogs/instruments",
   },
   tabs: {
