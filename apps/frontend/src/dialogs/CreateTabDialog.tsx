@@ -20,6 +20,7 @@ import { useCreateTab } from "../api/hooks/useCreateTab";
 import { useAuth } from "../api/hooks/useAuth";
 import { canManageTabs, normalizeRole } from "../auth/tabPermissions";
 import { getYouTubeEmbedUrl } from "../utils/youtube";
+import { ManageGenresDialog } from "./ManageGenresDialog";
 
 interface CreateTabDialogProps {
   open: boolean;
@@ -52,6 +53,7 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
   const [modalType, setModalType] = useState<"success" | "error" | "warning">("success");
   const [modalMessage, setModalMessage] = useState("");
   const [modalTitle, setModalTitle] = useState("");
+  const [manageGenresOpen, setManageGenresOpen] = useState(false);
 
   const { data: genres = [], isLoading: loadingGenres } = useGenres();
   const { data: instruments = [], isLoading: loadingInstruments } = useInstruments();
@@ -206,12 +208,22 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
         onConfirm={handleModalClose}
       />
 
+      <ManageGenresDialog
+        open={manageGenresOpen}
+        onClose={() => setManageGenresOpen(false)}
+        onCreated={(created) => setGenre(created.id.toString())}
+        onDeleted={(id) => {
+          if (genre === id.toString()) setGenre("");
+        }}
+      />
+
       <Dialog
         open={open}
         onClose={onClose}
         fullWidth
         maxWidth="md"
         fullScreen={fullScreen}
+        disableEnforceFocus={manageGenresOpen}
         PaperProps={{
           sx: {
             borderRadius: { xs: 0, md: 3 },
@@ -260,6 +272,21 @@ export const CreateTabDialog: React.FC<CreateTabDialogProps> = ({
                 onChange={(e) => setGenre(e.target.value)}
                 options={loadingGenres ? [] : genres.map((g) => ({ value: g.id.toString(), label: g.name }))}
                 fullWidth
+              />
+              <Button
+                type="button"
+                label="Manage genres"
+                variantType="primary"
+                size="small"
+                onClick={() => setManageGenresOpen(true)}
+                sx={{
+                  mt: 0.75,
+                  minHeight: 32,
+                  py: 0.25,
+                  px: 1.5,
+                  fontSize: "0.8rem",
+                  width: { xs: "100%", sm: "auto" },
+                }}
               />
             </Grid>
             <Grid size={{ xs: 12, md: 6, lg: 4 }}>
