@@ -7,13 +7,23 @@ export class Genre {
   ) {}
 
   static create(id: number, name: string): Genre {
-    if (!name || name.trim().length === 0) {
+    const trimmed = name?.trim() ?? "";
+    if (!trimmed) {
       throw new DomainError("GenreError", "Genre name cannot be empty");
     }
-    return new Genre(id, name);
+    return new Genre(id, trimmed);
+  }
+
+  /** Unsaved genre (id 0 until the repository assigns one). */
+  static createNew(name: string): Genre {
+    return Genre.create(0, name);
   }
 
   static rehydrate(id: number, name: string): Genre {
     return new Genre(id, name);
+  }
+
+  rename(name: string): Genre {
+    return Genre.create(this.id, name);
   }
 }
