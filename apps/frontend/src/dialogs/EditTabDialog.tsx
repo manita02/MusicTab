@@ -17,6 +17,7 @@ import { IconLoader } from "../components/IconLoader/IconLoader";
 import { MessageModal } from "../components/MessageModal/MessageModal";
 import { useGenres, useInstruments } from "../api/hooks/useCatalog";
 import { useUpdateTab } from "../api/hooks/useUpdateTab";
+import { getYouTubeEmbedUrl } from "../utils/youtube";
 
 interface EditTabDialogProps {
   open: boolean;
@@ -114,13 +115,6 @@ export const EditTabDialog: React.FC<EditTabDialogProps> = ({
         showModal("error", "Error Updating Tab", backendMsg);
       },
     });
-  };
-
-  const getYouTubeEmbedUrl = (url: string) => {
-    const regExp =
-      /(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-    const match = url.match(regExp);
-    return match ? `https://www.youtube.com/embed/${match[1]}` : null;
   };
 
   const embedUrl = getYouTubeEmbedUrl(youtubeUrl);

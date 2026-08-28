@@ -38,10 +38,10 @@ describe("Navbar component", () => {
     expect(within(menu).queryByText(/Manage users/i)).not.toBeInTheDocument();
   });
 
-  test("shows Manage users only for ADMIN", () => {
+  test("does not show Capture tab PDF in the user menu", () => {
     renderNavbar({ isLoggedIn: true, userName: "root", userRole: "ADMIN" });
     fireEvent.click(screen.getByLabelText(/root menu/i));
-    expect(within(screen.getByRole("menu")).getByText(/Manage users/i)).toBeVisible();
+    expect(within(screen.getByRole("menu")).queryByText(/Capture tab PDF/i)).not.toBeInTheDocument();
   });
 
   test("hides Manage users for USER", () => {

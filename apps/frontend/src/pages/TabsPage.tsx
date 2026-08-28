@@ -21,6 +21,7 @@ import { Button } from "../components/Button/Button";
 import { InputField } from "../components/InputField/InputField";
 import { SelectField } from "../components/SelectField/SelectField";
 import { CreateTabDialog } from "../dialogs/CreateTabDialog";
+import { CaptureTabPdfButton } from "../components/CaptureTabPdfButton/CaptureTabPdfButton";
 import { useAuth } from "../api/hooks/useAuth";
 import { useAllTabs } from "../api/hooks/useTabs";
 import { useGenres, useInstruments } from "../api/hooks/useCatalog";
@@ -39,6 +40,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { api } from "../api/client";
 import { ENDPOINTS } from "../api/endpoints";
 import { STATS_GLOBAL_QUERY_KEY, STATS_ME_QUERY_KEY } from "../api/hooks/useStats";
+import { getYouTubeEmbedUrl } from "../utils/youtube";
 
 const GUEST_TABS_MESSAGE =
   "You can browse all published tabs below. Buttons for PDF download and tab editing are locked until you sign in. Sign in or create an account to unlock downloads. Only admins can create tabs, and an admin can edit or delete only the tabs they created.";
@@ -227,13 +229,6 @@ export const TabsPage: React.FC = () => {
 
   const getInstrumentName = (id: number) =>
     instruments.find((i: any) => i.id === id)?.name || "-";
-
-  const getYouTubeEmbedUrl = (url: string) => {
-    const regExp =
-      /(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-    const match = url?.match(regExp);
-    return match ? `https://www.youtube.com/embed/${match[1]}` : null;
-  };
 
   const rows =
     filteredTabs?.map((tab: any) => ({
@@ -673,6 +668,9 @@ export const TabsPage: React.FC = () => {
                   />
                 </span>
               </Tooltip>
+            </Grid>
+            <Grid size={{ xs: 12, sm: "auto" }}>
+              <CaptureTabPdfButton sx={{ height: 56 }} />
             </Grid>
           </Grid>
 

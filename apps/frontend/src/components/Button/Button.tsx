@@ -10,6 +10,7 @@ type MusicButtonProps = MUIButtonProps & {
 export const Button: React.FC<MusicButtonProps> = ({
   label,
   variantType = "primary",
+  sx,
   ...props
 }) => {
   let color: MUIButtonProps["color"] = "primary";
@@ -22,11 +23,14 @@ export const Button: React.FC<MusicButtonProps> = ({
       variant="contained"
       color={color}
       {...props}
-      sx={{
-        "&:hover": {
-          fontWeight: "bold",
+      sx={[
+        {
+          "&:hover": {
+            fontWeight: "bold",
+          },
         },
-      }}
+        ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
+      ]}
     >
       {label}
     </ButtonMUI>
